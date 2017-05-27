@@ -83,6 +83,15 @@ DEPARTMENT_FIT_CTU_KAM = "KAM"     # katedra aplikovane matematiky
 DEPARTMENT_FELK_CTU_CS = "CS"      # katedra pocitacu
 DEPARTMENT_FELK_CTU_DCGI = "DCGI"  # katedra pocitacove grafiky a interakce
 
+DEPARTMENT_FAI_UTB_UAI = "UAI"     # ustav aplikovane informatiky
+DEPARTMENT_FAI_UTB_UIUI = "UIUI"   # ustav informatiky a umele inteligence
+DEPARTMENT_FAI_UTB_UPKS = "UPKS"   # ustav pocitacovych a komunikacnich systemu
+DEPARTMENT_FAI_UTB_UART = "UART"   # ustav automatizace a ridici techniky
+DEPARTMENT_FAI_UTB_UELM = "UELM"   # ustav elektroniky a mereni
+DEPARTMENT_FAI_UTB_UBI = "UBI"     # ustav bezpecnostniho inzenyrstvi
+DEPARTMENT_FAI_UTB_UM = "UM"       # ustav matematiky
+DEPARTMENT_FAI_UTB_URP = "URP"     # ustav rizeni procesu
+
 FIELD_AI = "artificial intelligence"
 FIELD_CG = "computer graphics"
 FIELD_NET = "computer networks"
@@ -661,13 +670,62 @@ class CtuDownloader(FacultyDownloader):
 
 #----------------------------------------
 
+class FaiUtbDownloader(FacultyDownloader):
+
+  BASE_URL = "http://digilib.k.utb.cz/"
+
+  def get_thesis_list(self):
+    result = []
+
+    lists = (
+      (DEPARTMENT_FAI_UTB_UAI,   THESIS_MASTER,    77),
+      (DEPARTMENT_FAI_UTB_UART,  THESIS_BACHELOR,  90),
+      (DEPARTMENT_FAI_UTB_UIUI,  THESIS_BACHELOR,  94),
+      (DEPARTMENT_FAI_UTB_UIUI,  THESIS_MASTER,    154),
+      (DEPARTMENT_FAI_UTB_UAI,   THESIS_BACHELOR,  76),
+      (DEPARTMENT_FAI_UTB_UART,  THESIS_MASTER,    91),
+      (DEPARTMENT_FAI_UTB_UBI,   THESIS_BACHELOR,  92),
+      (DEPARTMENT_FAI_UTB_UBI,   THESIS_MASTER,    152),
+      (DEPARTMENT_FAI_UTB_UELM,  THESIS_BACHELOR,  93),
+      (DEPARTMENT_FAI_UTB_UELM,  THESIS_MASTER,    153),
+      (DEPARTMENT_FAI_UTB_UPKS,  THESIS_BACHELOR,  95),
+      (DEPARTMENT_FAI_UTB_UPKS,  THESIS_MASTER,    155),
+      (DEPARTMENT_FAI_UTB_URP,   THESIS_BACHELOR,  95),
+      (DEPARTMENT_FAI_UTB_URP,   THESIS_BACHELOR,  156),
+      (0,                        THESIS_PHD,       78)
+      )
+
+    for l in lists:
+      offset = 0
+
+      while True:    # for each page
+        soup = BeautifulSoup(download_webpage("http://digilib.k.utb.cz/handle/10563/" + str(l[2]) + "/recent-submissions?offset=" + str(offset)),"lxml")
+
+        if not soup.find("a",class_="next-page-link"):
+          break
+
+        current = soup.find("div",class_="pagination top")
+
+        while True:
+          current = current.find_next(lambda t: t.name == "a" and t.next_sibling != None and t["href"].find("=") == -1 and t["href"][:3] == "/ha" and t.string != "Next Page") 
+
+          if not current:
+            break
+
+          result.append(FaiUtbDownloader.BASE_URL + current["href"][1:])
+
+        offset += 20
+
+    return result
+
+#----------------------------------------
+
 fit_vut = FitButDownloader()
 ctu = CtuDownloader()
+fai_utb = FaiUtbDownloader()
 
-others = ctu.get_others()
-
-for o in others:
-  print(o)
+for l in fai_utb.get_thesis_list():
+  print(l)
 
 #for l in fit_vut.get_thesis_list():
 #  print(l)
