@@ -19,6 +19,7 @@ THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
 THESIS_PHD = "PhD"              # PhD.
 THESIS_DR = "small doctorate"   # PhDr, RNDr, ...
+THESIS_DOC = "habilitation"     # Doc.
 
 DEGREE_BC = "Bc."
 DEGREE_ING = "Ing."
@@ -224,6 +225,14 @@ class Thesis():
   def __str__(self):
     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False)
 
+  def incorporate_pdf_indo(self, pdf_info):
+    self.pages = pdf_info.pages
+    self.size = pdf_info.size    
+    self.typesetting_system = pdf_info.typesetting_system
+
+    if self.language == None:
+      self.language = pdf_info.language
+
 class PDFInfo:
   def __init__(self, filename):
     self.language = None
@@ -328,9 +337,12 @@ class FitButDownloader(FacultyDownloader):
     elif thesis_url_substring == "DP":
       result.kind = THESIS_MASTER
       result.degree = DEGREE_ING
-    else:
+    elif thesis_url_substring == "PD":
       result.kind = THESIS_PHD
       result.degree = DEGREE_PHD
+    elif url.find("HABIL"):
+      result.kind = THESIS_DOC
+      result.degree = DEGREE_DOC
 
     url = url.replace(".php.cs",".php").replace(".php.en",".php") 
     soup = BeautifulSoup(download_webpage(url.replace(".php",".php.cs",1)),"lxml")
@@ -417,25 +429,33 @@ class FitButDownloader(FacultyDownloader):
         }
 
       result.field = department_to_field[result.department]
-     
-    result.abstract_cs = text_in_table("Abstrakt")
-    result.abstract_en = text_in_table("Abstract",False)
+    
+    if result.kind == THESIS_DOC:
+      result.abstract_cs = text_in_table("Anotace")
+      result.abstract_en = text_in_table("Annotation",False)
+    else: 
+      result.abstract_cs = text_in_table("Abstrakt")
+      result.abstract_en = text_in_table("Abstract",False)
 
     result.url_page = url
 
-    result.url_fulltext = FitButDownloader.BASE_URL + soup.find("a",string="Text práce")["href"][1:]
-
-    state_string = text_in_table("Stav:") 
-
-    result.defended = state_string[0] == "o"  # for "pbhájeno"
-
-    if result.defended:
-      result.mark = state_string[-1]
+    if result.kind == THESIS_DOC:
+      result.url_fulltext = FitButDownloader.BASE_URL + soup.find(lambda t: t.name == "a" and t.string != None and t.string[-4:] == ".pdf")["href"][1:]
+      result.defended = True
     else:
-      result.mark = MARK_F
+      result.url_fulltext = FitButDownloader.BASE_URL + soup.find("a",string="Text práce")["href"][1:]
+ 
+      state_string = text_in_table("Stav:")
+      
+      result.defended = state_string[0] == "o"  # for "pbhájeno"
 
-    if not result.mark in ALL_MARKS:
-      result.mark = None    
+      if result.defended:
+        result.mark = state_string[-1]
+      else:
+        result.mark = MARK_F
+
+      if not result.mark in ALL_MARKS:
+        result.mark = None    
 
     try:
       lang_string = text_in_table("Jazyk:")
@@ -458,14 +478,8 @@ class FitButDownloader(FacultyDownloader):
       debug_print("keywords not found:" + str(e)) 
 
     pdf_info = download_and_analyze_pdf(FitButDownloader.BASE_URL + result.url_fulltext)
-  
-    result.pages = pdf_info.pages
-
-    if result.language == None:
-      result.language = pdf_info.language
-
-    result.typesetting_system = pdf_info.typesetting_system   
-    result.size = pdf_info.size
+ 
+    result.incorporate_pdf_indo(pdf_info) 
  
     return result
 
@@ -475,13 +489,18 @@ class FitButDownloader(FacultyDownloader):
 
     result = []
 
-    for thesis_type in ["BP","DP","PD"]:
-      soup = BeautifulSoup(download_webpage(FitButDownloader.BASE_URL + "study/DP/" + thesis_type + ".php?y=*&ved=&st=&t=&k="),"lxml")
+    for thesis_type in ["BP","DP","PD","DOC"]:
+      if thesis_type == "DOC":
+        url = FitButDownloader.BASE_URL + "research/habilitace/"
+      else:
+        url = FitButDownloader.BASE_URL + "study/DP/" + thesis_type + ".php?y=*&ved=&st=&t=&k="
+
+      soup = BeautifulSoup(download_webpage(url),"lxml")
 
       link_tags = soup.find_all(is_thesis_link)
 
       for link_tag in link_tags:
-        result.append(link_tag["href"])
+        result.append(FitButDownloader.BASE_URL + link_tag["href"][1:])
     
     return result
 
@@ -491,8 +510,58 @@ class CtuDownloader(FacultyDownloader):
 
   BASE_URL = "https://dip.felk.cvut.cz/browse/"
 
-  def get_thesis_info(self, url): 
-    pass
+  def get_others(self):
+    result = []
+
+    url_phd = "https://www.fit.cvut.cz/fakulta/veda/doktorandi/disertacni-prace"
+    url_doc = "https://www.fit.cvut.cz/node/2373"
+
+    for other_type in (0,1):
+      soup = BeautifulSoup(download_webpage(url_phd if other_type == 0 else url_doc),"lxml")
+
+      current = soup.find("table",class_="tabulka")
+
+      state = 0
+
+      while True:
+        current = current.find_next("td")
+        
+        if current == None:
+          break
+
+        if state == 0:    # author
+          result.append(Thesis())
+
+          result[-1].defended = True
+          result[-1].faculty = FACULTY_FIT_CTU
+          result[-1].kind = THESIS_PHD if other_type == 0 else THESIS_DOC
+          result[-1].degree = DEGREE_PHD if other_type == 0 else DEGREE_DOC
+
+          result[-1].author = Person()
+          result[-1].author.from_string(current.string)
+          state += 1
+        elif state == 1:  # title and link
+          result[-1].title_en = current.contents[1].string
+          
+          if current.contents[1].name == "a":
+            result[-1].url_fulltext = current.contents[1]["href"] 
+
+          result[-1].url_page = url_phd
+          state += 1
+        elif state == 2:
+
+          if other_type == 0:
+            result[-1].year = current.contents[1].string.split(".")[2]
+          else:
+            result[-1].year = current.string.split(".")[2]
+
+          state += 1
+        elif state == 3:
+          state = 0
+
+    return result
+
+
 
   def get_thesis_list(self):
     result = []
@@ -539,7 +608,7 @@ class CtuDownloader(FacultyDownloader):
       "K103": DEPARTMENT_FIT_CTU_KCN,
       "K104": DEPARTMENT_FIT_CTU_KPS,
       "K105": DEPARTMENT_FIT_CTU_KAM,
-      "K13131": DEPARTMENT_FELK_CTU_CS,
+      "K13136": DEPARTMENT_FELK_CTU_CS,
       "K13139": DEPARTMENT_FELK_CTU_DCGI 
       }
 
@@ -582,6 +651,7 @@ class CtuDownloader(FacultyDownloader):
     result.url_fulltext = CtuDownloader.BASE_URL + soup.find("td",string="fulltext").find_next("a")["href"] 
 
     pdf_info = download_and_analyze_pdf(result.url_fulltext)
+    result.incorporate_pdf_indo(pdf_info)
 
     result.pages = pdf_info.pages
     result.typesetting_system = pdf_info.typesetting_system
@@ -591,16 +661,23 @@ class CtuDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-#f = FitButDownloader()
-#info = f.get_thesis_info("http://www.fit.vutbr.cz/study/DP/BP.php?id=2581&y=0")
+fit_vut = FitButDownloader()
+ctu = CtuDownloader()
+
+others = ctu.get_others()
+
+for o in others:
+  print(o)
+
+#for l in fit_vut.get_thesis_list():
+#  print(l)
+
+#info = fit_vut.get_thesis_info("http://www.fit.vutbr.cz/research/habilitace/index.php?id=10697&type=HABIL")
 #print(str(info))
 
-f2 = CtuDownloader()
+#l = ctu.get_thesis_list()
+#  print(l)
 
-#l = f2.get_thesis_list()
-#for ll in l:
-#  print(ll)
-
-print(f2.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F3&d=K13139&y=1988&a=pytelma1&t=bach"))
+#print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F3&d=K13136&y=2005&a=franc&t=dipl"))
 
 
