@@ -13,6 +13,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf8")
 
+ANALYZE_PDFS = False
+
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
 THESIS_PHD = "PhD"              # PhD.
@@ -62,7 +64,8 @@ LANGUAGE_SK = "sk"
 FACULTY_MFF_CUNI = "MFF CUNI"
 FACULTY_FIT_BUT = "FIT BUT"
 FACULTY_FI_MUNI = "FI MUNI"
-FACULTY_FIT_CVUT = "FIT CVUT"
+FACULTY_FELK_CTU = "FELK CVUT"
+FACULTY_FIT_CTU = "FIT CTU"
 FACULTY_FEI_VSB = "FEI VŠB"
 FACULTY_FAI_UTB = "FAI UTB"
 
@@ -71,11 +74,13 @@ DEPARTMENT_FIT_BUT_UPSY = "UPSY"   # ustav pocitacovych systemu
 DEPARTMENT_FIT_BUT_UIFS = "UIFS"   # ustav informacnich systemu
 DEPARTMENT_FIT_BUT_UITS = "UITS"   # ustav inteligentnich systemu
 
-DEPARTMENT_FIT_CVUT_KTI = "KTI"    # katedra teoreticke informatiky
-DEPARTMENT_FIT_CVUT_KSI = "KSI"    # katedra softwaroveho inzenyrstvi
-DEPARTMENT_FIT_CVUT_KCN = "KCN"    # katedra cislicoveho navrhu
-DEPARTMENT_FIT_CVUT_KPS = "KPS"    # katedra pocitacovych systemu
-DEPARTMENT_FIT_CVUT_KAM = "KAM"    # katedra aplikovane matematiky
+DEPARTMENT_FIT_CTU_KTI = "KTI"     # katedra teoreticke informatiky
+DEPARTMENT_FIT_CTU_KSI = "KSI"     # katedra softwaroveho inzenyrstvi
+DEPARTMENT_FIT_CTU_KCN = "KCN"     # katedra cislicoveho navrhu
+DEPARTMENT_FIT_CTU_KPS = "KPS"     # katedra pocitacovych systemu
+DEPARTMENT_FIT_CTU_KAM = "KAM"     # katedra aplikovane matematiky
+DEPARTMENT_FELK_CTU_CS = "CS"      # katedra pocitacu
+DEPARTMENT_FELK_CTU_DCGI = "DCGI"  # katedra pocitacove grafiky a interakce
 
 FIELD_AI = "artificial intelligence"
 FIELD_CG = "computer graphics"
@@ -145,6 +150,9 @@ NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Linda", "Ivana", "Michala", "Karolína", "Sára",
   "Ingrid", "Ema", "Zlata", "Emílie", "Ivona"]
 
+def debug_print(print_string):
+  print(print_string)
+
 class Person:
   def __init__(self):
    
@@ -211,6 +219,7 @@ class Thesis():
     self.field = None
     self.abstract_en = None
     self.abstract_cs = None
+    self.size = None                # in bytes
 
   def __str__(self):
     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False)
@@ -220,16 +229,27 @@ class PDFInfo:
     self.language = None
     self.pages = None
     self.typesetting_system = None
-    self.size = 0                     # in bytes
+    self.size = None                     # in bytes
+    self.characters = None
+
+    if not ANALYZE_PDFS:
+      return
 
     try:
       input_pdf = PdfFileReader(open(filename,"rb"))
-      self.language = langdetect.detect(input_pdf.getPage(10).extractText())    # we suppose page 10 exists and has some text
+
       self.pages = input_pdf.getNumPages()
+     
+      self.pdf_text = ""
 
+      for page in range(self.pages):
+        self.pdf_text += input_pdf.getPage(page).extractText()
+
+      self.characters = len(self.pdf_text)
+
+      self.language = langdetect.detect(self.pdf_text)    # we suppose page 10 exists and has some text
+ 
       created_with = input_pdf.getDocumentInfo().creator
-
-      print(created_with)
 
       if created_with[:5].lower() == "latex":
         self.typesetting_system = SYSTEM_LATEX
@@ -241,7 +261,7 @@ class PDFInfo:
       self.size = os.path.getsize(filename)
 
     except Exception as e:
-      print("ERROR: could not analyze PDF: " + str(e))
+      debug_print("ERROR: could not analyze PDF: " + str(e))
 
 def beautify_list(keywords):  # removes duplicates, empties, strips etc.
   return [item.decode("utf-8") for item in map(lambda s: s.lstrip().rstrip(), list(set(keywords))) if len(item) > 1]
@@ -258,6 +278,9 @@ def download_to_file(url, filename):
     local_file.write(web_file.read()) 
 
 def download_and_analyze_pdf(url):
+  if not ANALYZE_PDFS:
+    return PDFInfo(None) 
+
   download_to_file(url,"tmp.pdf")
   return PDFInfo("tmp.pdf")
 
@@ -287,6 +310,8 @@ class FacultyDownloader:              # base class for downloaders of theses of 
 #----------------------------------------
 
 class FitButDownloader(FacultyDownloader):
+
+  BASE_URL = "http://www.fit.vutbr.cz/"
 
   def get_thesis_info(self, url): 
     result = Thesis()
@@ -323,7 +348,7 @@ class FitButDownloader(FacultyDownloader):
         new_person.from_string(text_in_table(line),False)
         return new_person
       except Exception as e:
-        print(line + " not found: " + str(e))
+        debug_print(line + " not found: " + str(e))
         return None
 
     result.author = person_from_table(u"Student:")
@@ -338,7 +363,7 @@ class FitButDownloader(FacultyDownloader):
       else: 
         result.year = text_in_table(u"Ak.rok:").split("/")[1]
     except Exception as e:
-      print("year not found: " + str(e))
+      debug_print("year not found: " + str(e))
 
     result.title_en = soup_en.find("h2").string
     result.title_cs = soup.find("h2").string
@@ -363,7 +388,7 @@ class FitButDownloader(FacultyDownloader):
           break
 
     except Exception as e:
-      print("branch could not be resolved: " + str(e))
+      debug_print("branch could not be resolved: " + str(e))
 
     try:
       department_string = text_in_table("Ústav:")
@@ -381,7 +406,7 @@ class FitButDownloader(FacultyDownloader):
           break
 
     except Exception as e:
-      print("department could not be resolved: " + str(e))
+      debug_print("department could not be resolved: " + str(e))
 
     if result.field == None and result.department != None:
       department_to_field = {
@@ -398,7 +423,7 @@ class FitButDownloader(FacultyDownloader):
 
     result.url_page = url
 
-    result.url_fulltext = soup.find("a",string="Text práce")["href"]
+    result.url_fulltext = FitButDownloader.BASE_URL + soup.find("a",string="Text práce")["href"][1:]
 
     state_string = text_in_table("Stav:") 
 
@@ -422,7 +447,7 @@ class FitButDownloader(FacultyDownloader):
       elif lang_string == "slovenština":
         result.language = LANGUAGE_SK
     except Exception as e:
-      print("language not found: " + str(e))
+      debug_print("language not found: " + str(e))
 
     try:
       result.keywords = beautify_list(
@@ -430,9 +455,9 @@ class FitButDownloader(FacultyDownloader):
          soup_en.find("th",string="Keywords").find_next("td").string.split(",")
          )
     except Exception as e:
-      print("keywords not found:" + str(e)) 
+      debug_print("keywords not found:" + str(e)) 
 
-    pdf_info = download_and_analyze_pdf("http://www.fit.vutbr.cz/" + result.url_fulltext)
+    pdf_info = download_and_analyze_pdf(FitButDownloader.BASE_URL + result.url_fulltext)
   
     result.pages = pdf_info.pages
 
@@ -440,6 +465,7 @@ class FitButDownloader(FacultyDownloader):
       result.language = pdf_info.language
 
     result.typesetting_system = pdf_info.typesetting_system   
+    result.size = pdf_info.size
  
     return result
 
@@ -450,7 +476,7 @@ class FitButDownloader(FacultyDownloader):
     result = []
 
     for thesis_type in ["BP","DP","PD"]:
-      soup = BeautifulSoup(download_webpage("http://www.fit.vutbr.cz/study/DP/" + thesis_type + ".php?y=*&ved=&st=&t=&k="),"lxml")
+      soup = BeautifulSoup(download_webpage(FitButDownloader.BASE_URL + "study/DP/" + thesis_type + ".php?y=*&ved=&st=&t=&k="),"lxml")
 
       link_tags = soup.find_all(is_thesis_link)
 
@@ -461,7 +487,7 @@ class FitButDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-class FitCvutDownloader(FacultyDownloader):
+class CtuDownloader(FacultyDownloader):
 
   BASE_URL = "https://dip.felk.cvut.cz/browse/"
 
@@ -471,18 +497,21 @@ class FitCvutDownloader(FacultyDownloader):
   def get_thesis_list(self):
     result = []
 
-    for department in range(101,106):
-      url = FitCvutDownloader.BASE_URL + "department.php?f=F8&d=K" + str(department)
+    for faculty in ("F8","F3"):
+      departments = range(101,106) if faculty == "F8" else (13136,13139)
 
-      page_soup = BeautifulSoup(download_webpage(url),"lxml")
+      for department in departments:
+        url = CtuDownloader.BASE_URL + "department.php?f=" + faculty + "&d=K" + str(department)
 
-      year_urls =  page_soup.find_all("a")[:-1]
+        page_soup = BeautifulSoup(download_webpage(url),"lxml")
 
-      year_urls = map(lambda item: FitCvutDownloader.BASE_URL + item["href"],year_urls)
+        year_urls =  page_soup.find_all("a")[:-1]
 
-      for year_url in year_urls:
-        page_soup2 = BeautifulSoup(download_webpage(year_url),"lxml")
-        result = result + map(lambda item: FitCvutDownloader.BASE_URL + item["href"],page_soup2.find_all("a")[:-1])
+        year_urls = map(lambda item: CtuDownloader.BASE_URL + item["href"],year_urls)
+
+        for year_url in year_urls:
+          page_soup2 = BeautifulSoup(download_webpage(year_url),"lxml")
+          result = result + map(lambda item: CtuDownloader.BASE_URL + item["href"],page_soup2.find_all("a")[:-1])
 
     return result    
 
@@ -497,17 +526,35 @@ class FitCvutDownloader(FacultyDownloader):
     def get_table_text(line):
       return soup.find("td",string=line).find_next("td").string
 
-    result.faculty = FACULTY_FIT_CVUT
+    faculty_string = get_table_text("fakulta")
+
+    if faculty_string == "F3":
+      result.faculty = FACULTY_FELK_CTU
+    else:
+      result.faculty = FACULTY_FIT_CTU
 
     string_to_department = {
-      "K101": DEPARTMENT_FIT_CVUT_KTI,
-      "K102": DEPARTMENT_FIT_CVUT_KSI,
-      "K103": DEPARTMENT_FIT_CVUT_KCN,
-      "K104": DEPARTMENT_FIT_CVUT_KPS,
-      "K105": DEPARTMENT_FIT_CVUT_KAM
+      "K101": DEPARTMENT_FIT_CTU_KTI,
+      "K102": DEPARTMENT_FIT_CTU_KSI,
+      "K103": DEPARTMENT_FIT_CTU_KCN,
+      "K104": DEPARTMENT_FIT_CTU_KPS,
+      "K105": DEPARTMENT_FIT_CTU_KAM,
+      "K13131": DEPARTMENT_FELK_CTU_CS,
+      "K13139": DEPARTMENT_FELK_CTU_DCGI 
+      }
+
+    department_to_field = {
+      DEPARTMENT_FIT_CTU_KTI: FIELD_TCS,
+      DEPARTMENT_FIT_CTU_KSI: FIELD_SE,
+      DEPARTMENT_FIT_CTU_KCN: FIELD_HW,
+      DEPARTMENT_FIT_CTU_KPS: FIELD_HW,
+      DEPARTMENT_FIT_CTU_KAM: FIELD_TCS,
+      DEPARTMENT_FELK_CTU_CS: FIELD_HW,
+      DEPARTMENT_FELK_CTU_DCGI: FIELD_CG
       }
 
     result.department = string_to_department[get_table_text("katedra")]
+    result.field = department_to_field[result.department]
  
     result.author = Person()
     result.author.from_string(get_table_text("autor"))
@@ -521,8 +568,10 @@ class FitCvutDownloader(FacultyDownloader):
 
     if type_string == "Diplomová práce":
       result.kind = THESIS_MASTER
+      result.degree = DEGREE_ING
     elif type_string == "Bakalářská práce":
       result.kind = THESIS_BACHELOR
+      result.degree = DEGREE_BC
 
     result.title_en = get_table_text("název (anglicky)")
     result.title_cs = get_table_text("název")
@@ -530,7 +579,7 @@ class FitCvutDownloader(FacultyDownloader):
     result.abstract_en = get_table_text("abstrakt (anglicky)")
     result.abstract_cs = get_table_text("abstrakt")
 
-    result.url_fulltext = FitCvutDownloader.BASE_URL + soup.find("td",string="fulltext").find_next("a")["href"] 
+    result.url_fulltext = CtuDownloader.BASE_URL + soup.find("td",string="fulltext").find_next("a")["href"] 
 
     pdf_info = download_and_analyze_pdf(result.url_fulltext)
 
@@ -542,21 +591,16 @@ class FitCvutDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-f = FitButDownloader()
+#f = FitButDownloader()
 #info = f.get_thesis_info("http://www.fit.vutbr.cz/study/DP/BP.php?id=2581&y=0")
 #print(str(info))
 
-f2 = FitCvutDownloader()
+f2 = CtuDownloader()
 
 #l = f2.get_thesis_list()
 #for ll in l:
 #  print(ll)
 
-#print(f2.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F8&d=K101&y=2012&a=cackolen&t=bach"))
+print(f2.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F3&d=K13139&y=1988&a=pytelma1&t=bach"))
 
-info = PDFInfo("test2.pdf")
 
-print(info.pages)
-print(info.language)
-print(info.typesetting_system)
-print(info.size)
