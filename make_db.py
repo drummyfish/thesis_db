@@ -106,6 +106,7 @@ FIELD_AI = "artificial intelligence"
 FIELD_CG = "computer graphics"
 FIELD_NET = "computer networks"
 FIELD_HW = "hardware"
+FIELD_SP = "speech"
 FIELD_SE = "software engineering"
 FIELD_SEC = "computer security"
 FIELD_TCS = "theoretical computer science"
@@ -115,6 +116,173 @@ FIELD_ROBO = "robotics"
 FIELD_EDU = "education"
 FIELD_MAN = "management"
 FIELD_OTHER = "other"
+
+ALL_FIELDS = [
+  FIELD_AI,
+  FIELD_CG,
+  FIELD_NET,
+  FIELD_HW,
+  FIELD_SE,
+  FIELD_SEC,
+  FIELD_TCS,
+  FIELD_TCS,
+  FIELD_IS,
+  FIELD_BIO,
+  FIELD_ROBO,
+  FIELD_EDU,
+  FIELD_MAN,
+  FIELD_OTHER
+  ]
+
+KEYWORDS_TO_FIELD = {
+  "počítačová grafika": FIELD_CG,
+  "computer graphics": FIELD_CG,
+  "panorama": FIELD_CG,
+  "textures": FIELD_CG,
+  "textura": FIELD_CG,
+  "ray-tracing": FIELD_CG,
+  "ray tracing": FIELD_CG,
+  "protocols": FIELD_NET,
+  "networking": FIELD_NET,
+  "computer networks": FIELD_NET,
+  "počítačové sítě": FIELD_NET,
+  "CISCO": FIELD_NET,
+  "router": FIELD_NET,
+  "routers": FIELD_NET,
+  "software engineering": FIELD_SE,
+  "UML": FIELD_SE,
+  "security": FIELD_SEC,
+  "computer security": FIELD_SEC,
+  "bezpečnost": FIELD_SEC,
+  "marketing": FIELD_MAN,
+  "management": FIELD_MAN,
+  "robotics": FIELD_ROBO,
+  "robotika": FIELD_ROBO,
+  "hardware": FIELD_HW,
+  "CMOS": FIELD_HW,
+  "vzdělávání": FIELD_EDU,
+  "školství": FIELD_EDU,
+  "education": FIELD_EDU,
+  "bioinformatika": FIELD_BIO,
+  "bioinformatics": FIELD_BIO,
+  "artificial intelligence": FIELD_AI,
+  "umělá inteligence": FIELD_AI,
+  "HTML": FIELD_IS,
+  "CSS": FIELD_IS,
+  "cryptography": FIELD_SEC,
+  "kryptografie": FIELD_SEC,
+  "HTTP": FIELD_NET,
+  "HTTPS": FIELD_NET,
+  "RSA": FIELD_SEC,
+  "SSL": FIELD_SEC,
+  "hra": FIELD_CG,
+  "game": FIELD_CG,
+  "procedural generation": FIELD_CG,
+  "procedurální generování": FIELD_CG,
+  "3D": FIELD_CG,
+  "OpenCV": FIELD_CG,
+  "segmentace": FIELD_CG,
+  "segmentation": FIELD_CG,
+  "gen": FIELD_BIO,
+  "DNA": FIELD_BIO,
+  "síťový tok": FIELD_NET,
+  "klient-server": FIELD_NET,
+  "client-server": FIELD_NET,
+  "RPC": FIELD_NET,
+  "database": FIELD_IS,
+  "watermark": FIELD_CG,
+  "vodoznak": FIELD_CG,
+  "HTML5": FIELD_IS,
+  "soft body": FIELD_CG,
+  "hard body": FIELD_CG,
+  "scene graph": FIELD_CG,
+  "OpenGL": FIELD_CG,
+  "GUI": FIELD_IS,
+  "uživatelské rozhraní": FIELD_IS,
+  "virtual reality": FIELD_CG,
+  "virtuální realita": FIELD_CG,
+  "Oculus Rift": FIELD_CG,
+  "transistor": FIELD_HW,
+  "power": FIELD_HW,
+  "výkon": FIELD_HW,
+  "ROS": FIELD_ROBO,
+  "neural networks": FIELD_AI,
+  "compute shaders": FIELD_CG,
+  "compute shader": FIELD_CG,
+  "photography": FIELD_CG,
+  "Node.js": FIELD_IS,
+  "PHP": FIELD_IS,
+  "voip": FIELD_NET,
+  "SQL": FIELD_IS,
+  "detekce hran": FIELD_CG,
+  "edge detection": FIELD_CG,
+  "HDR": FIELD_CG,
+  "robot": FIELD_ROBO,
+  "SLAM": FIELD_ROBO,
+  "zpracování obrazu": FIELD_CG,
+  "Direct3D": FIELD_CG,
+  "shader": FIELD_CG,
+  "shaders": FIELD_CG,
+  "GLSL": FIELD_CG,
+  "HLSL": FIELD_CG,
+  "speech": FIELD_SP,
+  "TCP/IP": FIELD_NET,
+  "vowels": FIELD_SP,
+  "phoneme": FIELD_SP,
+  "webová aplikace": FIELD_IS,
+  "grammar": FIELD_TCS,
+  "grammars": FIELD_TCS,
+  "gramatiky": FIELD_TCS,
+  "Turing machine": FIELD_TCS,
+  "complexity": FIELD_TCS,
+  "Turingův stroj": FIELD_TCS,
+  "Turingovy stroje": FIELD_TCS,
+  "konečné automaty": FIELD_TCS,
+  "finite automata": FIELD_TCS,
+  "verification": FIELD_TCS,
+  "verifikace": FIELD_TCS,
+  "DNS": FIELD_NET,
+  "IPv4": FIELD_NET,
+  "IPv6": FIELD_NET,
+  "animation": FIELD_CG,
+  "neuronová síť": FIELD_AI,
+  "Twitter": FIELD_AI,
+  "LPC": FIELD_SP,
+  "frontend": FIELD_IS,
+  "rendering": FIELD_CG,
+  "compiler": FIELD_TCS,
+  "překladače": FIELD_TCS,
+  "RISC": FIELD_HW,
+  "CISC": FIELD_HW,
+  "embedded systems": FIELD_HW,
+  "rozpoznávání řečníka": FIELD_SP,
+  "driver": FIELD_HW,
+  "ovladač": FIELD_HW,
+  "projektové řízení": FIELD_MAN,
+  "P2P": FIELD_NET,
+  "clustering": FIELD_AI,
+  "shlukování": FIELD_AI,
+  "PCA": FIELD_AI,
+  "curves": FIELD_CG,
+  "strojové učení": FIELD_AI,
+  "machine learning": FIELD_AI,
+  "bounding box": FIELD_CG,
+  "OCR": FIELD_CG,
+  "recognition": FIELD_AI,
+  "evoluční algoritmy": FIELD_AI,
+  "výuka": FIELD_EDU,
+  "shadows": FIELD_CG,
+  "stíny": FIELD_CG,
+  "reflections": FIELD_CG,
+  "refractions": FIELD_CG,
+  "global illumination": FIELD_CG,
+  "convolution": FIELD_CG,
+  "vizualizace": FIELD_CG,
+  "agent": FIELD_AI,
+  "augmented reality": FIELD_CG,
+  "voxel": FIELD_CG,
+  "klasifikace": FIELD_AI
+  }
 
 CITY_PRAHA = "Praha"
 CITY_BRNO = "Brno"
@@ -172,6 +340,28 @@ NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
 
 def debug_print(print_string):
   print(print_string)
+
+def guess_field_from_keywords(keyword_list):
+  histogram = {}
+
+  for field in ALL_FIELDS:
+    histogram[field] = 0
+
+  for keyword in keyword_list:
+    print(keyword,keyword in KEYWORDS_TO_FIELD)
+
+    if keyword in KEYWORDS_TO_FIELD:
+      histogram[KEYWORDS_TO_FIELD[keyword]] += 1
+
+  best_field = None
+  best_score = 0
+
+  for field in histogram:
+    if histogram[field] > best_score:
+      best_field = field
+      best_score = histogram[field]
+
+  return best_field
 
 class Person:
   def __init__(self):
@@ -438,6 +628,17 @@ class FitButDownloader(FacultyDownloader):
 
     except Exception as e:
       debug_print("department could not be resolved: " + str(e))
+ 
+    try:
+      result.keywords = beautify_list(
+         soup.find("th",string="Klíčová slova").find_next("td").string.split(",") +
+         soup_en.find("th",string="Keywords").find_next("td").string.split(",")
+         )
+    except Exception as e:
+      debug_print("keywords not found:" + str(e)) 
+
+    if result.field == None:
+      result.field = guess_field_from_keywords(result.keywords)
 
     if result.field == None and result.department != None:
       department_to_field = {
@@ -487,14 +688,6 @@ class FitButDownloader(FacultyDownloader):
         result.language = LANGUAGE_SK
     except Exception as e:
       debug_print("language not found: " + str(e))
-
-    try:
-      result.keywords = beautify_list(
-         soup.find("th",string="Klíčová slova").find_next("td").string.split(",") +
-         soup_en.find("th",string="Keywords").find_next("td").string.split(",")
-         )
-    except Exception as e:
-      debug_print("keywords not found:" + str(e)) 
 
     pdf_info = download_and_analyze_pdf(FitButDownloader.BASE_URL + result.url_fulltext)
  
@@ -579,8 +772,6 @@ class CtuDownloader(FacultyDownloader):
           state = 0
 
     return result
-
-
 
   def get_thesis_list(self):
     result = []
@@ -828,6 +1019,9 @@ class FaiUtbDownloader(FacultyDownloader):
       result.department = DEPARTMENT_FAI_UTB_UPKS
     elif grantor_string.find("řízení proc") >= 0:
       result.department = DEPARTMENT_FAI_UTB_URP
+
+    if result.field == None:
+      result.field = guess_field_from_keywords(result.keywords)
     
     result.url_fulltext = FaiUtbDownloader.BASE_URL + soup.find("table",class_="ds-table file-list").find_next("a")["href"] 
 
@@ -843,7 +1037,7 @@ fit_vut = FitButDownloader()
 ctu = CtuDownloader()
 fai_utb = FaiUtbDownloader()
 
-print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/27274"))
+# print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/27274"))
 
 #for l in fai_utb.get_thesis_list():
 #  print(l)
