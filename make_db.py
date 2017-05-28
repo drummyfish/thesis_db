@@ -357,7 +357,21 @@ NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
 def debug_print(print_string):
   print(print_string)
 
+def iterative_load(soup,find_func,process_func):
+  result = []
+
+  current = soup.find("body").find_next(find_func)
+
+  while current != None:
+    result.append(process_func(current))
+    current = current.find_next(find_func)
+
+  return result
+
 def guess_field_from_keywords(keyword_list):
+  if keyword_list == None:
+    return None
+
   histogram = {}
 
   for field in ALL_FIELDS:
@@ -380,12 +394,15 @@ def guess_field_from_keywords(keyword_list):
   return best_field
 
 class Person:
-  def __init__(self):
+  def __init__(self, from_string=None, first_name_first=True):
    
     self.name_first = None
     self.name_last = None
     self.degrees = []
     self.sex = None
+
+    if from_string != None:
+      self.from_string(from_string,first_name_first)
 
   def __str__(self):
     result = ""
@@ -716,9 +733,6 @@ class FitButDownloader(FacultyDownloader):
     return result
 
   def get_thesis_list(self):
-    def is_thesis_link(tag):
-      return tag.name == "a" and tag.contents[0].name == "i"
-
     result = []
 
     for thesis_type in ["BP","DP","PD","DOC"]:
@@ -729,11 +743,11 @@ class FitButDownloader(FacultyDownloader):
 
       soup = BeautifulSoup(download_webpage(url),"lxml")
 
-      link_tags = soup.find_all(is_thesis_link)
+      result += iterative_load(soup,
+        lambda t: t.name == "a" and t.contents[0].name == "i",
+        lambda t: FitButDownloader.BASE_URL + t["href"][1:]
+        )
 
-      for link_tag in link_tags:
-        result.append(FitButDownloader.BASE_URL + link_tag["href"][1:])
-    
     return result
 
 #----------------------------------------
@@ -922,20 +936,17 @@ class FaiUtbDownloader(FacultyDownloader):
       while True:    # for each page
         soup = BeautifulSoup(download_webpage("http://digilib.k.utb.cz/handle/10563/" + str(l[2]) + "/recent-submissions?offset=" + str(offset)),"lxml")
 
-        if not soup.find("a",class_="next-page-link"):
-          break
+        links = iterative_load(soup,
+          lambda t: t.name == "a" and t.next_sibling != None and t["href"].find("=") == -1 and t["href"][:3] == "/ha" and t.string != "Next Page",
+          lambda t: FaiUtbDownloader.BASE_URL + t["href"][1:],
+          )
 
-        current = soup.find("div",class_="pagination top")
-
-        while True:
-          current = current.find_next(lambda t: t.name == "a" and t.next_sibling != None and t["href"].find("=") == -1 and t["href"][:3] == "/ha" and t.string != "Next Page") 
-
-          if not current:
-            break
-
-          result.append(FaiUtbDownloader.BASE_URL + current["href"][1:])
+        result += links
 
         offset += 20
+
+        if len(links) == 0 or offset > 20000:
+          break
 
     return result
 
@@ -996,31 +1007,14 @@ class FaiUtbDownloader(FacultyDownloader):
     result.abstract_cs = text_in_table("dc.description.abstract")
     result.abstract_en = text_in_table("dc.description.abstract-translated")
 
-    result.opponents = []
-
-    current = soup.find("h2")
-
-    while True:    # find opponents
-      current = current.find_next("td",string="dc.contributor.referee")
-
-      if current == None:
-        break
-
-      opponent = Person()
-      opponent.from_string(current.find_next("td").string,False)
-      result.opponents.append(opponent)
-
-    result.keywords = []
-
-    current = soup.find("h2")
-
-    while True:    # find keywords
-      current = current.find_next("td",string="dc.subject")
-
-      if current == None:
-        break
-
-      result.keywords.append(current.find_next("td").contents[1].string)
+    result.opponents = iterative_load(soup,
+      lambda t: t.name == "td" and t.string == "dc.contributor.referee",
+      lambda t: Person(t.find_next("td").string,False)
+      )
+   
+    result.keywords = iterative_load(soup,
+      lambda t: t.name == "td" and t.string == "dc.subject",
+      lambda t: t.find_next("td").contents[1].string)
 
     grantor_string = text_in_table("dc.thesis.degree-grantor")
  
@@ -1199,7 +1193,6 @@ class MffCuniDownloader(FacultyDownloader):
     elif department_string.find("IUUK") >= 0:
       result.department = DEPARTMENT_MFF_CUNI_IUUK
     
-
     return result    
 
   def get_thesis_list(self):
@@ -1212,21 +1205,116 @@ class MffCuniDownloader(FacultyDownloader):
 
       current = soup.find("span",class_="title")
 
-      enough = True
+      links = iterative_load(soup,
+        lambda t: t.name == "div" and t.get("class") != None and t.get("class")[0] == "zzp-work-maintitle",
+        lambda t: t.contents[1]["href"]
+        )
 
-      while True:
-        current = current.find_next("div",class_="zzp-work-maintitle")
-
-        if current == None:
-          break
-
-        enough = False
-        result.append(current.contents[1]["href"])
+      result += links
 
       page += 1
 
-      if enough or page > 500:
+      break
+
+      if len(links) == 0 or page > 1000:
         break
+
+    return result
+
+#----------------------------------------
+
+class FeiVsbDownloader(FacultyDownloader):
+  BASE_URL = "http://dspace.vsb.cz/"
+
+  def get_thesis_list(self):
+    result = []
+    records = 500
+    offset = 0
+
+    while True:    # for each page
+      soup = BeautifulSoup(download_webpage(FeiVsbDownloader.BASE_URL + "handle/10084/2564/browse?order=ASC&rpp=" + str(records) + "&sort_by=2&etal=-1&offset=" + str(offset) + "&type=dateissued"),"lxml")
+      current = soup.find("h2")
+
+      links = iterative_load(soup,
+        lambda t: t.name == "h4",
+        lambda t: FeiVsbDownloader.BASE_URL + t.find_next("a")["href"]
+        )
+
+      result += links
+
+      offset += records
+
+      if len(links) == 0 or offset > 20000:
+        break
+
+    return result
+
+  def get_thesis_info(self, url):
+    url = url + "?show=full"
+    result = Thesis()
+
+    result.url_page = url
+
+    result.faculty = FACULTY_FEI_VSB
+    result.city = CITY_OSTRAVA
+
+    soup =  BeautifulSoup(download_webpage(url),"lxml")
+
+    def text_in_table(line):
+      return soup.find("td",string=line).find_next("td").string
+
+    type_string = text_in_table("dc.type")
+
+    if starts_with(type_string,"Diplom"):
+      result.kind = THESIS_MASTER
+    elif starts_with(type_string,"Baka"):
+      result.kind = THESIS_BACHELOR
+      result.degree = DEGREE_BC
+    elif starts_with(type_string,"Diser"):
+      result.kind = THESIS_PHD
+      result.degree = DEGREES_PHD
+    elif starts_with(type_string,"Habil"):
+      result.kind = THESIS_DOC
+      result.degree = DEGREE_DOC
+
+    result.author = Person()
+    result.author.from_string(text_in_table("dc.contributor.author"),False)
+
+    result.supervisor = Person()
+    result.supervisor.from_string(text_in_table("dc.contributor.advisor"),False)
+
+    result.year = text_in_table("dc.date.issued")
+    result.language = text_in_table("dc.language.iso")
+
+    if result.language in [LANGUAGE_CS,LANGUAGE_SK]:
+      try:
+        result.title_cs = text_in_table("dc.title")
+        result.title_en = text_in_table("dc.title.alternative")
+      except Exception as e:
+        pass
+    else:
+      try:
+        result.title_en = text_in_table("dc.title")
+        result.title_cs = text_in_table("dc.title.alternative")
+      except Exception as e:
+        pass
+
+    try:
+      abstract_tag = soup.find("td",string="dc.description.abstract")
+      result.abstract_cs = abstract_tag.find_next("td").string
+      abstract_tag = abstract_tag.find_next("td",string="dc.description.abstract")
+      result.abstract_en = abstract_tag.find_next("td").string
+    except Exception as e:
+      debug_print("could not resolve abstract: " + str(e))
+
+    result.keywords = iterative_load(
+      soup,
+      lambda t: t.name == "td" and t.string == "dc.subject",
+      lambda t: t.find_next("td").string)
+
+    result.field = guess_field_from_keywords(result.keywords)
+
+    result.pages = text_in_table("dc.format").split(" ")[0]
 
     return result
 
@@ -1236,8 +1324,16 @@ fit_vut = FitButDownloader()
 ctu = CtuDownloader()
 fai_utb = FaiUtbDownloader()
 mff_cuni = MffCuniDownloader()
+fei_vsb = FeiVsbDownloader()
 
-print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/115130/24960376/?q=%7B%22______searchform___search%22%3A%22KSI%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A1%7D&lang=cs"))
+for l in fit_vut.get_thesis_list():
+  print(l)
+
+#print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/37262"))
+
+#print(fei_vsb.get_thesis_info("http://dspace.vsb.cz/handle/10084/105757"))
+
+#print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/115130/24960376/?q=%7B%22______searchform___search%22%3A%22KSI%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A1%7D&lang=cs"))
 
 # print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/27274"))
 
