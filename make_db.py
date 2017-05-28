@@ -33,6 +33,16 @@ DEGREE_DOC = "doc."
 DEGREE_CSC = "CSc."
 DEGREE_MBA = "MBA"
 
+DEGREES_MASTER = [
+  DEGREE_ING,
+  DEGREE_MGR
+  ]
+
+DEGREES_PHD = [
+  DEGREE_PHD,
+  DEGREE_PHD2
+  ]
+
 DEGREES = [
   DEGREE_BC,
   DEGREE_ING,
@@ -49,14 +59,14 @@ DEGREES = [
 
 DEGREES_AFTER = [DEGREE_PHD, DEGREE_CSC, DEGREE_MBA] 
 
-MARK_A = "A"
-MARK_B = "B"
-MARK_C = "C"
-MARK_D = "D"
-MARK_E = "E"
-MARK_F = "F"
+GRADE_A = "A"
+GRADE_B = "B"
+GRADE_C = "C"
+GRADE_D = "D"
+GRADE_E = "E"
+GRADE_F = "F"
 
-ALL_MARKS = [MARK_A,MARK_B,MARK_C,MARK_D,MARK_E,MARK_F]
+ALL_MARKS = [GRADE_A,GRADE_B,GRADE_C,GRADE_D,GRADE_E,GRADE_F]
 
 LANGUAGE_EN = "en"
 LANGUAGE_CS = "cs"
@@ -221,7 +231,7 @@ class Thesis():
     self.url_fulltext = None
     self.author = Person()
     self.supervisor = Person()
-    self.mark = None
+    self.grade = None
     self.defended = None
     self.pages = None
     self.typesetting_system = None
@@ -279,7 +289,7 @@ class PDFInfo:
       self.size = os.path.getsize(filename)
 
     except Exception as e:
-      debug_print("ERROR: could not analyze PDF: " + str(e))
+      debug_print("could not analyze PDF: " + str(e))
 
 def beautify_list(keywords):  # removes duplicates, empties, strips etc.
   return [item.decode("utf-8") for item in map(lambda s: s.lstrip().rstrip(), list(set(keywords))) if len(item) > 1]
@@ -459,12 +469,12 @@ class FitButDownloader(FacultyDownloader):
       result.defended = state_string[0] == "o"  # for "pbhájeno"
 
       if result.defended:
-        result.mark = state_string[-1]
+        result.grade = state_string[-1]
       else:
-        result.mark = MARK_F
+        result.grade = GRADE_F
 
-      if not result.mark in ALL_MARKS:
-        result.mark = None    
+      if not result.grade in ALL_MARKS:
+        result.grade = None    
 
     try:
       lang_string = text_in_table("Jazyk:")
@@ -601,10 +611,10 @@ class CtuDownloader(FacultyDownloader):
     result.url_page = url
     result.city = CITY_PRAHA 
 
-    def get_table_text(line):
+    def text_in_table(line):
       return soup.find("td",string=line).find_next("td").string
 
-    faculty_string = get_table_text("fakulta")
+    faculty_string = text_in_table("fakulta")
 
     if faculty_string == "F3":
       result.faculty = FACULTY_FELK_CTU
@@ -631,18 +641,18 @@ class CtuDownloader(FacultyDownloader):
       DEPARTMENT_FELK_CTU_DCGI: FIELD_CG
       }
 
-    result.department = string_to_department[get_table_text("katedra")]
+    result.department = string_to_department[text_in_table("katedra")]
     result.field = department_to_field[result.department]
  
     result.author = Person()
-    result.author.from_string(get_table_text("autor"))
+    result.author.from_string(text_in_table("autor"))
 
     result.supervisor = Person()
-    result.supervisor.from_string(get_table_text("vedoucí"))
+    result.supervisor.from_string(text_in_table("vedoucí"))
 
-    result.year = get_table_text("rok")
+    result.year = text_in_table("rok")
 
-    type_string = get_table_text("typ")
+    type_string = text_in_table("typ")
 
     if type_string == "Diplomová práce":
       result.kind = THESIS_MASTER
@@ -651,11 +661,11 @@ class CtuDownloader(FacultyDownloader):
       result.kind = THESIS_BACHELOR
       result.degree = DEGREE_BC
 
-    result.title_en = get_table_text("název (anglicky)")
-    result.title_cs = get_table_text("název")
+    result.title_en = text_in_table("název (anglicky)")
+    result.title_cs = text_in_table("název")
 
-    result.abstract_en = get_table_text("abstrakt (anglicky)")
-    result.abstract_cs = get_table_text("abstrakt")
+    result.abstract_en = text_in_table("abstrakt (anglicky)")
+    result.abstract_cs = text_in_table("abstrakt")
 
     result.url_fulltext = CtuDownloader.BASE_URL + soup.find("td",string="fulltext").find_next("a")["href"] 
 
@@ -718,14 +728,125 @@ class FaiUtbDownloader(FacultyDownloader):
 
     return result
 
+  def get_thesis_info(self, url):
+    result = Thesis()
+    result.url_page = url
+    result.city = CITY_ZLIN
+
+    url += "?show=full"
+
+    result.faculty = FACULTY_FAI_UTB
+
+    soup =  BeautifulSoup(download_webpage(url),"lxml")
+
+    def text_in_table(line):
+      tag = soup.find("td",string=line).find_next("td")
+      return tag.string if tag.string != None else tag.contents[1].string
+
+    result.year = text_in_table("dc.date.issued").split("-")[0]
+
+    result.author = Person()
+    result.author.from_string(text_in_table("dc.contributor.author"),False)
+
+    try:
+      result.supervisor = Person()
+      result.supervisor.from_string(text_in_table("dc.contributor.advisor"),False)
+    except Exception as e:
+      result.supervisor = None 
+      debug_print("supervisor not found: " + str(e))
+
+    result.language = text_in_table("dc.language.iso")
+    result.degree = text_in_table("dc.thesis.degree-name")
+
+    if result.degree == DEGREE_BC:
+      result.kind = THESIS_BACHELOR
+    elif result.degree in DEGREES_MASTER:
+      result.kind = THESIS_MASTER
+    elif result.degree in DEGREES_PHD:
+      result.kind = THESIS_PHD
+
+    try:
+      if result.kind != THESIS_PHD:
+        result.grade = text_in_table("utb.result.grade")
+    except Exception as e:
+      debug_print("grade not found: " + str(e))
+
+    if result.grade in (GRADE_A, GRADE_B, GRADE_C, GRADE_D, GRADE_E):
+      result.defended = True
+    elif result.grade == GRADE_F:
+      result.defended = False
+
+    result.title_cs = text_in_table("dc.title")
+    result.title_en = text_in_table("dc.title.alternative")
+
+    if result.title_cs == result.title_en:
+      result.title_cs = None
+
+    result.abstract_cs = text_in_table("dc.description.abstract")
+    result.abstract_en = text_in_table("dc.description.abstract-translated")
+
+    result.opponents = []
+
+    current = soup.find("h2")
+
+    while True:    # find opponents
+      current = current.find_next("td",string="dc.contributor.referee")
+
+      if current == None:
+        break
+
+      opponent = Person()
+      opponent.from_string(current.find_next("td").string,False)
+      result.opponents.append(opponent)
+
+    result.keywords = []
+
+    current = soup.find("h2")
+
+    while True:    # find keywords
+      current = current.find_next("td",string="dc.subject")
+
+      if current == None:
+        break
+
+      result.keywords.append(current.find_next("td").contents[1].string)
+
+    grantor_string = text_in_table("dc.thesis.degree-grantor")
+ 
+    if grantor_string.find("aplikované in") >= 0:
+      result.department = DEPARTMENT_FAI_UTB_UAI
+    elif grantor_string.find("automatizace a") >= 0:
+      result.department = DEPARTMENT_FAI_UTB_UART
+    elif grantor_string.find("bezpečnostního in") >= 0:
+      result.department = DEPARTMENT_FAI_UTB_UBI
+      result.field = FIELD_SEC
+    elif grantor_string.find("elektrotechniky a") >= 0:
+      result.department = DEPARTMENT_FAI_UTB_UELM
+    elif grantor_string.find("umělé in") >= 0:
+      result.department = DEPARTMENT_FAI_UTB_UIUI
+    elif grantor_string.find("počítačových a kom") >= 0:
+      result.department = DEPARTMENT_FAI_UTB_UPKS
+    elif grantor_string.find("řízení proc") >= 0:
+      result.department = DEPARTMENT_FAI_UTB_URP
+    
+    result.url_fulltext = FaiUtbDownloader.BASE_URL + soup.find("table",class_="ds-table file-list").find_next("a")["href"] 
+
+    if result.url_fulltext.find(".pdf") >= 0:
+      pdf_info = download_and_analyze_pdf(result.url_fulltext)
+      result.incorporate_pdf_indo(pdf_info)
+
+    return result
+
 #----------------------------------------
 
 fit_vut = FitButDownloader()
 ctu = CtuDownloader()
 fai_utb = FaiUtbDownloader()
 
-for l in fai_utb.get_thesis_list():
-  print(l)
+print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/27274"))
+
+#for l in fai_utb.get_thesis_list():
+#  print(l)
 
 #for l in fit_vut.get_thesis_list():
 #  print(l)
