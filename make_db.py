@@ -1100,8 +1100,12 @@ class MffCuniDownloader(FacultyDownloader):
       result.title_cs = None
 
     result.year = text_in_table("Datum obhajoby:").split(".")[-1]
-    result.abstract_cs = text_in_table("Abstrakt:")   
-    result.abstract_en = text_in_table("Abstract v angličtině:")   
+
+    try:
+      result.abstract_cs = text_in_table("Abstrakt:")   
+      result.abstract_en = text_in_table("Abstract v angličtině:")   
+    except Exception as e:
+      debug_print("could not resolve abstract: " + str(e))
 
     try:
       result.author = Person()
@@ -1140,9 +1144,26 @@ class MffCuniDownloader(FacultyDownloader):
         u"velmi dobře": GRADE_B,
         u"dobře": GRADE_C,
         u"uspokojivě": GRADE_D,
-        u"vyhovující": GRADE_E,
-        u"nevyhovující": GRADE_F
+        u"prospěl/a": GRADE_E,
+        u"neprospěl/a": GRADE_F
       }
+
+    try:
+      result.keywords = []
+
+      for s in ("Klíčová slova:","Klíčová slova v angličtině:","Klíčová slova v češtině:"):
+        try:
+          result.keywords += text_in_table(s).split(";")
+        except Exception:
+          pass
+    except Exception as e:
+      debug_print("could not keywords: " + str(e)) 
+
+    if len(result.keywords) == 0:
+      result.keywords = None
+    else:
+      result.keywords = beautify_list(result.keywords) 
+      result.field = guess_field_from_keywords(result.keywords)
 
     if result.kind in (THESIS_BACHELOR, THESIS_MASTER):
       result.grade = string_to_grade[text_in_table("Výsledek obhajoby:")]
@@ -1156,6 +1177,28 @@ class MffCuniDownloader(FacultyDownloader):
 
     pdf_info = download_and_analyze_pdf(result.url_fulltext)
     result.incorporate_pdf_indo(pdf_info)
+
+    department_string = text_in_table("Pracoviště:")
+
+    if department_string.find("KSVI") >= 0:
+      result.department = DEPARTMENT_MFF_CUNI_KSVI
+    elif department_string.find("KSI") >= 0:
+      result.department = DEPARTMENT_MFF_CUNI_KSI
+    elif department_string.find("KAM") >= 0:
+      result.department = DEPARTMENT_MFF_CUNI_KAM
+    elif department_string.find("D3S") >= 0:
+      result.department = DEPARTMENT_MFF_CUNI_D3S
+    elif department_string.find("KTIML") >= 0:
+      result.department = DEPARTMENT_MFF_CUNI_KTIML
+      result.field = FIELD_TCS
+    elif department_string.find("SISAL") >= 0:
+      result.department = DEPARTMENT_MFF_CUNI_SISAL
+    elif department_string.find("UFAL") >= 0:
+      result.department = DEPARTMENT_MFF_CUNI_UFAL
+      result.field = FIELD_SP
+    elif department_string.find("IUUK") >= 0:
+      result.department = DEPARTMENT_MFF_CUNI_IUUK
+    
 
     return result    
 
@@ -1194,7 +1237,7 @@ ctu = CtuDownloader()
 fai_utb = FaiUtbDownloader()
 mff_cuni = MffCuniDownloader()
 
-print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/85322/24959788/?q=%7B%22______searchform___search%22%3A%22%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A%222%22%7D&lang=cs"))
+print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/115130/24960376/?q=%7B%22______searchform___search%22%3A%22KSI%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A1%7D&lang=cs"))
 
 # print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/27274"))
 
