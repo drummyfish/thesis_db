@@ -43,6 +43,11 @@ DEGREES_PHD = [
   DEGREE_PHD2
   ]
 
+DEGREES_DR = [
+  DEGREE_PHDR,
+  DEGREE_RNDR
+  ]
+
 DEGREES = [
   DEGREE_BC,
   DEGREE_ING,
@@ -80,27 +85,36 @@ FACULTY_FIT_CTU = "FIT CTU"
 FACULTY_FEI_VSB = "FEI VŠB"
 FACULTY_FAI_UTB = "FAI UTB"
 
-DEPARTMENT_FIT_BUT_UPGM = "UPGM"   # ustav pocitacove grafiky a multimedii
-DEPARTMENT_FIT_BUT_UPSY = "UPSY"   # ustav pocitacovych systemu
-DEPARTMENT_FIT_BUT_UIFS = "UIFS"   # ustav informacnich systemu
-DEPARTMENT_FIT_BUT_UITS = "UITS"   # ustav inteligentnich systemu
+DEPARTMENT_FIT_BUT_UPGM = "FIT BUT UPGM"     # ustav pocitacove grafiky a multimedii
+DEPARTMENT_FIT_BUT_UPSY = "FIT BUT UPSY"     # ustav pocitacovych systemu
+DEPARTMENT_FIT_BUT_UIFS = "FIT BUT UIFS"     # ustav informacnich systemu
+DEPARTMENT_FIT_BUT_UITS = "FIT BUT UITS"     # ustav inteligentnich systemu
 
-DEPARTMENT_FIT_CTU_KTI = "KTI"     # katedra teoreticke informatiky
-DEPARTMENT_FIT_CTU_KSI = "KSI"     # katedra softwaroveho inzenyrstvi
-DEPARTMENT_FIT_CTU_KCN = "KCN"     # katedra cislicoveho navrhu
-DEPARTMENT_FIT_CTU_KPS = "KPS"     # katedra pocitacovych systemu
-DEPARTMENT_FIT_CTU_KAM = "KAM"     # katedra aplikovane matematiky
-DEPARTMENT_FELK_CTU_CS = "CS"      # katedra pocitacu
-DEPARTMENT_FELK_CTU_DCGI = "DCGI"  # katedra pocitacove grafiky a interakce
+DEPARTMENT_FIT_CTU_KTI = "FIT CTU KTI"       # katedra teoreticke informatiky
+DEPARTMENT_FIT_CTU_KSI = "FIT CTU KSI"       # katedra softwaroveho inzenyrstvi
+DEPARTMENT_FIT_CTU_KCN = "FIT CTU KCN"       # katedra cislicoveho navrhu
+DEPARTMENT_FIT_CTU_KPS = "FIT CTU KPS"       # katedra pocitacovych systemu
+DEPARTMENT_FIT_CTU_KAM = "FIT CTU KAM"       # katedra aplikovane matematiky
+DEPARTMENT_FELK_CTU_CS = "FELK CTU CS"       # katedra pocitacu
+DEPARTMENT_FELK_CTU_DCGI = "FELK CTU DCGI"   # katedra pocitacove grafiky a interakce
 
-DEPARTMENT_FAI_UTB_UAI = "UAI"     # ustav aplikovane informatiky
-DEPARTMENT_FAI_UTB_UIUI = "UIUI"   # ustav informatiky a umele inteligence
-DEPARTMENT_FAI_UTB_UPKS = "UPKS"   # ustav pocitacovych a komunikacnich systemu
-DEPARTMENT_FAI_UTB_UART = "UART"   # ustav automatizace a ridici techniky
-DEPARTMENT_FAI_UTB_UELM = "UELM"   # ustav elektroniky a mereni
-DEPARTMENT_FAI_UTB_UBI = "UBI"     # ustav bezpecnostniho inzenyrstvi
-DEPARTMENT_FAI_UTB_UM = "UM"       # ustav matematiky
-DEPARTMENT_FAI_UTB_URP = "URP"     # ustav rizeni procesu
+DEPARTMENT_FAI_UTB_UAI = "FAI UTB UAI"       # ustav aplikovane informatiky
+DEPARTMENT_FAI_UTB_UIUI = "FAI UTB UIUI"     # ustav informatiky a umele inteligence
+DEPARTMENT_FAI_UTB_UPKS = "FAI UTB UPKS"     # ustav pocitacovych a komunikacnich systemu
+DEPARTMENT_FAI_UTB_UART = "FAI UTB UART"     # ustav automatizace a ridici techniky
+DEPARTMENT_FAI_UTB_UELM = "FAI UTB UELM"     # ustav elektroniky a mereni
+DEPARTMENT_FAI_UTB_UBI = "FAI UTB UBI"       # ustav bezpecnostniho inzenyrstvi
+DEPARTMENT_FAI_UTB_UM = "FAI UTB UM"         # ustav matematiky
+DEPARTMENT_FAI_UTB_URP = "FAI UTB URP"       # ustav rizeni procesu
+
+DEPARTMENT_MFF_CUNI_KSI = "MFF CUNI KSI"     # katedra softwaroveho inzenyrstvi
+DEPARTMENT_MFF_CUNI_KSVI = "MFF CUNI KSVI"   # katedra softwaru a vyuky informatiky
+DEPARTMENT_MFF_CUNI_KAM = "MFF CUNI KAM"     # katedra aplikovane matematiky
+DEPARTMENT_MFF_CUNI_D3S = "MFF CUNI D3S"     # katedra distribuovanych a spolehlivych systemu
+DEPARTMENT_MFF_CUNI_KTIML = "MFF CUNI KTIML" # katedra teoreticke informatiky a matematicke logiky
+DEPARTMENT_MFF_CUNI_SISAL = "MFF CUNI SISAL" # stredisko informaticke site a laboratori
+DEPARTMENT_MFF_CUNI_UFAL = "MFF CUNI UFAL"   # ustav formalni a aplikovane lingvistiky
+DEPARTMENT_MFF_CUNI_IUUK = "MFF CUNI IUUK"   # informaticky ustav universzity karlovy
 
 FIELD_AI = "artificial intelligence"
 FIELD_CG = "computer graphics"
@@ -315,7 +329,8 @@ NAMES_MALE = ["Jiří", "Jan", "Petr", "Pavel", "Jaroslav",
   "Čestmír", "Juraj", "Tadeáš", "Mojmír", "Radoslav",
   "Marián", "Andrej", "Tibor", "Mikuláš", "Oto",
   "Dan", "Daniel", "Emanuel", "Čeněk", "Hynek",
-  "Jarmil", "Matěj", "Mikoláš"]
+  "Jarmil", "Matěj", "Mikoláš","Branislav","Matej",
+  "Dávid", "Samuel"]
 
 NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Věra", "Lenka", "Alena", "Jaroslava", "Lucie",
@@ -336,7 +351,8 @@ NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Silvie", "Alexandra", "Edita", "Leona", "Dita",
   "Sabina", "Lada", "Radmila", "Taťána", "Darina",
   "Linda", "Ivana", "Michala", "Karolína", "Sára",
-  "Ingrid", "Ema", "Zlata", "Emílie", "Ivona"]
+  "Ingrid", "Ema", "Zlata", "Emílie", "Ivona",
+  "Natália", "Viktória"]
 
 def debug_print(print_string):
   print(print_string)
@@ -393,6 +409,10 @@ class Person:
     self.name_last = parts[1 if first_name_first else 0]
 
     self.estimate_sex()
+
+    for i in range(len(self.degrees)):
+      if self.degrees[i] == DEGREE_PHD2:     # normalize
+        self.degrees[i] = DEGREE_PHD
 
   def estimate_sex(self):
     if self.name_first != None:
@@ -1031,11 +1051,150 @@ class FaiUtbDownloader(FacultyDownloader):
 
     return result
 
+#---------------------------------------
+
+class MffCuniDownloader(FacultyDownloader):
+
+  def get_thesis_info(self, url):
+    result = Thesis()
+
+    result.city = CITY_PRAHA
+    result.faculty = FACULTY_MFF_CUNI
+    result.url_page = url
+
+    soup = BeautifulSoup(download_webpage(url),"lxml")
+
+    def text_in_table(line):
+      return soup.find(lambda t: t.name == "div" and t.string != None and t.string.lstrip().rstrip() == line).find_next("span").string.lstrip().rstrip()
+
+    type_string = text_in_table("Program studia:")
+
+    if not starts_with(type_string,"Informatika"):
+      return None
+
+    lang_string = text_in_table("Jazyk práce:")
+
+    if lang_string == "Čeština":
+      result.language = LANGUAGE_CS
+    if lang_string == "Angličtina":
+      result.language = LANGUAGE_EN
+    if lang_string == "Slovenština":
+      result.language = LANGUAGE_SK
+
+    try:
+      if result.language in (LANGUAGE_CS,LANGUAGE_SK): 
+        result.title_cs = text_in_table("Název:")
+        result.title_en = text_in_table("Název v angličtině:")
+      if result.language == LANGUAGE_EN:
+        try: 
+          result.title_en = text_in_table("Název:")
+          result.title_cs = text_in_table("Název v češtině:")
+        except Exception:
+          result.title_en = text_in_table("Název v angličtině:")
+          result.title_cs = text_in_table("Název v češtině:")
+    except Exception as e:
+      debug_print("could not resolve title: " + str(e))
+
+    if result.language == LANGUAGE_EN and result.title_cs != None and result.title_en == None:
+      result.title_en = result.title_cs
+      result.title_cs = None
+
+    result.year = text_in_table("Datum obhajoby:").split(".")[-1]
+    result.abstract_cs = text_in_table("Abstrakt:")   
+    result.abstract_en = text_in_table("Abstract v angličtině:")   
+
+    try:
+      result.author = Person()
+      result.author.from_string(text_in_table("Autor:"))
+    except Exception as e:
+      debug_print("could not resolve author: " + str(e))
+
+    try:
+      result.supervisor = Person()
+      result.supervisor.from_string(text_in_table("Vedoucí:"))
+    except Exception as e:
+      debug_print("could not resolve supervisor: " + str(e))
+
+    result.degree = text_in_table("Přidělovaný titul:")
+
+    if result.degree == DEGREE_BC:
+      result.kind = THESIS_BACHELOR
+    elif result.degree in DEGREES_MASTER:
+      result.kind = THESIS_MASTER
+    elif result.degree in DEGREES_PHD:
+      result.kind = THESIS_PHD
+    elif result.degree in DEGREES_DR:
+      result.kind = THESIS_DR
+    elif result.degree == DEGREE_DOC:
+      result.kind = THESIS_DOC
+
+    try:
+      result.opponents = [Person()]
+      result.opponents[0].from_string(text_in_table("Oponent:"))
+    except Exception as e:
+      result.opponents = []
+      debug_print("could not resolve opponent: " + str(e)) 
+
+    string_to_grade = {
+        u"výborně": GRADE_A,
+        u"velmi dobře": GRADE_B,
+        u"dobře": GRADE_C,
+        u"uspokojivě": GRADE_D,
+        u"vyhovující": GRADE_E,
+        u"nevyhovující": GRADE_F
+      }
+
+    if result.kind in (THESIS_BACHELOR, THESIS_MASTER):
+      result.grade = string_to_grade[text_in_table("Výsledek obhajoby:")]
+      result.defended = result.grade != GRADE_F
+    elif result.kind == THESIS_PHD:
+      result.defended = text_in_table("Výsledek obhajoby:")[0] == "p"
+    elif result.kind == THESIS_DR:
+      result.defended = text_in_table("Výsledek obhajoby:")[0] == "u"
+
+    result.url_fulltext = soup.find("a",class_="btn")["href"]
+
+    pdf_info = download_and_analyze_pdf(result.url_fulltext)
+    result.incorporate_pdf_indo(pdf_info)
+
+    return result    
+
+  def get_thesis_list(self):
+    result = []
+
+    page = 1
+
+    while True:      # for each page
+      soup = BeautifulSoup(download_webpage("https://is.cuni.cz/webapps/zzp/search/?______searchform___search=&______facetform___facets___faculty%5B%5D=11320&tab_searchas=basic&lang=cs&PSzzpSearchListbasic=10&SOzzpSearchListbasic=&_sessionId=0&______searchform___butsearch=Vyhledat&PNzzpSearchListbasic=" + str(page)),"lxml")
+
+      current = soup.find("span",class_="title")
+
+      enough = True
+
+      while True:
+        current = current.find_next("div",class_="zzp-work-maintitle")
+
+        if current == None:
+          break
+
+        enough = False
+        result.append(current.contents[1]["href"])
+
+      page += 1
+
+      if enough or page > 500:
+        break
+
+    return result
+
 #----------------------------------------
 
 fit_vut = FitButDownloader()
 ctu = CtuDownloader()
 fai_utb = FaiUtbDownloader()
+mff_cuni = MffCuniDownloader()
+
+print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/85322/24959788/?q=%7B%22______searchform___search%22%3A%22%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A%222%22%7D&lang=cs"))
 
 # print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/27274"))
 
