@@ -143,6 +143,27 @@ DEPARTMENT_MFF_CUNI_SISAL = "MFF CUNI SISAL" # stredisko informaticke site a lab
 DEPARTMENT_MFF_CUNI_UFAL = "MFF CUNI UFAL"   # ustav formalni a aplikovane lingvistiky
 DEPARTMENT_MFF_CUNI_IUUK = "MFF CUNI IUUK"   # informaticky ustav universzity karlovy
 
+DEPARTMENT_FI_MUNI_KPSK = "KPSK FI MU"       # katedra pocitacovych systemu a komunikace
+DEPARTMENT_FI_MUNI_CVT = "CVT FI MU"         # centrum vypocetni techniky
+DEPARTMENT_FI_MUNI_KPGD = "KPGD FI MU"       # katedra pocitacove grafiky a designu
+DEPARTMENT_FI_MUNI_KIT = "KIT FI MU"         # katedra informacnich technologii
+DEPARTMENT_FI_MUNI_KTP = "KTP FI MU"         # katedra teorie programovani
+
+DEPARTMENT_FF_MUNI_UHV = "ÚHV FF MU"         # ustav hudebni vychovy
+DEPARTMENT_PDF_MUNI_KTECH = "KTechV PdF MU"  # katedra technicke a informacni vychovy
+DEPARTMENT_FF_MU_UCJ = "ÚČJ FF MU"           # ustav ceskeho jazyka
+
+DEPARTMENTS_MUNI = [
+  DEPARTMENT_FI_MUNI_KPSK,
+  DEPARTMENT_FI_MUNI_CVT,
+  DEPARTMENT_FI_MUNI_KPGD,
+  DEPARTMENT_FI_MUNI_KIT,
+  DEPARTMENT_FI_MUNI_KTP,
+  DEPARTMENT_FF_MUNI_UHV,
+  DEPARTMENT_PDF_MUNI_KTECH,
+  DEPARTMENT_FF_MU_UCJ
+]
+
 FIELD_AI = "artificial intelligence"
 FIELD_CG = "computer graphics"
 FIELD_NET = "computer networks"
@@ -506,6 +527,7 @@ class Thesis(object):
     self.abstract_en = None
     self.abstract_cs = None
     self.size = None                # in bytes
+    self.public_university = None
 
   def __str__(self):
     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False)
@@ -615,6 +637,11 @@ class Thesis(object):
       except Exception:
         print_norm("could not convert year to int")
 
+    if self.faculty in (FACULTY_FIT_BUT,FACULTY_FIT_CTU,FACULTY_FELK_CTU,
+      FACULTY_FAI_UTB,FACULTY_MFF_CUNI,FACULTY_FEI_VSB,FACULTY_FI_MUNI) and self.public_university != True:
+      print_norm("public university but public_university != True - correcting")
+      self.public_university = True
+
 class PDFInfo(object):
   def __init__(self, filename):
     self.language = None
@@ -706,6 +733,7 @@ class FitButDownloader(FacultyDownloader):
 
   def get_thesis_info(self, url): 
     result = Thesis()
+    result.public_university = True
 
     result.faculty = FACULTY_FIT_BUT
     result.city = CITY_BRNO
@@ -916,6 +944,7 @@ class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset 
           result.append(Thesis())
 
           result[-1].defended = True
+          result[-1].public_university = True
           result[-1].faculty = FACULTY_FIT_CTU
           result[-1].kind = THESIS_PHD if other_type == 0 else THESIS_DOC
           result[-1].degree = DEGREE_PHD if other_type == 0 else DEGREE_DOC
@@ -967,6 +996,7 @@ class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset 
 
   def get_thesis_info(self, url):
     result = Thesis()
+    result.public_university = True
 
     soup = BeautifulSoup(download_webpage(url),"lxml")
  
@@ -1092,6 +1122,7 @@ class FaiUtbDownloader(FacultyDownloader):
     result = Thesis()
     result.url_page = url
     result.city = CITY_ZLIN
+    result.public_university = True
 
     url += "?show=full"
 
@@ -1189,6 +1220,7 @@ class MffCuniDownloader(FacultyDownloader):
     result.city = CITY_PRAHA
     result.faculty = FACULTY_MFF_CUNI
     result.url_page = url
+    result.public_university = True
 
     soup = BeautifulSoup(download_webpage(url),"lxml")
 
@@ -1378,6 +1410,7 @@ class FeiVsbDownloader(FacultyDownloader):
   def get_thesis_info(self, url):
     url = url + "?show=full"
     result = Thesis()
+    result.public_university = True
 
     result.url_page = url
 
@@ -1471,6 +1504,7 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
         result.city = CITY_BRNO
         result.faculty = FACULTY_FI_MUNI
         result.url_page = page_url
+        result.public_university = True
 
         result.author = Person(div.find("b").string,False)
 
@@ -1529,6 +1563,7 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
 
   def get_thesis_info(self, url):
     result = Thesis()
+    result.public_university = True
 
     result.faculty = FACULTY_FI_MUNI
     result.city = CITY_BRNO
@@ -1593,8 +1628,6 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
 
     status_string = soup.find(lambda t: t.name == "h3" and t.string != None and starts_with(t.string,"Obhajoba")).find_next("li").contents[0]
 
-    print(status_string)
-
     if status_string.find(" úspěš") >= 0:
       result.defended = True
 
@@ -1603,12 +1636,19 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
     result.year = int(status_string.split(" ")[3][:-1])
 
     try:
-      result.supervisor = Person(soup.find("h4",string="Vedoucí:").find_next("li").string)
+      supervisor_string = soup.find("h4",string="Vedoucí:").find_next("li").string
+      result.supervisor = Person(supervisor_string)
+
+      for department in DEPARTMENTS_MUNI:
+        if supervisor_string.find(department) >= 0:
+          result.department = department
+          break
+
     except Exception as e:
       debug_print("could not resolve suprevisor: " + str(e))
 
     result.opponents = iterative_load(soup,
-      lambda t: t.name == "li" and t.parent.find_previous_sibling("h4",string="Oponenti:") != None,
+      lambda t: t.name == "li" and t.parent.find_previous_sibling(lambda t: t.name == "h4" and starts_with(t.string,"Oponent")) != None,
       lambda t: Person(t.string)
       )
 
@@ -1633,10 +1673,11 @@ fi_muni = FiMuniDownloader()
 #print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/38911"))
 
 #print(fi_muni.get_thesis_info("https://is.muni.cz/th/437651/fi_m/"))
-#print(fi_muni.get_thesis_info("https://is.muni.cz/th/72520/fi_b/"))
 
-fi_muni.get_thesis_list()
+print(fi_muni.get_thesis_info("https://is.muni.cz/th/359266/fi_b/"))
 
-for t in fi_muni.get_others():
-  print(t)
+#fi_muni.get_thesis_list()
+
+#for t in fi_muni.get_others():
+#  print(t)
 
