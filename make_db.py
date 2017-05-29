@@ -1440,17 +1440,41 @@ class FeiVsbDownloader(FacultyDownloader):
 
 #----------------------------------------
 
+class FiMuniDownloader(FacultyDownloader):
+
+  BASE_URL = "https://is.muni.cz/"
+
+  def get_thesis_list(self):
+    result = []
+
+    soup = BeautifulSoup(download_webpage("https://is.muni.cz/thesis/?FAK=1433;PRI=-;ROK=-;TIT=-;PRA=-;vypsat=1;exppar=1;por=1"),"lxml")
+
+    page_links = iterative_load(soup,
+      lambda t: t.name == "nobr" and t.parent.name == "font",
+      lambda t: FiMuniDownloader.BASE_URL + "thesis" + t.find_next("a")["href"][1:])
+
+    for page in page_links:   # first page already loaded
+      soup = BeautifulSoup(download_webpage(page),"lxml")
+
+      result += iterative_load(soup,
+        lambda t: t.name == "a" and t.string == "archiv",
+        lambda t: FiMuniDownloader.BASE_URL[:-1] + t["href"])
+
+    return result 
+
+#----------------------------------------
+
 fit_vut = FitButDownloader()
 ctu = CtuDownloader()
 fai_utb = FaiUtbDownloader()
 mff_cuni = MffCuniDownloader()
 fei_vsb = FeiVsbDownloader()
+fi_muni = FiMuniDownloader()
 
 #print(fit_vut.get_thesis_info("http://www.fit.vutbr.cz/study/DP/BP.php?id=16335&y=0&st=%E8%ED%BE"))
 #print(fei_vsb.get_thesis_info("http://dspace.vsb.cz/handle/10084/116764"))
 #print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F8&d=K103&y=2014&a=pichldom&t=bach"))
-print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/38911"))
+#print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/38911"))
 
-
-
-
+for l in fi_muni.get_thesis_list():
+  print(l)
