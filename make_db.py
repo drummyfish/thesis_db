@@ -22,6 +22,7 @@ THESIS_DR = "small doctorate"   # PhDr, RNDr, ...
 THESIS_DOC = "habilitation"     # Doc.
 
 DEGREE_BC = "Bc."
+DEGREE_BSC = "B.Sc."
 DEGREE_ING = "Ing."
 DEGREE_MGR = "Mgr."
 DEGREE_PHD = "PhD."
@@ -42,6 +43,11 @@ DEGREE_MDDR = "MDDr."
 DEGREE_MVDR = "MVDr."
 DEGREE_JUDR = "JUDr."
 DEGREE_THDR = "ThDr."
+
+DEGREES_BC = [
+  DEGREE_BC,
+  DEGREE_BSC
+  ]
 
 DEGREES_MASTER = [
   DEGREE_ING,
@@ -67,6 +73,7 @@ DEGREES_DR = [
 
 DEGREES = [
   DEGREE_BC,
+  DEGREE_BSC,
   DEGREE_ING,
   DEGREE_MGR,
   DEGREE_PHD,
@@ -350,7 +357,7 @@ NAMES_MALE = ["Jiří", "Jan", "Petr", "Pavel", "Jaroslav",
   "Marián", "Andrej", "Tibor", "Mikuláš", "Oto",
   "Dan", "Daniel", "Emanuel", "Čeněk", "Hynek",
   "Jarmil", "Matěj", "Mikoláš","Branislav","Matej",
-  "Dávid", "Samuel"]
+  "Dávid", "Samuel", "Mohamed", "Moslem"]
 
 NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Věra", "Lenka", "Alena", "Jaroslava", "Lucie",
@@ -411,7 +418,21 @@ def guess_field_from_keywords(keyword_list):
 
   return best_field
 
-class Person:
+def degree_to_thesis_type(degree): 
+  if degree in DEGREES_BC:
+    return THESIS_BACHELOR
+  elif degree in DEGREES_MASTER:
+    return THESIS_MASTER
+  elif degree in DEGREES_PHD:
+    return THESIS_PHD
+  elif degree in DEGREES_DR:
+    return THESIS_DR
+  elif degree == DEGREE_DOC:
+    return THESIS_DOC
+
+  return None
+
+class Person(object):
   def __init__(self, from_string=None, first_name_first=True):
    
     self.name_first = None
@@ -459,7 +480,7 @@ class Person:
     if self.sex == None and self.name_last != None and self.name_last[-1] == "á":
       self.sex = "female"
 
-class Thesis():
+class Thesis(object):
   def __init__(self):
 
     self.title_en = None
@@ -545,7 +566,7 @@ class Thesis():
       print_norm("not defended but wrong grade - correcting")
       self.defended = True
    
-    if self.degree == DEGREE_BC and self.kind != THESIS_BACHELOR:
+    if self.degree in DEGREES_BC and self.kind != THESIS_BACHELOR:
       print_norm("degree Bc. but kind != bachelor - correcting")
       self.kind = THESIS_BACHELOR 
 
@@ -594,7 +615,7 @@ class Thesis():
       except Exception:
         print_norm("could not convert year to int")
 
-class PDFInfo:
+class PDFInfo(object):
   def __init__(self, filename):
     self.language = None
     self.pages = None
@@ -661,7 +682,7 @@ def get_file_text(filename):
 def starts_with(what, prefix):
   return what[:len(prefix.decode("utf-8"))] == prefix
 
-class FacultyDownloader:              # base class for downloaders of theses of a single faculty
+class FacultyDownloader(object):      # base class for downloaders of theses of a single faculty
   def get_thesis_list(self):          # get list of links to these pages
     return []
 
@@ -868,7 +889,7 @@ class FitButDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-class CtuDownloader(FacultyDownloader):
+class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset with get_others
 
   BASE_URL = "https://dip.felk.cvut.cz/browse/"
 
@@ -1097,12 +1118,7 @@ class FaiUtbDownloader(FacultyDownloader):
     result.language = text_in_table("dc.language.iso")
     result.degree = text_in_table("dc.thesis.degree-name")
 
-    if result.degree == DEGREE_BC:
-      result.kind = THESIS_BACHELOR
-    elif result.degree in DEGREES_MASTER:
-      result.kind = THESIS_MASTER
-    elif result.degree in DEGREES_PHD:
-      result.kind = THESIS_PHD
+    result.kind = degree_to_thesis_type(result.degree)
 
     try:
       if result.kind != THESIS_PHD:
@@ -1233,16 +1249,7 @@ class MffCuniDownloader(FacultyDownloader):
 
     result.degree = text_in_table("Přidělovaný titul:")
 
-    if result.degree == DEGREE_BC:
-      result.kind = THESIS_BACHELOR
-    elif result.degree in DEGREES_MASTER:
-      result.kind = THESIS_MASTER
-    elif result.degree in DEGREES_PHD:
-      result.kind = THESIS_PHD
-    elif result.degree in DEGREES_DR:
-      result.kind = THESIS_DR
-    elif result.degree == DEGREE_DOC:
-      result.kind = THESIS_DOC
+    result.kind = degree_to_thesis_type(result.degree)
 
     try:
       result.opponents = [Person()]
@@ -1440,11 +1447,59 @@ class FeiVsbDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-class FiMuniDownloader(FacultyDownloader):
+class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these with get_others (after calling get_thesis_list)
 
   BASE_URL = "https://is.muni.cz/"
 
+  def __init__(self):
+    super(FiMuniDownloader,self).__init__()
+
+    self.other_these_retrieved = False
+    self.other_theses = []
+
+  def get_others(self):     # get_thesis_list must be called first
+    if not self.other_these_retrieved:
+      debug_print("WATCH OUT! calling get_others from FiMuniDownloader before get_thesis_list was called! Nothing will be returned.")
+      return []
+
+    return self.other_theses
+
   def get_thesis_list(self):
+    def analyze_div(div, page_url):
+      try:
+        result = Thesis()
+        result.city = CITY_BRNO
+        result.faculty = FACULTY_FI_MUNI
+        result.url_page = page_url
+
+        result.author = Person(div.find("b").string,False)
+
+        if div.find("i",string="úspěšně absolvováno") != None:
+          result.defended = True
+        elif div.find("i",string="neúspěšně ukončen") != None:
+          result.defended = False
+        
+        title_string = div.find_all("i")[-1].string
+
+        result.language = langdetect.detect(title_string) 
+
+        if result.language in (LANGUAGE_CS,LANGUAGE_SK):
+          result.title_cs = title_string
+        else:        
+          result.title_en = title_string
+
+        result.year = int(div.find("i",string="Fakulta informatiky").find_next("i").string)
+
+        result.degree = div.find(lambda t: t.name == "i" and t.string in DEGREES).string
+
+        result.kind = degree_to_thesis_type(result.degree)
+
+        result.normalize()
+        return result
+      except Exception as e:
+        debug_print("could not analyse thesis div: " + str(e))
+        return None
+
     result = []
 
     soup = BeautifulSoup(download_webpage("https://is.muni.cz/thesis/?FAK=1433;PRI=-;ROK=-;TIT=-;PRA=-;vypsat=1;exppar=1;por=1"),"lxml")
@@ -1459,8 +1514,109 @@ class FiMuniDownloader(FacultyDownloader):
       result += iterative_load(soup,
         lambda t: t.name == "a" and t.string == "archiv",
         lambda t: FiMuniDownloader.BASE_URL[:-1] + t["href"])
+ 
+      # retrieve other theses that don't have their own page:
 
-    return result 
+      self.other_theses += iterative_load(soup,
+        lambda t: t.name == "div" and t.parent.get("id") == "aplikace" and t.contents[0].name == "b" and t.find("a") == None,
+        lambda t: analyze_div(t,page))
+
+      break # TMP
+
+    self.other_these_retrieved = True
+
+    return result
+
+  def get_thesis_info(self, url):
+    result = Thesis()
+
+    result.faculty = FACULTY_FI_MUNI
+    result.city = CITY_BRNO
+    result.url_page = url
+
+    soup = BeautifulSoup(download_webpage(url),"lxml") 
+
+    current = soup.find(lambda t: t.get("id") == "metadata").find_next("b")
+
+    result.author = Person(current.string)
+
+    language_string = soup.find(lambda t: t.name == "p" and t.string != None and starts_with(t.string,"Jazyk práce:")).string[13:]
+
+    if language_string == "angličtina":
+      result.language = LANGUAGE_EN
+    elif language_string == "čeština":
+      result.language = LANGUAGE_CS
+    elif language_string == "slovenština":
+      result.language = LANGUAGE_SK
+
+    try:
+      current = current.find_next("h2")
+
+      if result.language in (LANGUAGE_CS,LANGUAGE_SK):
+        result.title_cs = current.string
+        next_sibling = current.find_next_sibling("h2")
+
+        if next_sibling != None:
+          result.title_en = next_sibling.string
+      else:
+        result.title_en = current.string
+        next_sibling = current.find_next_sibling("h2")
+
+        if next_sibling != None:
+          result.title_cs = next_sibling.string
+    except Exception as e:
+      debug_print("could not resolve title: " + str(e))
+
+    result.keywords = iterative_load(soup,
+      lambda t: t.name == "span" and t.get("class") != None and t.get("class")[0] == "tg5",
+      lambda t: t.contents[0].string)
+
+    result.field = guess_field_from_keywords(result.keywords)
+
+    result.abstract_cs = soup.find("i",string="Anotace:").next_sibling.string.replace("\n","").rstrip().lstrip()
+    result.abstract_en = soup.find("i",string="Abstract:").next_sibling.string.replace("\n","").rstrip().lstrip()
+
+    status_string = soup.find(lambda t: t.name == "h3" and t.string != None and starts_with(t.string,"Obhajoba")).string
+    
+    if status_string.find("bakalář") >= 0:
+      result.kind = THESIS_BACHELOR
+      result.degree = DEGREE_BC
+    elif status_string.find("diplom") >= 0:
+      result.kind = THESIS_MASTER
+      result.degree = DEGREE_MGR
+    elif status_string.find("disert") >= 0:
+      result.kind = THESIS_PHD
+      result.degree = DEGREE_PHD
+    if status_string.find("rigor") >= 0:
+      result.kind = THESIS_DR
+      result.degree = DEGREE_RNDR
+
+    status_string = soup.find(lambda t: t.name == "h3" and t.string != None and starts_with(t.string,"Obhajoba")).find_next("li").contents[0]
+
+    print(status_string)
+
+    if status_string.find(" úspěš") >= 0:
+      result.defended = True
+
+    result.url_fulltext = FiMuniDownloader.BASE_URL[:-1] + soup.find("h5",string="Plný text práce").find_next("a")["href"]
+
+    result.year = int(status_string.split(" ")[3][:-1])
+
+    try:
+      result.supervisor = Person(soup.find("h4",string="Vedoucí:").find_next("li").string)
+    except Exception as e:
+      debug_print("could not resolve suprevisor: " + str(e))
+
+    result.opponents = iterative_load(soup,
+      lambda t: t.name == "li" and t.parent.find_previous_sibling("h4",string="Oponenti:") != None,
+      lambda t: Person(t.string)
+      )
+
+    pdf_info = download_and_analyze_pdf(result.url_fulltext)
+    result.incorporate_pdf_indo(pdf_info)
+
+    result.normalize()
+    return result
 
 #----------------------------------------
 
@@ -1476,5 +1632,11 @@ fi_muni = FiMuniDownloader()
 #print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F8&d=K103&y=2014&a=pichldom&t=bach"))
 #print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/38911"))
 
-for l in fi_muni.get_thesis_list():
-  print(l)
+#print(fi_muni.get_thesis_info("https://is.muni.cz/th/437651/fi_m/"))
+#print(fi_muni.get_thesis_info("https://is.muni.cz/th/72520/fi_b/"))
+
+fi_muni.get_thesis_list()
+
+for t in fi_muni.get_others():
+  print(t)
+
