@@ -510,7 +510,7 @@ class Thesis(object):
   def __str__(self):
     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False)
 
-  def incorporate_pdf_indo(self, pdf_info):
+  def incorporate_pdf_info(self, pdf_info):
     self.pages = pdf_info.pages
     self.size = pdf_info.size    
     self.typesetting_system = pdf_info.typesetting_system
@@ -765,7 +765,7 @@ class FitButDownloader(FacultyDownloader):
     try:
       branch_string = text_in_table(u"Obor studia:")
 
-      prefix_fiels = (
+      prefix_fields = (
         (u"Bezpečnost",             FIELD_SEC),
         (u"Počítačová grafika",     FIELD_CG),
         (u"Informační systémy",     FIELD_IS),
@@ -776,7 +776,7 @@ class FitButDownloader(FacultyDownloader):
         ("Management",             FIELD_MAN)
         )
 
-      for item in prefix_fiels:
+      for item in prefix_fields:
         if starts_with(branch_string,item[0]):
           result.field = item[1]
           break
@@ -864,7 +864,7 @@ class FitButDownloader(FacultyDownloader):
 
     pdf_info = download_and_analyze_pdf(FitButDownloader.BASE_URL + result.url_fulltext)
  
-    result.incorporate_pdf_indo(pdf_info) 
+    result.incorporate_pdf_info(pdf_info) 
 
     result.normalize() 
     return result
@@ -1032,7 +1032,7 @@ class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset 
     result.url_fulltext = CtuDownloader.BASE_URL + soup.find("td",string="fulltext").find_next("a")["href"] 
 
     pdf_info = download_and_analyze_pdf(result.url_fulltext)
-    result.incorporate_pdf_indo(pdf_info)
+    result.incorporate_pdf_info(pdf_info)
 
     result.pages = pdf_info.pages
     result.typesetting_system = pdf_info.typesetting_system
@@ -1174,7 +1174,7 @@ class FaiUtbDownloader(FacultyDownloader):
 
     if result.url_fulltext.find(".pdf") >= 0:
       pdf_info = download_and_analyze_pdf(result.url_fulltext)
-      result.incorporate_pdf_indo(pdf_info)
+      result.incorporate_pdf_info(pdf_info)
 
     result.normalize() 
     return result
@@ -1295,7 +1295,7 @@ class MffCuniDownloader(FacultyDownloader):
     result.url_fulltext = soup.find("a",class_="btn")["href"]
 
     pdf_info = download_and_analyze_pdf(result.url_fulltext)
-    result.incorporate_pdf_indo(pdf_info)
+    result.incorporate_pdf_info(pdf_info)
 
     department_string = text_in_table("Pracoviště:")
 
@@ -1613,7 +1613,7 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
       )
 
     pdf_info = download_and_analyze_pdf(result.url_fulltext)
-    result.incorporate_pdf_indo(pdf_info)
+    result.incorporate_pdf_info(pdf_info)
 
     result.normalize()
     return result
