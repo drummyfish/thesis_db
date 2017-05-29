@@ -32,10 +32,21 @@ DEGREE_PROF = "prof."
 DEGREE_DOC = "doc."
 DEGREE_CSC = "CSc."
 DEGREE_MBA = "MBA"
+DEGREE_DR = "Dr."
+DEGREE_MSC = "MSc"
+
+# just in case:
+
+DEGREE_MUDR = "MUDr."
+DEGREE_MDDR = "MDDr."
+DEGREE_MVDR = "MVDr."
+DEGREE_JUDR = "JUDr."
+DEGREE_THDR = "ThDr."
 
 DEGREES_MASTER = [
   DEGREE_ING,
-  DEGREE_MGR
+  DEGREE_MGR,
+  DEGREE_MSC
   ]
 
 DEGREES_PHD = [
@@ -45,7 +56,13 @@ DEGREES_PHD = [
 
 DEGREES_DR = [
   DEGREE_PHDR,
-  DEGREE_RNDR
+  DEGREE_RNDR,
+  DEGREE_DR,
+  DEGREE_MUDR,
+  DEGREE_MDDR,
+  DEGREE_MVDR,
+  DEGREE_JUDR,
+  DEGREE_THDR
   ]
 
 DEGREES = [
@@ -59,7 +76,8 @@ DEGREES = [
   DEGREE_PROF,
   DEGREE_DOC,
   DEGREE_CSC,
-  DEGREE_MBA
+  DEGREE_MBA,
+  DEGREE_DR
   ]
 
 DEGREES_AFTER = [DEGREE_PHD, DEGREE_CSC, DEGREE_MBA] 
@@ -71,11 +89,13 @@ GRADE_D = "D"
 GRADE_E = "E"
 GRADE_F = "F"
 
-ALL_MARKS = [GRADE_A,GRADE_B,GRADE_C,GRADE_D,GRADE_E,GRADE_F]
+ALL_GRADES = [GRADE_A,GRADE_B,GRADE_C,GRADE_D,GRADE_E,GRADE_F]
 
 LANGUAGE_EN = "en"
 LANGUAGE_CS = "cs"
 LANGUAGE_SK = "sk"
+
+LANGUAGES = [LANGUAGE_CS, LANGUAGE_SK, LANGUAGE_EN]
 
 FACULTY_MFF_CUNI = "MFF CUNI"
 FACULTY_FIT_BUT = "FIT BUT"
@@ -378,8 +398,6 @@ def guess_field_from_keywords(keyword_list):
     histogram[field] = 0
 
   for keyword in keyword_list:
-    print(keyword,keyword in KEYWORDS_TO_FIELD)
-
     if keyword in KEYWORDS_TO_FIELD:
       histogram[KEYWORDS_TO_FIELD[keyword]] += 1
 
@@ -456,8 +474,8 @@ class Thesis():
     self.department = None
     self.url_page = None
     self.url_fulltext = None
-    self.author = Person()
-    self.supervisor = Person()
+    self.author = None
+    self.supervisor = None
     self.grade = None
     self.defended = None
     self.pages = None
@@ -478,6 +496,103 @@ class Thesis():
 
     if self.language == None:
       self.language = pdf_info.language
+
+  def normalize(self):              # makes the object consistent
+    def print_norm(print_what):
+      debug_print("NORMALIZATION: " + print_what)
+
+    if self.opponents == None:
+      print_norm("correcting oppoentnts (None to [])")
+      self.opponents = []
+
+    if self.keywords == None: 
+      print_norm("correcting keywords (None to [])")
+      self.keywords = []
+
+    if self.author != None and self.author.name_first == None and self.author.name_first == None:
+      print_norm("correcting author (set but empty)")
+      self.author = None
+
+    if self.supervisor != None and self.supervisor.name_first == None and self.supervisor.name_first == None:
+      print_norm("correcting supervisor (set but empty)")
+      self.supervisor = None
+
+    if self.degree != None and not self.degree in DEGREES:
+      print_norm("correcting degree (" + str(self.degree) + ")")
+      self.degree = None
+
+    if self.language != None and not self.language in LANGUAGES:
+      print_norm("correcting language (" + str(self.language) + ")")
+      self.language = None 
+
+    if self.grade != None and not self.grade in ALL_GRADES:
+      print_norm("correcting grade (" + str(self.grade) + ")")
+      self.grade = None
+
+    if self.field != None and not self.field in ALL_FIELDS:
+      print_norm("correcting field (" + str(self.field) + ")")
+      self.field = None
+
+    if self.degree == DEGREE_PHD2: 
+      print_norm("correcting degree: " + DEGREE_PHD2 + " -> " + DEGREE_PHD)
+      self.degree = DEGREE_PHD
+
+    if self.grade == GRADE_F and self.defended != False:
+      print_norm("F grade but wrong defended value - correcting")
+      self.defended = False
+
+    if self.defended == False and self.grade != None and self.grade != GRADE_F:
+      print_norm("not defended but wrong grade - correcting")
+      self.defended = True
+   
+    if self.degree == DEGREE_BC and self.kind != THESIS_BACHELOR:
+      print_norm("degree Bc. but kind != bachelor - correcting")
+      self.kind = THESIS_BACHELOR 
+
+    if self.kind == THESIS_BACHELOR and self.degree != DEGREE_BC:
+      print_norm("kind bachelor but degree != Bc. - correcting")
+      self.degree = DEGREE_BC
+
+    if self.degree in DEGREES_MASTER and self.kind != THESIS_MASTER:
+      print_norm("master degree but kind != master - correcting")
+      self.kind = THESIS_MASTER
+ 
+    if self.degree == DEGREE_DOC and self.kind != THESIS_DOC:
+      print_norm("doc. degree but kind != doc - correcting")
+      self.kind = THESIS_DOC
+
+    if self.kind == THESIS_DOC and self.degree != DEGREE_DOC:
+      print_norm("kind doc but degree != doc. - correcting")
+      self.degree = DEGREE_DOC
+
+    if self.degree in DEGREES_PHD and self.kind != THESIS_PHD:
+      print_norm("PhD degree but kind != phd - correcting")
+      self.kind = THESIS_PHD
+
+    if self.kind == THESIS_PHD and self.degree != DEGREE_PHD:
+      print_norm("kind phd but degree != PhD - correcting")
+      self.degree = DEGREE_PHD
+
+    if self.degree in DEGREES_DR and self.kind != THESIS_DR:
+      print_norm("degree dr but kind != dr - correcting")
+      self.kind = THESIS_DR
+
+    if self.kind == THESIS_DOC and self.defended != True:
+      print_norm("doc thesis and defended != True - correcting")
+      self.defended = True
+
+    if self.year != None and not isinstance(self.year,int):
+      print_norm("year not int - correcting")
+      
+      try:
+        self.year = int(self.year)
+
+        if self.year < 1000 or self.year > 3000:
+          print_norm("wrong year value (" + str(self.year) + ") - clearing")
+          self.year = None
+
+      except Exception:
+        print_norm("could not convert year to int")
 
 class PDFInfo:
   def __init__(self, filename):
@@ -617,9 +732,9 @@ class FitButDownloader(FacultyDownloader):
 
     try:
       if result.kind == THESIS_PHD:
-        result.year = text_in_table(u"Disertace:")
+        result.year = int(text_in_table(u"Disertace:"))
       else: 
-        result.year = text_in_table(u"Ak.rok:").split("/")[1]
+        result.year = int(text_in_table(u"Ak.rok:").split("/")[1])
     except Exception as e:
       debug_print("year not found: " + str(e))
 
@@ -711,7 +826,7 @@ class FitButDownloader(FacultyDownloader):
       else:
         result.grade = GRADE_F
 
-      if not result.grade in ALL_MARKS:
+      if not result.grade in ALL_GRADES:
         result.grade = None    
 
     try:
@@ -729,7 +844,8 @@ class FitButDownloader(FacultyDownloader):
     pdf_info = download_and_analyze_pdf(FitButDownloader.BASE_URL + result.url_fulltext)
  
     result.incorporate_pdf_indo(pdf_info) 
- 
+
+    result.normalize() 
     return result
 
   def get_thesis_list(self):
@@ -797,9 +913,9 @@ class CtuDownloader(FacultyDownloader):
         elif state == 2:
 
           if other_type == 0:
-            result[-1].year = current.contents[1].string.split(".")[2]
+            result[-1].year = int(current.contents[1].string.split(".")[2])
           else:
-            result[-1].year = current.string.split(".")[2]
+            result[-1].year = int(current.string.split(".")[2])
 
           state += 1
         elif state == 3:
@@ -875,7 +991,7 @@ class CtuDownloader(FacultyDownloader):
     result.supervisor = Person()
     result.supervisor.from_string(text_in_table("vedoucí"))
 
-    result.year = text_in_table("rok")
+    result.year = int(text_in_table("rok"))
 
     type_string = text_in_table("typ")
 
@@ -901,6 +1017,7 @@ class CtuDownloader(FacultyDownloader):
     result.typesetting_system = pdf_info.typesetting_system
     result.language = pdf_info.language
 
+    result.normalize() 
     return result
 
 #----------------------------------------
@@ -965,7 +1082,7 @@ class FaiUtbDownloader(FacultyDownloader):
       tag = soup.find("td",string=line).find_next("td")
       return tag.string if tag.string != None else tag.contents[1].string
 
-    result.year = text_in_table("dc.date.issued").split("-")[0]
+    result.year = int(text_in_table("dc.date.issued").split("-")[0])
 
     result.author = Person()
     result.author.from_string(text_in_table("dc.contributor.author"),False)
@@ -1043,6 +1160,7 @@ class FaiUtbDownloader(FacultyDownloader):
       pdf_info = download_and_analyze_pdf(result.url_fulltext)
       result.incorporate_pdf_indo(pdf_info)
 
+    result.normalize() 
     return result
 
 #---------------------------------------
@@ -1093,7 +1211,7 @@ class MffCuniDownloader(FacultyDownloader):
       result.title_en = result.title_cs
       result.title_cs = None
 
-    result.year = text_in_table("Datum obhajoby:").split(".")[-1]
+    result.year = int(text_in_table("Datum obhajoby:").split(".")[-1])
 
     try:
       result.abstract_cs = text_in_table("Abstrakt:")   
@@ -1193,6 +1311,7 @@ class MffCuniDownloader(FacultyDownloader):
     elif department_string.find("IUUK") >= 0:
       result.department = DEPARTMENT_MFF_CUNI_IUUK
     
+    result.normalize() 
     return result    
 
   def get_thesis_list(self):
@@ -1272,7 +1391,7 @@ class FeiVsbDownloader(FacultyDownloader):
       result.degree = DEGREE_BC
     elif starts_with(type_string,"Diser"):
       result.kind = THESIS_PHD
-      result.degree = DEGREES_PHD
+      result.degree = DEGREE_PHD
     elif starts_with(type_string,"Habil"):
       result.kind = THESIS_DOC
       result.degree = DEGREE_DOC
@@ -1283,7 +1402,7 @@ class FeiVsbDownloader(FacultyDownloader):
     result.supervisor = Person()
     result.supervisor.from_string(text_in_table("dc.contributor.advisor"),False)
 
-    result.year = text_in_table("dc.date.issued")
+    result.year = int(text_in_table("dc.date.issued"))
     result.language = text_in_table("dc.language.iso")
 
     if result.language in [LANGUAGE_CS,LANGUAGE_SK]:
@@ -1316,6 +1435,7 @@ class FeiVsbDownloader(FacultyDownloader):
 
     result.pages = text_in_table("dc.format").split(" ")[0]
 
+    result.normalize() 
     return result
 
 #----------------------------------------
@@ -1326,29 +1446,11 @@ fai_utb = FaiUtbDownloader()
 mff_cuni = MffCuniDownloader()
 fei_vsb = FeiVsbDownloader()
 
-for l in fit_vut.get_thesis_list():
-  print(l)
+#print(fit_vut.get_thesis_info("http://www.fit.vutbr.cz/study/DP/BP.php?id=16335&y=0&st=%E8%ED%BE"))
+#print(fei_vsb.get_thesis_info("http://dspace.vsb.cz/handle/10084/116764"))
+#print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F8&d=K103&y=2014&a=pichldom&t=bach"))
+print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/38911"))
 
-#print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/37262"))
 
-#print(fei_vsb.get_thesis_info("http://dspace.vsb.cz/handle/10084/105757"))
-
-#print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/115130/24960376/?q=%7B%22______searchform___search%22%3A%22KSI%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A1%7D&lang=cs"))
-
-# print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/27274"))
-
-#for l in fai_utb.get_thesis_list():
-#  print(l)
-
-#for l in fit_vut.get_thesis_list():
-#  print(l)
-
-#info = fit_vut.get_thesis_info("http://www.fit.vutbr.cz/research/habilitace/index.php?id=10697&type=HABIL")
-#print(str(info))
-
-#l = ctu.get_thesis_list()
-#  print(l)
-
-#print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F3&d=K13136&y=2005&a=franc&t=dipl"))
 
 
