@@ -1179,19 +1179,29 @@ class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset 
       DEPARTMENT_FELK_CTU_CS: FIELD_HW,
       DEPARTMENT_FELK_CTU_DCGI: FIELD_CG
       }
+   
+    try:
+      result.department = string_to_department[text_in_table("katedra")]
+    except Exception as e:
+      debug_print("could not resolve department: " + str(e))
 
-    result.department = string_to_department[text_in_table("katedra")]
     result.field = department_to_field[result.department]
  
-    result.author = Person()
-    result.author.from_string(text_in_table("autor"))
+    try:
+      result.author = Person(text_in_table("autor"))
+      result.supervisor = Person(text_in_table("vedoucí"))
+      result.year = int(text_in_table("rok"))
+      type_string = text_in_table("typ")
 
-    result.supervisor = Person()
-    result.supervisor.from_string(text_in_table("vedoucí"))
+      if type_string == "Diplomová práce":
+        result.kind = THESIS_MASTER
+        result.degree = DEGREE_ING
+      elif type_string == "Bakalářská práce":
+        result.kind = THESIS_BACHELOR
+        result.degree = DEGREE_BC
 
-    result.year = int(text_in_table("rok"))
-
-    type_string = text_in_table("typ")
+    except Exception as e:
+      debug_print("error at author/supervisor/year/type: " + str(e))
 
     if type_string == "Diplomová práce":
       result.kind = THESIS_MASTER
@@ -1200,20 +1210,28 @@ class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset 
       result.kind = THESIS_BACHELOR
       result.degree = DEGREE_BC
 
-    result.title_en = text_in_table("název (anglicky)")
-    result.title_cs = text_in_table("název")
+    try:
+      result.title_en = text_in_table("název (anglicky)")
+      result.title_cs = text_in_table("název")
+    except Exception as e:
+      debug_print("could not resolve title: " + str(e))
 
-    result.abstract_en = text_in_table("abstrakt (anglicky)")
-    result.abstract_cs = text_in_table("abstrakt")
+    try:
+      result.abstract_en = text_in_table("abstrakt (anglicky)")
+      result.abstract_cs = text_in_table("abstrakt")
+    except Exception as e:
+      debug_print("could not resolve abstract: " + str(e))
 
-    result.url_fulltext = CtuDownloader.BASE_URL + soup.find("td",string="fulltext").find_next("a")["href"] 
+    try:
+      result.url_fulltext = CtuDownloader.BASE_URL + soup.find("td",string="fulltext").find_next("a")["href"]  
+    except Exception as e:
+      debug_print("could not resolve fulltext: " + str(e))
 
-    pdf_info = download_and_analyze_pdf(result.url_fulltext)
-    result.incorporate_pdf_info(pdf_info)
-
-    result.pages = pdf_info.pages
-    result.typesetting_system = pdf_info.typesetting_system
-    result.language = pdf_info.language
+    try:
+      pdf_info = download_and_analyze_pdf(result.url_fulltext)
+      result.incorporate_pdf_info(pdf_info)
+    except Exception as e:
+      debug_print("could not analyze pdf: " + str(e))
 
     result.normalize() 
     return result
