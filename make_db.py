@@ -13,7 +13,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-ANALYZE_PDFS = False
+ANALYZE_PDFS = True
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
@@ -671,8 +671,10 @@ class PDFInfo(object):
 
       if created_with[:5].lower() == "latex":
         self.typesetting_system = SYSTEM_LATEX
-      elif created_with.lower().find("word"):
-        self.typesetting_system = SYSTEM_WORD
+      elif created_with.lower().find("word") >= 0:
+        self.typesetting_system = SYSTEM_WORD 
+      elif created_with.lower().find("writer") >= 0:
+        self.typesetting_system = SYSTEM_OPEN_OFFICE
       else:
         self.typesetting_system = None
 
@@ -1674,7 +1676,12 @@ fi_muni = FiMuniDownloader()
 
 #print(fi_muni.get_thesis_info("https://is.muni.cz/th/437651/fi_m/"))
 
-print(fi_muni.get_thesis_info("https://is.muni.cz/th/359266/fi_b/"))
+#print(fi_muni.get_thesis_info("https://is.muni.cz/th/359266/fi_b/"))
+
+
+p = PDFInfo("word_test.pdf")
+
+print(p.typesetting_system)
 
 #fi_muni.get_thesis_list()
 
