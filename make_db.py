@@ -1129,6 +1129,8 @@ class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset 
     result = Thesis()
     result.public_university = True
 
+    # branch info is unavailable at the CTU website
+
     soup = BeautifulSoup(download_webpage(url),"lxml")
  
     result.url_page = url
@@ -1328,6 +1330,23 @@ class FaiUtbDownloader(FacultyDownloader):
       result.department = DEPARTMENT_FAI_UTB_UPKS
     elif grantor_string.find("řízení proc") >= 0:
       result.department = DEPARTMENT_FAI_UTB_URP
+
+    branch_string = text_in_table("dc.thesis.degree-discipline")
+
+    substring_to_branch = {
+      "Informační technologie": BRANCH_FAI_UTB_IT,
+      "Bezpečnostní technologie": BRANCH_FAI_UTB_BTSM,
+      "řídicí technologie": BRANCH_FAI_UTB_IRT,
+      "v administrativě": BRANCH_FAI_UTB_ITA,
+      "Automatizace a řídicí": BRANCH_FAI_UTB_ARI,
+      "Učitelství": BRANCH_FAI_UTB_UISS,
+      "komunikační systémy": BRANCH_FAI_UTB_PKS, 
+      "roboty": BRANCH_FAI_UTB_ISR,
+      "Softwarové": BRANCH_FAI_UTB_SWI,
+      "budovách": BRANCH_FAI_UTB_ISB 
+      }
+
+    result.handle_branch(branch_string,substring_to_branch)
 
     if result.field == None:
       result.field = guess_field_from_keywords(result.keywords)
@@ -1798,8 +1817,8 @@ mff_cuni = MffCuniDownloader()
 fei_vsb = FeiVsbDownloader()
 fi_muni = FiMuniDownloader()
 
-print(fit_vut.get_thesis_info("http://www.fit.vutbr.cz/study/DP/PD.php?id=88&y=0"))
+#print(fit_vut.get_thesis_info("http://www.fit.vutbr.cz/study/DP/PD.php?id=88&y=0"))
 #print(fei_vsb.get_thesis_info("http://dspace.vsb.cz/handle/10084/116764"))
 #print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F8&d=K103&y=2014&a=pichldom&t=bach"))
-#print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/38911"))
+print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/10542"))
 
