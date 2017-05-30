@@ -36,6 +36,8 @@ DEGREE_CSC = "CSc."
 DEGREE_MBA = "MBA"
 DEGREE_DR = "Dr."
 DEGREE_MSC = "MSc"
+DEGREE_MGA = "MgA."
+DEGREE_BCA = "BcA."
 
 # just in case:
 
@@ -47,13 +49,15 @@ DEGREE_THDR = "ThDr."
 
 DEGREES_BC = [
   DEGREE_BC,
-  DEGREE_BSC
+  DEGREE_BSC,
+  DEGREE_BCA
   ]
 
 DEGREES_MASTER = [
   DEGREE_ING,
   DEGREE_MGR,
-  DEGREE_MSC
+  DEGREE_MSC,
+  DEGREE_MGA
   ]
 
 DEGREES_PHD = [
@@ -85,8 +89,11 @@ DEGREES = [
   DEGREE_DOC,
   DEGREE_CSC,
   DEGREE_MBA,
-  DEGREE_DR
+  DEGREE_DR,
+  DEGREE_MGA,
+  DEGREE_BCA
   ]
+
 
 DEGREES_AFTER = [DEGREE_PHD, DEGREE_CSC, DEGREE_MBA] 
 
@@ -146,7 +153,7 @@ BRANCH_FI_MUNI_IS     = "FI MUNI IS"           # (mgr) informacni systemy
 BRANCH_FI_MUNI_TI     = "FI MUNI TI"           # (mgr) teoreticka informatika
 BRANCH_FI_MUNI_SSME   = "FI MUNI SSME"         # (mgr) service science, management, and engineering
 BRANCH_FI_MUNI_OBR    = "FI MUNI OBR"          # (mgr) zpracovani obrazu
-BRANCH_FI_UCI         = "FI MUNI UCI"          # (mgr) ucitelstvi informatiky pro stredni skoly
+BRANCH_FI_MUNI_UCI    = "FI MUNI UCI"          # (mgr) ucitelstvi informatiky pro stredni skoly
 
 BRANCH_FIT_CTU_BIT    = "FIT CTU BIT"          # (bc) bezpecnost informacnich technologii
 BRANCH_FIT_CTU_ISM    = "FIT CTU ISM"          # (bc) studijni obor informacni systemy a management
@@ -427,8 +434,15 @@ KEYWORDS_TO_FIELD = {
   "agent": FIELD_AI,
   "augmented reality": FIELD_CG,
   "voxel": FIELD_CG,
-  "klasifikace": FIELD_AI
+  "klasifikace": FIELD_AI,
+  "computability": FIELD_TCS,
+  "decidability": FIELD_TCS
   }
+
+KEYWORDS_TO_FIELD_LOWER = {}
+
+for k in KEYWORDS_TO_FIELD:
+  KEYWORDS_TO_FIELD_LOWER[k.lower()] = KEYWORDS_TO_FIELD[k]
 
 CITY_PRAHA = "Praha"
 CITY_BRNO = "Brno"
@@ -462,7 +476,7 @@ NAMES_MALE = ["Jiří", "Jan", "Petr", "Pavel", "Jaroslav",
   "Marián", "Andrej", "Tibor", "Mikuláš", "Oto",
   "Dan", "Daniel", "Emanuel", "Čeněk", "Hynek",
   "Jarmil", "Matěj", "Mikoláš","Branislav","Matej",
-  "Dávid", "Samuel", "Mohamed", "Moslem"]
+  "Dávid", "Samuel", "Mohamed", "Moslem", "Gabriel"]
 
 NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Věra", "Lenka", "Alena", "Jaroslava", "Lucie",
@@ -510,8 +524,8 @@ def guess_field_from_keywords(keyword_list):
     histogram[field] = 0
 
   for keyword in keyword_list:
-    if keyword in KEYWORDS_TO_FIELD:
-      histogram[KEYWORDS_TO_FIELD[keyword]] += 1
+    if keyword.lower() in KEYWORDS_TO_FIELD_LOWER:
+      histogram[KEYWORDS_TO_FIELD_LOWER[keyword.lower()]] += 1
 
   best_field = None
   best_score = 0
@@ -1592,41 +1606,62 @@ class FeiVsbDownloader(FacultyDownloader):
     def text_in_table(line):
       return soup.find("td",string=line).find_next("td").string
 
-    type_string = text_in_table("dc.type")
+    try:
+      type_string = text_in_table("dc.type")
 
-    if starts_with(type_string,"Diplom"):
-      result.kind = THESIS_MASTER
-    elif starts_with(type_string,"Baka"):
-      result.kind = THESIS_BACHELOR
-      result.degree = DEGREE_BC
-    elif starts_with(type_string,"Diser"):
-      result.kind = THESIS_PHD
-      result.degree = DEGREE_PHD
-    elif starts_with(type_string,"Habil"):
-      result.kind = THESIS_DOC
-      result.degree = DEGREE_DOC
+      if starts_with(type_string,"Diplom"):
+        result.kind = THESIS_MASTER
+      elif starts_with(type_string,"Baka"):
+        result.kind = THESIS_BACHELOR
+        result.degree = DEGREE_BC
+      elif starts_with(type_string,"Diser"):
+        result.kind = THESIS_PHD
+        result.degree = DEGREE_PHD
+      elif starts_with(type_string,"Habil"):
+        result.kind = THESIS_DOC
+        result.degree = DEGREE_DOC
+    except Exception as e:
+      debug_print("could not resolve thesis type:" + str(e))
 
-    result.author = Person()
-    result.author.from_string(text_in_table("dc.contributor.author"),False)
+    try:
+      result.author = Person(text_in_table("dc.contributor.author"),False)
+      result.supervisor = Person(text_in_table("dc.contributor.advisor"),False)
+      result.year = int(text_in_table("dc.date.issued"))
+      result.language = text_in_table("dc.language.iso")
+    except Exception as e:
+      debug_print("error at author/supervisor/year/language: " + str(e))   
 
-    result.supervisor = Person()
-    result.supervisor.from_string(text_in_table("dc.contributor.advisor"),False)
+    try:
+      branch_string = text_in_table("dc.thesis.degree-branch")
 
-    result.year = int(text_in_table("dc.date.issued"))
-    result.language = text_in_table("dc.language.iso")
+      substring_to_branch = {
+        "Informatika a": BRANCH_FEI_VSB_IVT,
+        "Řídicí": BRANCH_FEI_VSB_RIS,
+        "Mobilní": BRANCH_FEI_VSB_MT,
+        "Telekomuni": BRANCH_FEI_VSB_TT,
+        "Výpočetní mat": BRANCH_FEI_VSB_VM,
+        "komunikační bezpečnost": BRANCH_FEI_VSB_IKB
+        }
 
-    if result.language in [LANGUAGE_CS,LANGUAGE_SK]:
-      try:
-        result.title_cs = text_in_table("dc.title")
-        result.title_en = text_in_table("dc.title.alternative")
-      except Exception as e:
-        pass
-    else:
-      try:
-        result.title_en = text_in_table("dc.title")
-        result.title_cs = text_in_table("dc.title.alternative")
-      except Exception as e:
-        pass
+      result.handle_branch(branch_string,substring_to_branch)
+    except Exception as e:
+      debug_print("could not recolve branch: " + str(e))
+
+    try:
+      if result.language in [LANGUAGE_CS,LANGUAGE_SK]:
+        try:
+          result.title_cs = text_in_table("dc.title")
+          result.title_en = text_in_table("dc.title.alternative")
+        except Exception as e:
+          pass
+      else:
+        try:
+          result.title_en = text_in_table("dc.title")
+          result.title_cs = text_in_table("dc.title.alternative")
+        except Exception as e:
+          pass
+    except Exception as e:
+      debug_print("could not resolve title: " + str(e))
 
     try:
       abstract_tag = soup.find("td",string="dc.description.abstract")
@@ -1643,7 +1678,12 @@ class FeiVsbDownloader(FacultyDownloader):
 
     result.field = guess_field_from_keywords(result.keywords)
 
-    result.pages = text_in_table("dc.format").split(" ")[0]
+    # fulltexts are not available for FEI VSB
+
+    try:
+      result.pages = text_in_table("dc.format").split(" ")[0]
+    except Exception as e:
+      debug_print("could not retrieve number of pages: " + str(e))
 
     result.normalize() 
     return result
@@ -1659,6 +1699,28 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
 
     self.other_these_retrieved = False
     self.other_theses = []
+
+    self.substring_to_branch = {
+        "Zpracování": BRANCH_FI_MUNI_OBR,
+        "Aplikovaná": BRANCH_FI_MUNI_AP,
+        "Teoretická": BRANCH_FI_MUNI_TI,
+        "grafika": BRANCH_FI_MUNI_GRA,
+        "Informační systémy": BRANCH_FI_MUNI_IS,
+        "Matematická": BRANCH_FI_MUNI_MI,
+        "Bezpečnost": BRANCH_FI_MUNI_SEC,
+        "Služby": BRANCH_FI_MUNI_SSME,
+        "sítě a": BRANCH_FI_MUNI_PSK,
+        "správě": BRANCH_FI_MUNI_INVS,
+        "Paralelní": BRANCH_FI_MUNI_PDS,
+        "Počítačové systémy": BRANCH_FI_MUNI_PSZD,
+        "Programovatelné techni": BRANCH_FI_MUNI_PTS,
+        "inteligence": BRANCH_FI_MUNI_UMI, 
+        "Bio": BRANCH_FI_MUNI_BIO,
+        "Soci": BRANCH_FI_MUNI_SOCI,
+        "druhý": BRANCH_FI_MUNI_IO,
+        "Kybernetická bezpečnost": BRANCH_FI_MUNI_KB,
+        "Učitelství": BRANCH_FI_MUNI_UCI 
+      }
 
   def get_others(self):     # get_thesis_list must be called first
     if not self.other_these_retrieved:
@@ -1682,6 +1744,8 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
           result.defended = True
         elif div.find("i",string="neúspěšně ukončen") != None:
           result.defended = False
+
+        result.handle_branch(div.find_all("i")[4].string,self.substring_to_branch)
         
         title_string = div.find_all("i")[-1].string
 
@@ -1745,14 +1809,17 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
 
     result.author = Person(current.string)
 
-    language_string = soup.find(lambda t: t.name == "p" and t.string != None and starts_with(t.string,"Jazyk práce:")).string[13:]
+    try:
+      language_string = soup.find(lambda t: t.name == "p" and t.string != None and starts_with(t.string,"Jazyk práce:")).string[13:]
 
-    if language_string == "angličtina":
-      result.language = LANGUAGE_EN
-    elif language_string == "čeština":
-      result.language = LANGUAGE_CS
-    elif language_string == "slovenština":
-      result.language = LANGUAGE_SK
+      if language_string == "angličtina":
+        result.language = LANGUAGE_EN
+      elif language_string == "čeština":
+        result.language = LANGUAGE_CS
+      elif language_string == "slovenština":
+        result.language = LANGUAGE_SK
+    except Exception as e:
+      debug_print("could not resolve language:" + str(e))
 
     try:
       current = current.find_next("h2")
@@ -1772,38 +1839,58 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
     except Exception as e:
       debug_print("could not resolve title: " + str(e))
 
-    result.keywords = iterative_load(soup,
-      lambda t: t.name == "span" and t.get("class") != None and t.get("class")[0] == "tg5",
-      lambda t: t.contents[0].string)
+    try:
+      result.keywords = iterative_load(soup,
+        lambda t: t.name == "span" and t.get("class") != None and t.get("class")[0] == "tg5",
+        lambda t: t.contents[0].string)
 
-    result.field = guess_field_from_keywords(result.keywords)
+      result.field = guess_field_from_keywords(result.keywords)
+    except Exception as e:
+      debug_print("error at keywords/field: " + str(e))
 
-    result.abstract_cs = soup.find("i",string="Anotace:").next_sibling.string.replace("\n","").rstrip().lstrip()
-    result.abstract_en = soup.find("i",string="Abstract:").next_sibling.string.replace("\n","").rstrip().lstrip()
+    try:
+      result.abstract_cs = soup.find("i",string="Anotace:").next_sibling.string.replace("\n","").rstrip().lstrip()
+      result.abstract_en = soup.find("i",string="Abstract:").next_sibling.string.replace("\n","").rstrip().lstrip()
+    except Exception as e:
+      debug_print("could not resolve abstract:" + str(e))
 
-    status_string = soup.find(lambda t: t.name == "h3" and t.string != None and starts_with(t.string,"Obhajoba")).string
-    
-    if status_string.find("bakalář") >= 0:
-      result.kind = THESIS_BACHELOR
-      result.degree = DEGREE_BC
-    elif status_string.find("diplom") >= 0:
-      result.kind = THESIS_MASTER
-      result.degree = DEGREE_MGR
-    elif status_string.find("disert") >= 0:
-      result.kind = THESIS_PHD
-      result.degree = DEGREE_PHD
-    if status_string.find("rigor") >= 0:
-      result.kind = THESIS_DR
-      result.degree = DEGREE_RNDR
+    try:
+      status_string = soup.find(lambda t: t.name == "h3" and t.string != None and starts_with(t.string,"Obhajoba")).string
+      
+      if status_string.find("bakalář") >= 0:
+        result.kind = THESIS_BACHELOR
+        result.degree = DEGREE_BC
+      elif status_string.find("diplom") >= 0:
+        result.kind = THESIS_MASTER
+        result.degree = DEGREE_MGR
+      elif status_string.find("disert") >= 0:
+        result.kind = THESIS_PHD
+        result.degree = DEGREE_PHD
+      if status_string.find("rigor") >= 0:
+        result.kind = THESIS_DR
+        result.degree = DEGREE_RNDR
+    except Exception as e:
+      debug_print("could not resolve thesis kind: " + str(e))
 
-    status_string = soup.find(lambda t: t.name == "h3" and t.string != None and starts_with(t.string,"Obhajoba")).find_next("li").contents[0]
+    result.handle_branch(soup.find("h4",string="Masarykova univerzita").find_next("em").string,self.substring_to_branch)
 
-    if status_string.find(" úspěš") >= 0:
-      result.defended = True
+    try:
+      status_string = soup.find(lambda t: t.name == "h3" and t.string != None and starts_with(t.string,"Obhajoba")).find_next("li").contents[0]
 
-    result.url_fulltext = FiMuniDownloader.BASE_URL[:-1] + soup.find("h5",string="Plný text práce").find_next("a")["href"]
+      if status_string.find(" úspěš") >= 0:
+        result.defended = True
+    except Exception as e:
+      debug_print("could not resolve defended state: " + str(e))
 
-    result.year = int(status_string.split(" ")[3][:-1])
+    try:
+      result.url_fulltext = FiMuniDownloader.BASE_URL[:-1] + soup.find("h5",string="Plný text práce").find_next("a")["href"]
+    except Exception as e:
+      debug_print("could not resolve fulltext: " + str(e))
+
+    try:
+      result.year = int(status_string.split(" ")[3][:-1])
+    except Exception as e:
+      debug_print("could not resolve year: " + str(e))
 
     try:
       supervisor_string = soup.find("h4",string="Vedoucí:").find_next("li").string
@@ -1822,8 +1909,11 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
       lambda t: Person(t.string)
       )
 
-    pdf_info = download_and_analyze_pdf(result.url_fulltext)
-    result.incorporate_pdf_info(pdf_info)
+    try:
+      pdf_info = download_and_analyze_pdf(result.url_fulltext)
+      result.incorporate_pdf_info(pdf_info)
+    except Exception as e:
+      print("could not analyze pdf: " + str(e))
 
     result.normalize()
     return result
@@ -1836,9 +1926,3 @@ fai_utb = FaiUtbDownloader()
 mff_cuni = MffCuniDownloader()
 fei_vsb = FeiVsbDownloader()
 fi_muni = FiMuniDownloader()
-
-#print(fit_vut.get_thesis_info("http://www.fit.vutbr.cz/study/DP/PD.php?id=88&y=0"))
-#print(fei_vsb.get_thesis_info("http://dspace.vsb.cz/handle/10084/116764"))
-#print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F8&d=K103&y=2014&a=pichldom&t=bach"))
-print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/79056/24991138/?q=%7B%22______searchform___search%22%3A%22%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A%2210%22%7D&lang=cs"))
-
