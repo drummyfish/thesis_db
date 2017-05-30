@@ -7,13 +7,14 @@ import langdetect
 import json
 from PyPDF2 import PdfFileReader
 from bs4 import BeautifulSoup
+from bs4 import element
 import os
 import sys
 
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-ANALYZE_PDFS = True
+ANALYZE_PDFS = False
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
@@ -111,6 +112,89 @@ FACULTY_FELK_CTU = "FELK CVUT"
 FACULTY_FIT_CTU = "FIT CTU"
 FACULTY_FEI_VSB = "FEI VŠB"
 FACULTY_FAI_UTB = "FAI UTB"
+
+# branches:
+
+BRANCH_FIT_BUT_BIT   = "FIT BUT BIT"           # (bc) informacni technologie
+BRANCH_FIT_BUT_MBS   = "FIT BUT MBS"           # (ing) bezpecnost informacnich technologii
+BRANCH_FIT_BUT_MBI   = "FIT BUT MBI"           # (ing) bioinformatika a biocomputing
+BRANCH_FIT_BUT_MIS   = "FIT BUT MIS"           # (ing) informacni systemy
+BRANCH_FIT_BUT_MIN   = "FIT BUT MIN"           # (ing) inteligentni systemy
+BRANCH_FIT_BUT_MMI   = "FIT BUT MMI"           # (ing) management a informacni technologie
+BRANCH_FIT_BUT_MMM   = "FIT BUT MMM"           # (ing) matematicke metody v informacnich technologiich
+BRANCH_FIT_BUT_MGM   = "FIT BUT MGM"           # (ing) pocitacova grafika a multimedia
+BRANCH_FIT_BUT_MPV   = "FIT BUT MPV"           # (ing) pocitacove a vestavene systemy
+BRANCH_FIT_BUT_MSK   = "FIT BUT MSK"           # (ing) pocitacove site a komunikace
+BRANCH_FIT_BUT_MPS   = "FIT BUT MPS"           # (ing) pocitacove systemy a site
+
+BRANCH_FI_MUNI_MI     = "FI MUNI MI"           # (bc) matematicka informatika
+BRANCH_FI_MUNI_PDS    = "FI MUNI PDS"          # (bc/mgr) paralelni a distribuovane systemy
+BRANCH_FI_MUNI_GRA    = "FI MUNI GRA"          # (bc/mgr) pocitacova grafika a zpracovani obrazu
+BRANCH_FI_MUNI_PSZD   = "FI MUNI PSZD"         # (bc/mgr) pocitacove systemy a zpracovani dat
+BRANCH_FI_MUNI_PSK    = "FI MUNI PSK"          # (bc/mgr) pocitacove site a komunikace
+BRANCH_FI_MUNI_PTS    = "FI MUNI PTS"          # (bc/mgr) programovatelne technicke struktury
+BRANCH_FI_MUNI_UMI    = "FI MUNI UMI"          # (bc/mgr) umela inteligence a zpracovani prirozeneho jazyka
+BRANCH_FI_MUNI_AP     = "FI MUNI AP"           # (bc/mgr) aplikovana informatika
+BRANCH_FI_MUNI_APGD   = "FI MUNI AP GD"        # (bc/mgr) aplikovana informatika - graficky design
+BRANCH_FI_MUNI_BIO    = "FI MUNI BIO"          # (bc/mgr) bioinformatika
+BRANCH_FI_MUNI_INVS   = "FI MUNI INVS"         # (bc) informatika ve verejne sprave
+BRANCH_FI_MUNI_SOCI   = "FI MUNI SOCI"         # (bc) socialni informatika
+BRANCH_FI_MUNI_IO     = "FI MUNI IO"           # (bc) informatika a druhy obor
+BRANCH_FI_MUNI_KB     = "FI MUNI KB"           # (mgr) kyberneticka bezpecnost
+BRANCH_FI_MUNI_SEC    = "FI MUNI SEC"          # (mgr) security of information and communication technologies
+BRANCH_FI_MUNI_IS     = "FI MUNI IS"           # (mgr) informacni systemy
+BRANCH_FI_MUNI_TI     = "FI MUNI TI"           # (mgr) teoreticka informatika
+BRANCH_FI_MUNI_SSME   = "FI MUNI SSME"         # (mgr) service science, management, and engineering
+BRANCH_FI_MUNI_OBR    = "FI MUNI OBR"          # (mgr) zpracovani obrazu
+BRANCH_FI_UCI         = "FI MUNI UCI"          # (mgr) ucitelstvi informatiky pro stredni skoly
+
+BRANCH_FIT_CTU_BIT    = "FIT CTU BIT"          # (bc) bezpecnost informacnich technologii
+BRANCH_FIT_CTU_ISM    = "FIT CTU ISM"          # (bc) studijni obor informacni systemy a management
+BRANCH_FIT_CTU_PI     = "FIT CTU PI"           # (bc) pocitacove inzenyrstvi
+BRANCH_FIT_CTU_TI     = "FIT CTU TI"           # (bc) teoreticka informatika
+BRANCH_FIT_CTU_WSIPG  = "FIT CTU WSI PG"       # (bc) webove inzenyrstvi - pocitacova grafika
+BRANCH_FIT_CTU_WSISI  = "FIT CTU WSI SI"       # (bc/ing) webove inzenyrstvi - softwarove inzenyrstvi
+BRANCH_FIT_CTU_WSIWI  = "FIT CTU WSI WI"       # (bc/ing) webove inzenyrstvi - webove inzenyrstvi
+BRANCH_FIT_CTU_ZI     = "FIT CTU ZI"           # (bc/ing) znalostni inzenyrstvi
+BRANCH_FIT_CTU_PB     = "FIT CTU PB"           # (ing) pocitacova bezpecnost
+BRANCH_FIT_CTU_PSK    = "FIT CTU PSK"          # (ing) pocitacove systemy a site
+BRANCH_FIT_CTU_NPVS   = "FIT CTU NPVS"         # (ing) navrh a programovani vestavenych systemu
+BRANCH_FIT_CTU_WSIISM = "FIT CTU WSI ISM"      # (ing) webove inzenyrstvi - informacni systemy a management
+BRANCH_FIT_CTU_SPSP   = "FIT CTU SP SP"        # (ing) systemove programovani - systemove programovani
+BRANCH_FIT_CTU_SPTI   = "FIT CTU SP TI"        # (ing) systemove programovani - teoreticka informatika
+# TODO: FELK branches
+                                               # CUNI branches are probably incomplete
+BRANCH_MFF_CUNI_IOI   = "MFF CUNI IOI"         # (bc) obecna informatika
+BRANCH_MFF_CUNI_IPSS  = "MFF CUNI IPPS"        # (bc) programovani a softwarove systemy
+BRANCH_MFF_CUNI_ISDI  = "MFF CUNI ISDI"        # (bc) softwarove a datove inzenyrstvi
+BRANCH_MFF_CUNI_IP    = "MFF CUNI IP"          # (bc) programovani
+BRANCH_MFF_CUNI_ISPS  = "MFF CUNI ISPS"        # (bc) sprava pocitacovych systemu
+BRANCH_MFF_CUNI_IAI   = "MFF CUNI IAI"         # (bc) aplikovana informatika
+BRANCH_MFF_CUNI_IML   = "MFF CUNI IML"         # (mgr) matematicka lingvistika
+BRANCH_MFF_CUNI_ITI   = "MFF CUNI ITI"         # (mgr) teoreticka informatika
+BRANCH_MFF_CUNI_IDI   = "MFF CUNI IDI"         # (mgr) datove inzenyrstvi
+BRANCH_MFF_CUNI_ISS   = "MFF CUNI ISS"         # (mgr) softwarove systemy
+BRANCH_MFF_CUNI_MMIB  = "MFF CUNI MMIB"        # (mgr) matematicke metody informacni bezpecnosti
+
+BRANCH_FAI_UTB_ISR    = "FAI UTB ISR"          # (bc) inteligentni systemy s roboty
+BRANCH_FAI_UTB_SWI    = "FAI UTB SWI"          # (bc) softwarove inzenyrstvi
+BRANCH_FAI_UTB_IRT    = "FAI UTB IŘT"          # (bc) informacni a ridici technologie
+BRANCH_FAI_UTB_ITA    = "FAI UTB ITA"          # (bc) informacni technologie v administrative
+BRANCH_FAI_UTB_BTSM   = "FAI UTB BTSM"         # (bc/ing) bezpecnostni technologie, systemy a management
+BRANCH_FAI_UTB_ARI    = "FAI UTB AŘI"          # (ing) automaticke rizeni a informatika
+BRANCH_FAI_UTB_IT     = "FAI UTB IT"           # (ing) informacni technologie
+BRANCH_FAI_UTB_ISB    = "FAI UTB ISB"          # (ing) integrovane systemy v budovach
+BRANCH_FAI_UTB_PKS    = "FAI UTB PKS"          # (ing) pocitacove a komunikacni systemy
+BRANCH_FAI_UTB_UISS   = "FAI UTB UISŠ"         # (ing) ucitelstvi informatiky pro stredni skoly
+
+BRANCH_FEI_VSB_RIS    = "FEI VSB RIS"          # (bc/ing) ridici a informacni systemy
+BRANCH_FEI_VSB_IVT    = "FEI VSB IVT"          # (bc/ing) informacni a vypocetni technika
+BRANCH_FEI_VSB_MT     = "FEI VSB MT"           # (bc/ing) mobilni technologie
+BRANCH_FEI_VSB_TT     = "FEI VSB TT"           # (bc/ing) telekomunikacni technika
+BRANCH_FEI_VSB_VM     = "FEI VSB VM"           # (bc/ing) vypocetni matematika
+BRANCH_FEI_VSB_IKB    = "FEI VSB IKB"          # (ing) informacni a komunikacni bezpecnost
+
+# departments:
 
 DEPARTMENT_FIT_BUT_UPGM = "FIT BUT UPGM"     # ustav pocitacove grafiky a multimedii
 DEPARTMENT_FIT_BUT_UPSY = "FIT BUT UPSY"     # ustav pocitacovych systemu
@@ -528,9 +612,16 @@ class Thesis(object):
     self.abstract_cs = None
     self.size = None                # in bytes
     self.public_university = None
+    self.branch = None
 
   def __str__(self):
     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False)
+
+  def handle_branch(self, branch_string, substring_mapping):
+    for substr in substring_mapping:
+      if branch_string.find(substr) >= 0:
+        self.branch = substring_mapping[substr]
+        break
 
   def incorporate_pdf_info(self, pdf_info):
     self.pages = pdf_info.pages
@@ -775,8 +866,11 @@ class FitButDownloader(FacultyDownloader):
         debug_print(line + " not found: " + str(e))
         return None
 
-    result.author = person_from_table(u"Student:")
-    result.supervisor = person_from_table(u"Vedoucí:")
+    try:
+      result.author = person_from_table(u"Student:")
+      result.supervisor = person_from_table(u"Vedoucí:")
+    except Exception as e:
+      debug_print("could not resolve author/supervisor:" + str(e))
 
     if result.kind != THESIS_PHD:
       result.opponents = [person_from_table(u"Oponent:")]
@@ -789,8 +883,35 @@ class FitButDownloader(FacultyDownloader):
     except Exception as e:
       debug_print("year not found: " + str(e))
 
-    result.title_en = soup_en.find("h2").string
-    result.title_cs = soup.find("h2").string
+    try:
+      result.title_en = soup_en.find("h2").string
+      result.title_cs = soup.find("h2").string
+    except Exception as e:
+      debug_print("could not resolve title(s):" + str(e))
+    
+    try:
+      if result.kind == THESIS_BACHELOR:
+        result.branch = BRANCH_FIT_BUT_BIT     # only one branch for Bc.
+      elif result.kind == THESIS_MASTER:
+        branch_string = text_in_table("Obor studia:")     
+
+        substring_to_branch = {
+          "MGM": BRANCH_FIT_BUT_MGM,
+          "MBS": BRANCH_FIT_BUT_MBS,
+          "MBI": BRANCH_FIT_BUT_MBI,
+          "MMM": BRANCH_FIT_BUT_MMM,
+          "MIS": BRANCH_FIT_BUT_MIS,
+          "MIN": BRANCH_FIT_BUT_MIN,
+          "MPV": BRANCH_FIT_BUT_MPV,
+          "MSK": BRANCH_FIT_BUT_MSK,
+          "MPS": BRANCH_FIT_BUT_MPS,
+          "MMI": BRANCH_FIT_BUT_MMI
+          }
+
+        result.handle_branch(branch_string,substring_to_branch) 
+  
+    except Exception as e:
+      debug_print("could not resolve branch: " + str(e))
 
     try:
       branch_string = text_in_table(u"Obor studia:")
@@ -834,8 +955,8 @@ class FitButDownloader(FacultyDownloader):
  
     try:
       result.keywords = beautify_list(
-         soup.find("th",string="Klíčová slova").find_next("td").string.split(",") +
-         soup_en.find("th",string="Keywords").find_next("td").string.split(",")
+         soup.find("th",string="Klíčová slova").find_next(lambda t: t.string != None).string.split(",") +
+         soup_en.find("th",string="Keywords").find_next(lambda t: t.string != None).string.split(",")
          )
     except Exception as e:
       debug_print("keywords not found:" + str(e)) 
@@ -852,33 +973,39 @@ class FitButDownloader(FacultyDownloader):
         }
 
       result.field = department_to_field[result.department]
-    
-    if result.kind == THESIS_DOC:
-      result.abstract_cs = text_in_table("Anotace")
-      result.abstract_en = text_in_table("Annotation",False)
-    else: 
-      result.abstract_cs = text_in_table("Abstrakt")
-      result.abstract_en = text_in_table("Abstract",False)
+   
+    try: 
+      if result.kind == THESIS_DOC:
+        result.abstract_cs = text_in_table("Anotace")
+        result.abstract_en = text_in_table("Annotation",False)
+      else: 
+        result.abstract_cs = text_in_table("Abstrakt")
+        result.abstract_en = text_in_table("Abstract",False)
+    except Exception as e:
+      debug_print("could not extract abstract:" + str(e))
 
     result.url_page = url
 
-    if result.kind == THESIS_DOC:
-      result.url_fulltext = FitButDownloader.BASE_URL + soup.find(lambda t: t.name == "a" and t.string != None and t.string[-4:] == ".pdf")["href"][1:]
-      result.defended = True
-    else:
-      result.url_fulltext = FitButDownloader.BASE_URL + soup.find("a",string="Text práce")["href"][1:]
- 
-      state_string = text_in_table("Stav:")
-      
-      result.defended = state_string[0] == "o"  # for "pbhájeno"
-
-      if result.defended:
-        result.grade = state_string[-1]
+    try:
+      if result.kind == THESIS_DOC:
+        result.url_fulltext = FitButDownloader.BASE_URL + soup.find(lambda t: t.name == "a" and t.string != None and t.string[-4:] == ".pdf")["href"][1:]
+        result.defended = True
       else:
-        result.grade = GRADE_F
+        result.url_fulltext = FitButDownloader.BASE_URL + soup.find("a",string="Text práce")["href"][1:]
+   
+        state_string = text_in_table("Stav:")
+        
+        result.defended = state_string[0] == "o"  # for "pbhájeno"
 
-      if not result.grade in ALL_GRADES:
-        result.grade = None    
+        if result.defended:
+          result.grade = state_string[-1]
+        else:
+          result.grade = GRADE_F
+
+        if not result.grade in ALL_GRADES:
+          result.grade = None    
+    except Exception as e: 
+      debug_print("error with fulltext/defended/grade: " + str(e))
 
     try:
       lang_string = text_in_table("Jazyk:")
@@ -892,9 +1019,11 @@ class FitButDownloader(FacultyDownloader):
     except Exception as e:
       debug_print("language not found: " + str(e))
 
-    pdf_info = download_and_analyze_pdf(FitButDownloader.BASE_URL + result.url_fulltext)
- 
-    result.incorporate_pdf_info(pdf_info) 
+    try:
+      pdf_info = download_and_analyze_pdf(FitButDownloader.BASE_URL + result.url_fulltext) 
+      result.incorporate_pdf_info(pdf_info) 
+    except Exception as e:
+      debug_print("pdf could not be analyzed: " + str(e))
 
     result.normalize() 
     return result
@@ -1669,22 +1798,8 @@ mff_cuni = MffCuniDownloader()
 fei_vsb = FeiVsbDownloader()
 fi_muni = FiMuniDownloader()
 
-#print(fit_vut.get_thesis_info("http://www.fit.vutbr.cz/study/DP/BP.php?id=16335&y=0&st=%E8%ED%BE"))
+print(fit_vut.get_thesis_info("http://www.fit.vutbr.cz/study/DP/PD.php?id=88&y=0"))
 #print(fei_vsb.get_thesis_info("http://dspace.vsb.cz/handle/10084/116764"))
 #print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F8&d=K103&y=2014&a=pichldom&t=bach"))
 #print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/38911"))
-
-#print(fi_muni.get_thesis_info("https://is.muni.cz/th/437651/fi_m/"))
-
-#print(fi_muni.get_thesis_info("https://is.muni.cz/th/359266/fi_b/"))
-
-
-p = PDFInfo("word_test.pdf")
-
-print(p.typesetting_system)
-
-#fi_muni.get_thesis_list()
-
-#for t in fi_muni.get_others():
-#  print(t)
 
