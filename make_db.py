@@ -120,6 +120,8 @@ FACULTY_FIT_CTU = "FIT CTU"
 FACULTY_FEI_VSB = "FEI VŠB"
 FACULTY_FAI_UTB = "FAI UTB"
 
+FACULTY_UC = "Unicorn College"
+
 # branches:
 
 BRANCH_FIT_BUT_BIT   = "FIT BUT BIT"           # (bc) informacni technologie
@@ -761,6 +763,8 @@ class PDFInfo(object):
     try:
       input_pdf = PdfFileReader(open(filename,"rb"))
 
+      self.size = os.path.getsize(filename)
+
       self.pages = input_pdf.getNumPages()
      
       self.pdf_text = ""
@@ -782,8 +786,6 @@ class PDFInfo(object):
         self.typesetting_system = SYSTEM_OPEN_OFFICE
       else:
         self.typesetting_system = None
-
-      self.size = os.path.getsize(filename)
 
     except Exception as e:
       debug_print("could not analyze PDF: " + str(e))
@@ -1807,8 +1809,6 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
         lambda t: t.name == "div" and t.parent.get("id") == "aplikace" and t.contents[0].name == "b" and t.find("a") == None,
         lambda t: analyze_div(t,page))
 
-      break # TMP
-
     self.other_these_retrieved = True
 
     return result
@@ -1938,9 +1938,89 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
 
 #----------------------------------------
 
+class UcDownloader(FacultyDownloader):
+
+  BASE_URL = "https://www.unicorncollege.cz/bakalarske-prace/"
+
+  def get_thesis_info(self, url):
+    result = Thesis()
+
+    result.faculty = FACULTY_UC
+    result.city = CITY_PRAHA
+    result.public_university = False
+    result.url_page = url
+    result.kind = THESIS_BACHELOR
+    result.degree = DEGREE_BC
+
+    soup = BeautifulSoup(download_webpage(url),"lxml")
+
+    def text_in_table(line):
+      return soup.find("span",string=line).find_next("span").find_next("span").string
+
+    try:
+      result.author = Person(text_in_table("Autor"))
+    except Exception as e:
+      debug_print("could not resolve author: " + str(e)) 
+
+    try:
+      result.title_cs = text_in_table("Název")
+    except Exception as e:
+      debug_print("could not resolve title: " + str(e)) 
+
+    try:
+      result.year = int(text_in_table("Rok obhajoby"))
+    except Exception as e:
+      debug_print("could not resolve year: " + str(e)) 
+
+    try:
+      result.abstract_cs = text_in_table("Anotace")
+    except Exception as e:
+      debug_print("could not resolve abstract: " + str(e)) 
+
+    try:
+      relative_link = soup.find(lambda t: t.get("href") != None and t["href"][-4:].lower() == ".pdf")["href"]
+      result.url_fulltext = url[:url.rfind("/") + 1] + relative_link
+      pdf_info = download_and_analyze_pdf(result.url_fulltext)
+      result.incorporate_pdf_info(pdf_info)
+    except Exception as e:
+      debug_print("could not download/analyze pdf: " + str(e)) 
+
+
+    result.normalize()
+    return result
+
+  def get_thesis_list(self):
+    result = []
+
+    soup = BeautifulSoup(download_webpage(UcDownloader.BASE_URL + "bakalarske-prace.html"),"lxml")
+
+    year_links = iterative_load(soup,
+      lambda t: t.name == "span" and t.parent.name == "a" and t.parent.get("class")[0] == "uvcArtifact",
+      lambda t: t.parent["href"])
+
+    for year_link in year_links:
+      soup = BeautifulSoup(download_webpage(UcDownloader.BASE_URL + year_link),"lxml")
+
+      links = iterative_load(soup,
+        lambda t: t.name == "a" and t.get("class") != None and t.get("class")[0] == "uvcArtifact",
+        lambda t: t["href"])
+
+      result += links
+
+    return result 
+
+#----------------------------------------
+
 fit_vut = FitButDownloader()
 ctu = CtuDownloader()
 fai_utb = FaiUtbDownloader()
 mff_cuni = MffCuniDownloader()
 fei_vsb = FeiVsbDownloader()
 fi_muni = FiMuniDownloader()
+
+uc = UcDownloader()
+
+print(uc.get_thesis_info("https://www.unicorncollege.cz/bakalarske-prace/archiv-2016/pavlu-martin.html"))
+
+
+
