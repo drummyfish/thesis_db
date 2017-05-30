@@ -1377,10 +1377,30 @@ class MffCuniDownloader(FacultyDownloader):
     def text_in_table(line):
       return soup.find(lambda t: t.name == "div" and t.string != None and t.string.lstrip().rstrip() == line).find_next("span").string.lstrip().rstrip()
 
-    type_string = text_in_table("Program studia:")
 
-    if not starts_with(type_string,"Informatika"):
-      return None
+    branch_string = text_in_table("Obor studia:")
+
+    substring_to_branch = {
+      "IOI": BRANCH_MFF_CUNI_IOI,
+      "IPSS": BRANCH_MFF_CUNI_IPSS,
+      "ISDI": BRANCH_MFF_CUNI_ISDI,
+      "IP": BRANCH_MFF_CUNI_IP,
+      "ISPS": BRANCH_MFF_CUNI_ISPS,
+      "IAI": BRANCH_MFF_CUNI_IAI,
+      "IML": BRANCH_MFF_CUNI_IML,
+      "ITI": BRANCH_MFF_CUNI_ITI,
+      "IDI": BRANCH_MFF_CUNI_IDI,
+      "ISS": BRANCH_MFF_CUNI_ISS,
+      "MMIB": BRANCH_MFF_CUNI_MMIB,
+      }
+
+    result.handle_branch(branch_string,substring_to_branch)
+
+    if result.branch != BRANCH_MFF_CUNI_MMIB:        # only allowed non-cs branch
+      type_string = text_in_table("Program studia:")
+
+      if not starts_with(type_string,"Informatika"):
+        return None
 
     lang_string = text_in_table("Jazyk práce:")
 
@@ -1820,5 +1840,5 @@ fi_muni = FiMuniDownloader()
 #print(fit_vut.get_thesis_info("http://www.fit.vutbr.cz/study/DP/PD.php?id=88&y=0"))
 #print(fei_vsb.get_thesis_info("http://dspace.vsb.cz/handle/10084/116764"))
 #print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F8&d=K103&y=2014&a=pichldom&t=bach"))
-print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/10542"))
+print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/79056/24991138/?q=%7B%22______searchform___search%22%3A%22%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A%2210%22%7D&lang=cs"))
 
