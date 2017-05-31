@@ -9,6 +9,7 @@ import json
 from PyPDF2 import PdfFileReader
 from bs4 import BeautifulSoup
 from bs4 import element
+import random
 import os
 import sys
 
@@ -124,6 +125,7 @@ FACULTY_PEF_MENDELU = "PEF MENDELU"
 
 # privates:
 FACULTY_UC          = "Unicorn College"
+FACULTY_MVSO        = "MVŠO"
 
 # non-CS:
 FACULTY_FBMI_CTU    = "FBMI CTU"   # fakulta biomedicinskeho inzenyrstvi
@@ -514,7 +516,10 @@ NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Natália", "Viktória"]
 
 def debug_print(print_string):
-  print(print_string)
+  print("DEBUG: " + print_string)
+
+def progress_print(print_string):
+  print("PROGRESS: " + print_string)
 
 def iterative_load(soup,find_func,process_func):
   result = []
@@ -1059,6 +1064,8 @@ class FitButDownloader(FacultyDownloader):
     result = []
 
     for thesis_type in ["BP","DP","PD","DOC"]:
+      progress_print("downloading FIT BUT list for " + thesis_type)
+
       if thesis_type == "DOC":
         url = FitButDownloader.BASE_URL + "research/habilitace/"
       else:
@@ -1138,6 +1145,8 @@ class CtuDownloader(FacultyDownloader):      # for FEI and FELK don't forget to 
       departments = range(101,106) if faculty == "F8" else (13136,13139)
 
       for department in departments:
+        progress_print("downloading CTU these list for " + faculty + " " + str(department))
+
         url = CtuDownloader.BASE_URL + "department.php?f=" + faculty + "&d=K" + str(department)
 
         page_soup = BeautifulSoup(download_webpage(url),"lxml")
@@ -1275,11 +1284,10 @@ class CtuExtraDownloader(FacultyDownloader):     # downloads theses from Ctu fac
       bp_link = CtuExtraDownloader.BASE_URL[:-1] + soup.find(lambda t: t.name == "span" and t.string != None and starts_with(t.string,"Bakalářské práce")).parent["href"]
       dp_link = CtuExtraDownloader.BASE_URL[:-1] + soup.find(lambda t: t.name == "span" and t.string != None and starts_with(t.string,"Diplomové práce")).parent["href"]
 
-      print(bp_link,dp_link)
-
       page_links += [bp_link,dp_link]
 
     for page_link in page_links:
+      progress_print("downloading extra CTU list for " + page_link)
       current_url = page_link
 
       while True: 
@@ -1437,9 +1445,13 @@ class FaiUtbDownloader(FacultyDownloader):
       )
 
     for l in lists:
+      progress_print("downloading FAI UTB list for " + str(l[2]))
+
       offset = 0
 
       while True:    # for each page
+        progress_print("offset " + str(offset))
+
         soup = BeautifulSoup(download_webpage("http://digilib.k.utb.cz/handle/10563/" + str(l[2]) + "/recent-submissions?offset=" + str(offset)),"lxml")
 
         links = iterative_load(soup,
@@ -1451,7 +1463,7 @@ class FaiUtbDownloader(FacultyDownloader):
 
         offset += 20
 
-        if len(links) == 0 or offset > 20000:
+        if soup.find("a",class_="next-page-link") == None or len(links) == 0 or offset > 20000:
           break
 
     return result
@@ -1581,7 +1593,6 @@ class MffCuniDownloader(FacultyDownloader):
 
     def text_in_table(line):
       return soup.find(lambda t: t.name == "div" and t.string != None and t.string.lstrip().rstrip() == line).find_next("span").string.lstrip().rstrip()
-
 
     branch_string = text_in_table("Obor studia:")
 
@@ -1734,6 +1745,8 @@ class MffCuniDownloader(FacultyDownloader):
     page = 1
 
     while True:      # for each page
+      progress_print("downloading MFF CUNI list, page " + str(page))
+
       soup = BeautifulSoup(download_webpage("https://is.cuni.cz/webapps/zzp/search/?______searchform___search=&______facetform___facets___faculty%5B%5D=11320&tab_searchas=basic&lang=cs&PSzzpSearchListbasic=10&SOzzpSearchListbasic=&_sessionId=0&______searchform___butsearch=Vyhledat&PNzzpSearchListbasic=" + str(page)),"lxml")
 
       current = soup.find("span",class_="title")
@@ -1746,8 +1759,6 @@ class MffCuniDownloader(FacultyDownloader):
       result += links
 
       page += 1
-
-      break
 
       if len(links) == 0 or page > 1000:
         break
@@ -1765,6 +1776,8 @@ class FeiVsbDownloader(FacultyDownloader):
     offset = 0
 
     while True:    # for each page
+      progress_print("downloading FEI VSB these list, offset " + str(offset))      
+
       soup = BeautifulSoup(download_webpage(FeiVsbDownloader.BASE_URL + "handle/10084/2564/browse?order=ASC&rpp=" + str(records) + "&sort_by=2&etal=-1&offset=" + str(offset) + "&type=dateissued"),"lxml")
       current = soup.find("h2")
 
@@ -1967,7 +1980,13 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
       lambda t: t.name == "nobr" and t.parent.name == "font",
       lambda t: FiMuniDownloader.BASE_URL + "thesis" + t.find_next("a")["href"][1:])
 
+    # the list is doubled, as there are two link tables at the page (top and bottom) => take only the first half
+
+    page_links = page_links[:len(page_links) / 2]
+
     for page in page_links:   # first page already loaded
+      progress_print("downloading FI MUNI these list for " + page)
+
       soup = BeautifulSoup(download_webpage(page),"lxml")
 
       result += iterative_load(soup,
@@ -2226,6 +2245,8 @@ class PefMendeluDownloader(FacultyDownloader):
     programs = (3,397,7,9,885,63)
 
     for program in programs:
+      progress_print("downloading PF MENDELU these list, program " + str(program))
+
       param_string = "?razeni=fakulta;prehled=program;obor=0;forma=0;program=" + str(program) + ";obdobi=2013;obdobi=2014;obdobi=2015;obdobi=2016;obdobi=2017;obdobi=2018;dohledat=Dohledat;jazyk=1;jazyk=2;jazyk=3;lang=en"
       soup = BeautifulSoup(download_webpage(PefMendeluDownloader.BASE_URL + param_string),"lxml")
 
@@ -2259,7 +2280,6 @@ class UcDownloader(FacultyDownloader):
     result.url_page = url
     result.kind = THESIS_BACHELOR
     result.degree = DEGREE_BC
-
 
     soup = BeautifulSoup(download_webpage(url),"lxml")
 
@@ -2307,6 +2327,8 @@ class UcDownloader(FacultyDownloader):
       lambda t: t.parent["href"])
 
     for year_link in year_links:
+      progress_print("downloading UC link list for " + year_link)
+
       soup = BeautifulSoup(download_webpage(UcDownloader.BASE_URL + year_link),"lxml")
 
       links = iterative_load(soup,
@@ -2329,13 +2351,58 @@ fi_muni = FiMuniDownloader()
 pef_mendelu = PefMendeluDownloader()
 uc = UcDownloader()
 
-print(pef_mendelu.get_thesis_info("https://is.mendelu.cz/zp/portal_zp.pl?podrobnosti_zp=36190;zpet=;prehled=program;program=9;obor=0;forma=0;dohledat=Dohledat;obdobi=2019%2C2020%2C2021%2C2022%2C2023%2C2024%2C2025%2C2026%2C2027%2C2028%2C2029%2C2030%2C2031%2C2032%2C2033%2C2034%2C2035%2C2036%2C2037%2C2038;obdobi=2018;obdobi=2017;obdobi=2016;obdobi=2015;obdobi=2014;jazyk=1;jazyk=3;jazyk=2;lang=en"))
+LINK_FILE_NAME = "links.txt"
+LINK_FILE_SHUFFLED = "links_shuffled.txt"
+
+def make_these_list_file():    # makes a shuffled text file with all these URLs to be downloaded
+  progress_print("------ making link file ------")
+
+  link_list = []
+
+  progress_print("-- downloading links for MFF CUNI")
+  link_list += mff_cuni.get_thesis_list()
+
+  progress_print("-- downloading links for FEI VSB")
+  link_list += fei_vsb.get_thesis_list()
+
+  progress_print("-- downloading links for PEF MENDELU")
+  link_list += pef_mendelu.get_thesis_list()
+
+  progress_print("-- downloading links for UC")
+  link_list += uc.get_thesis_list()
+
+  progress_print("-- downloading links for FAI UTB")
+  link_list += fai_utb.get_thesis_list()
+
+  progress_print("-- downloading links for CTU")
+  link_list += ctu.get_thesis_list()
+
+  progress_print("-- downloading links for CTU (extra)")
+  link_list += ctu_extra.get_thesis_list()
+
+  progress_print("-- downloading links for FIT BUT")
+  link_list += fit_but.get_thesis_list()
+
+  progress_print("-- downloading links for FI MUNI")
+  link_list += fi_muni.get_thesis_list()
+
+  link_file = open(LINK_FILE_NAME,"w")
+  link_file_shuffled = open(LINK_FILE_SHUFFLED,"w")
+
+  for link in link_list:
+    link_file.write(link + "\n")
+
+  random.shuffle(link_list)
+
+  for link in link_list:
+    link_file_shuffled.write(link + "\n")
+
+  link_file.close()
+  link_file_shuffled.close()
+
+  progress_print("------- link file done -------")
 
 
-
-
-
-
-
+make_these_list_file()
 
 
