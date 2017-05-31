@@ -120,7 +120,14 @@ FACULTY_FIT_CTU = "FIT CTU"
 FACULTY_FEI_VSB = "FEI VŠB"
 FACULTY_FAI_UTB = "FAI UTB"
 
+# privates:
 FACULTY_UC = "Unicorn College"
+
+# non-CS:
+FACULTY_FBMI_CTU = "FBMI CTU"   # fakulta biomedicinskeho inzenyrstvi
+FACULTY_FD_CTU = "FD CTU"       # fakulta dopravni
+FACULTY_FJFI_CTU = "FJFI CTU"   # fakulta jaderna a fyzikalne inzenyrska
+FACULTY_FSV_CTU = "FSV CTU"     # fakulta stavebni
 
 # branches:
 
@@ -478,7 +485,8 @@ NAMES_MALE = ["Jiří", "Jan", "Petr", "Pavel", "Jaroslav",
   "Marián", "Andrej", "Tibor", "Mikuláš", "Oto",
   "Dan", "Daniel", "Emanuel", "Čeněk", "Hynek",
   "Jarmil", "Matěj", "Mikoláš","Branislav","Matej",
-  "Dávid", "Samuel", "Mohamed", "Moslem", "Gabriel"]
+  "Dávid", "Samuel", "Mohamed", "Moslem", "Gabriel",
+  "Zdeněk","Lubor"]
 
 NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Věra", "Lenka", "Alena", "Jaroslava", "Lucie",
@@ -1064,7 +1072,7 @@ class FitButDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset with get_others
+class CtuDownloader(FacultyDownloader):      # for FEI and FELK don't forget to get extra theset with get_others
 
   BASE_URL = "https://dip.felk.cvut.cz/browse/"
 
@@ -1237,6 +1245,166 @@ class CtuDownloader(FacultyDownloader):      # don't forget to get extra theset 
 
     result.normalize() 
     return result
+
+#----------------------------------------
+
+class CtuExtraDownloader(FacultyDownloader):     # downloads theses from Ctu faculties other than FEI and FELK
+
+  BASE_URL = "https://dspace.cvut.cz/"
+
+  def get_thesis_list(self):
+    result = []
+
+    urls = [ 
+        "https://dspace.cvut.cz/handle/10467/3560",
+        "https://dspace.cvut.cz/handle/10467/19149",
+        "https://dspace.cvut.cz/handle/10467/3478",
+        "https://dspace.cvut.cz/handle/10467/19143",
+        "https://dspace.cvut.cz/handle/10467/3320",
+        "https://dspace.cvut.cz/handle/10467/2948"
+      ] 
+
+    page_links = []
+
+    for url in urls:
+      soup = BeautifulSoup(download_webpage(url),"lxml")
+
+      bp_link = CtuExtraDownloader.BASE_URL[:-1] + soup.find(lambda t: t.name == "span" and t.string != None and starts_with(t.string,"Bakalářské práce")).parent["href"]
+      dp_link = CtuExtraDownloader.BASE_URL[:-1] + soup.find(lambda t: t.name == "span" and t.string != None and starts_with(t.string,"Diplomové práce")).parent["href"]
+
+      print(bp_link,dp_link)
+
+      page_links += [bp_link,dp_link]
+
+    for page_link in page_links:
+      current_url = page_link
+
+      while True: 
+        soup = BeautifulSoup(download_webpage(current_url),"lxml")
+
+        result += iterative_load(soup,
+            lambda t: t.name == "a" and t.parent.name == "h4",
+            lambda t: CtuExtraDownloader.BASE_URL[:-1] + t["href"]
+          )
+
+        current_url = soup.find("a",class_="next-page-link")
+
+        if current_url == None or current_url["href"] == "":
+          break
+      
+        current_url = CtuExtraDownloader.BASE_URL[:-1] + current_url["href"]
+
+    return result
+
+  def get_thesis_info(self, url):
+    result = Thesis()
+    result.url_page = url
+    result.city = CITY_PRAHA
+    result.public_university = True
+
+    url += "?show=full"
+
+    soup = BeautifulSoup(download_webpage(url),"lxml")
+
+    def text_in_table(line):
+      return soup.find("td",string=line).find_next("td").string
+
+    try:
+      result.author = Person(text_in_table("dc.contributor.author"),False)
+      result.supervisor = Person(text_in_table("dc.contributor.advisor"),False)
+      result.opponents = [Person(text_in_table("dc.contributor.referee"),False)]
+    except Exception as e:
+      debug_print("error at author/supervisor/opponent: " + str(e))
+
+    try:
+      result.degree = text_in_table("theses.degree.name")
+      result.kind = degree_to_thesis_type(result.degree)
+    except Exception as e:
+      debug_print("could not resolve degree/type: " + str(e))
+
+      try:
+        type_string = text_in_table("dc.type")
+
+        if type_string == "MAGISTERSKÁ PRÁCE":
+          result.kind = THESIS_MASTER
+        elif type_string == "BAKALÁŘSKÁ PRÁCE":
+          result.kind = THESIS_BACHELOR
+          result.degree = DEGREE_BC
+      except Exception:
+        pass
+
+    try:
+      result.language = text_in_table("dc.language.iso")
+      
+      if result.language.lower() == "eng":
+        result.language = LANGUAGE_EN
+      elif result.language.lower() == "cze":
+        result.language = LANGUAGE_CS
+      if result.language.lower() == "svk":
+        result.language = LANGUAGE_SK
+    except Exception as e:
+      debug_print("could not resolve language: " + str(e))
+ 
+    try:
+      t1 = soup.find("td",string="dc.title")
+      t2 = t1.find_next("td",string="dc.title")
+
+      result.title_cs = t1.find_next("td").string
+      result.title_en = t2.find_next("td").string
+    except Exception as e:
+      debug_print("could not resolve title: " + str(e))
+
+    try:
+      result.url_fulltext = CtuExtraDownloader.BASE_URL[:-1] + soup.find(lambda t: t.name == "dd" and t.get("title") == "PLNY_TEXT").find_next("a")["href"]
+    except Exception as e:
+      debug_print("could not resolve fulltext: " + str(e))
+
+    try:
+      result.year = int(text_in_table("dc.date.issued").split("-")[0])
+    except Exception as e:
+      debug_print("could not resolve year: " + str(e))
+
+    try:
+      faculty_string = text_in_table("theses.degree.grantor")
+
+      if faculty_string.find("biomedicín") >= 0:
+        result.faculty = FACULTY_FBMI_CTU
+      elif faculty_string.find("doprav") >= 0:
+        result.faculty = FACULTY_FD_CTU
+      elif faculty_string.find("jader") >= 0 or faculty_string.find("softwarového") >= 0: 
+        result.faculty = FACULTY_FJFI_CTU
+      elif faculty_string.find("staveb") >= 0:
+        result.faculty = FACULTY_FSV_CTU
+
+    except Exception as e:
+      debug_print("could not resolve faculty: " + str(e))
+
+    try:
+      keywords = iterative_load(soup,
+        lambda t: t.name == "td" and t.string != None and t.string == "dc.subject",
+        lambda t: t.find_next("td").string)
+
+      helper = []
+ 
+      for k in keywords:
+        for k2 in k.replace(",","").split(" "):
+          helper.append(k2)
+
+      result.keywords = beautify_list(helper)
+    except Exception as e:
+      debug_print("could not resolve keywords: " + str(e))
+
+    try:
+      a1 = soup.find("td",string="dc.description.abstract")
+      a2 = a1.find_next("td",string="dc.description.abstract")
+
+      result.abstract_cs = a1.find_next("td").string
+      result.abstract_en = a2.find_next("td").string
+    except Exception as e:
+      debug_print("could not resolve abstract: " + str(e))
+
+    result.normalize()
+    return result 
 
 #----------------------------------------
 
@@ -1952,6 +2120,7 @@ class UcDownloader(FacultyDownloader):
     result.kind = THESIS_BACHELOR
     result.degree = DEGREE_BC
 
+
     soup = BeautifulSoup(download_webpage(url),"lxml")
 
     def text_in_table(line):
@@ -1985,7 +2154,6 @@ class UcDownloader(FacultyDownloader):
     except Exception as e:
       debug_print("could not download/analyze pdf: " + str(e)) 
 
-
     result.normalize()
     return result
 
@@ -2013,14 +2181,12 @@ class UcDownloader(FacultyDownloader):
 
 fit_vut = FitButDownloader()
 ctu = CtuDownloader()
+ctu_extra = CtuExtraDownloader()
 fai_utb = FaiUtbDownloader()
 mff_cuni = MffCuniDownloader()
 fei_vsb = FeiVsbDownloader()
 fi_muni = FiMuniDownloader()
 
-uc = UcDownloader()
-
-print(uc.get_thesis_info("https://www.unicorncollege.cz/bakalarske-prace/archiv-2016/pavlu-martin.html"))
-
+print(ctu_extra.get_thesis_info("https://dspace.cvut.cz/handle/10467/10300"))
 
 
