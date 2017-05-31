@@ -2406,8 +2406,43 @@ def shuffle_list_file():
 
   link_file_shuffled.close()
 
+def download_theses(start_from=0):       # downloads all these listed in the shuffled list file 
+  lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
+
+  counter = 0
+
+  for line in lines:
+    progress_print("downloading these " + str(counter) + "/" + str(len(lines)))
+   
+    if line.find("fit.vutbr.") >= 0:
+      progress_print("FIT BUT")
+    elif line.find("is.muni.cz") >= 0:
+      progress_print("FI MUNI")
+    elif line.find("felk.cvut") >= 0:
+      progress_print("CTU")
+    elif line.find("dspace.cvut") >= 0:
+      progress_print("CTU2")
+    elif line.find("dspace.vsb") >= 0:
+      progress_print("VSB")
+    elif line.find("is.cuni") >= 0:
+      progress_print("MFF CUNI")
+    elif line.find(".utb.") >= 0:
+      progress_print("FAI UTB")
+    elif line.find("portal_zp.pl") >= 0:
+      progress_print("PEF MENDELU")
+    elif line.find(".unicorncollege.") >= 0:
+      progress_print("UC")
+    else:
+      progress_print("unknown link!!!")
+
+
+    counter += 1
+
+    if counter > 20:
+      break
+
+#======================
+
 #make_these_list_file()
-
-shuffle_list_file()
-
-
+#shuffle_list_file()
+download_theses(16301)
