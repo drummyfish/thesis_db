@@ -2253,7 +2253,7 @@ class PefMendeluDownloader(FacultyDownloader):
       temp_list = iterative_load(soup,
         lambda t: t.name == "a" and t.get("title") == "Displaying the final thesis",
         lambda t: (
-          "",
+          t["href"],
           t.find_previous("small").find_previous("small").find_previous("small").find_previous("small").find_previous("small").string,
           int(t.find_previous("small").find_previous("small").find_previous("small").find_previous("small").string)
         ))
@@ -2324,16 +2324,16 @@ class UcDownloader(FacultyDownloader):
 
     year_links = iterative_load(soup,
       lambda t: t.name == "span" and t.parent.name == "a" and t.parent.get("class")[0] == "uvcArtifact",
-      lambda t: t.parent["href"])
+      lambda t: UcDownloader.BASE_URL + t.parent["href"])
 
     for year_link in year_links:
       progress_print("downloading UC link list for " + year_link)
 
-      soup = BeautifulSoup(download_webpage(UcDownloader.BASE_URL + year_link),"lxml")
+      soup = BeautifulSoup(download_webpage(year_link),"lxml")
 
       links = iterative_load(soup,
         lambda t: t.name == "a" and t.get("class") != None and t.get("class")[0] == "uvcArtifact",
-        lambda t: t["href"])
+        lambda t: UcDownloader.BASE_URL + t["href"])
 
       result += links
 
@@ -2354,7 +2354,7 @@ uc = UcDownloader()
 LINK_FILE_NAME = "links.txt"
 LINK_FILE_SHUFFLED = "links_shuffled.txt"
 
-def make_these_list_file():    # makes a shuffled text file with all these URLs to be downloaded
+def make_these_list_file():    # makes a text file with all these URLs to be downloaded
   progress_print("------ making link file ------")
 
   link_list = []
@@ -2387,22 +2387,27 @@ def make_these_list_file():    # makes a shuffled text file with all these URLs 
   link_list += fi_muni.get_thesis_list()
 
   link_file = open(LINK_FILE_NAME,"w")
-  link_file_shuffled = open(LINK_FILE_SHUFFLED,"w")
 
   for link in link_list:
     link_file.write(link + "\n")
 
-  random.shuffle(link_list)
-
-  for link in link_list:
-    link_file_shuffled.write(link + "\n")
-
   link_file.close()
-  link_file_shuffled.close()
 
   progress_print("------- link file done -------")
 
+def shuffle_list_file():
+  lines = get_file_text(LINK_FILE_NAME).split("\n")
+  random.shuffle(lines)
+  
+  link_file_shuffled = open(LINK_FILE_SHUFFLED,"w")
 
-make_these_list_file()
+  for line in lines:
+    link_file_shuffled.write(line + "\n")
+
+  link_file_shuffled.close()
+
+#make_these_list_file()
+
+shuffle_list_file()
 
 
