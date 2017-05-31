@@ -2223,8 +2223,7 @@ class PefMendeluDownloader(FacultyDownloader):
   def get_thesis_list(self):
     result = []
 
-    #programs = (3,397,7,9,885,63)
-    programs = [9] 
+    programs = (3,397,7,9,885,63)
 
     for program in programs:
       param_string = "?razeni=fakulta;prehled=program;obor=0;forma=0;program=" + str(program) + ";obdobi=2013;obdobi=2014;obdobi=2015;obdobi=2016;obdobi=2017;obdobi=2018;dohledat=Dohledat;jazyk=1;jazyk=2;jazyk=3;lang=en"
