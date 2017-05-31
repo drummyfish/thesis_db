@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import urllib
 import urllib2
 import ssl
 import langdetect
@@ -112,22 +113,23 @@ LANGUAGE_SK = "sk"
 
 LANGUAGES = [LANGUAGE_CS, LANGUAGE_SK, LANGUAGE_EN]
 
-FACULTY_MFF_CUNI = "MFF CUNI"
-FACULTY_FIT_BUT = "FIT BUT"
-FACULTY_FI_MUNI = "FI MUNI"
-FACULTY_FELK_CTU = "FELK CVUT"
-FACULTY_FIT_CTU = "FIT CTU"
-FACULTY_FEI_VSB = "FEI VŠB"
-FACULTY_FAI_UTB = "FAI UTB"
+FACULTY_MFF_CUNI    = "MFF CUNI"
+FACULTY_FIT_BUT     = "FIT BUT"
+FACULTY_FI_MUNI     = "FI MUNI"
+FACULTY_FELK_CTU    = "FELK CVUT"
+FACULTY_FIT_CTU     = "FIT CTU"
+FACULTY_FEI_VSB     = "FEI VŠB"
+FACULTY_FAI_UTB     = "FAI UTB"
+FACULTY_PEF_MENDELU = "PEF MENDELU"
 
 # privates:
-FACULTY_UC = "Unicorn College"
+FACULTY_UC          = "Unicorn College"
 
 # non-CS:
-FACULTY_FBMI_CTU = "FBMI CTU"   # fakulta biomedicinskeho inzenyrstvi
-FACULTY_FD_CTU = "FD CTU"       # fakulta dopravni
-FACULTY_FJFI_CTU = "FJFI CTU"   # fakulta jaderna a fyzikalne inzenyrska
-FACULTY_FSV_CTU = "FSV CTU"     # fakulta stavebni
+FACULTY_FBMI_CTU    = "FBMI CTU"   # fakulta biomedicinskeho inzenyrstvi
+FACULTY_FD_CTU      = "FD CTU"       # fakulta dopravni
+FACULTY_FJFI_CTU    = "FJFI CTU"   # fakulta jaderna a fyzikalne inzenyrska
+FACULTY_FSV_CTU     = "FSV CTU"     # fakulta stavebni
 
 # branches:
 
@@ -445,7 +447,8 @@ KEYWORDS_TO_FIELD = {
   "voxel": FIELD_CG,
   "klasifikace": FIELD_AI,
   "computability": FIELD_TCS,
-  "decidability": FIELD_TCS
+  "decidability": FIELD_TCS,
+  "QoS": FIELD_NET
   }
 
 KEYWORDS_TO_FIELD_LOWER = {}
@@ -2106,6 +2109,144 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
 
 #----------------------------------------
 
+class PefMendeluDownloader(FacultyDownloader):
+
+  BASE_URL = "https://is.mendelu.cz/zp/portal_zp.pl"
+
+  def __init__(self):
+    super(FacultyDownloader,self).__init__()
+    self.name_to_year = {}
+
+  def get_thesis_info(self,url):
+    result = Thesis()
+    result.url_page = url
+    result.faculty = FACULTY_PEF_MENDELU
+    result.public_university = True
+    result.city = CITY_BRNO
+
+    soup = BeautifulSoup(download_webpage(url),"lxml")
+
+    try:
+      result.url_page = result.url_page[:result.url_page.find(";")]
+    except Exception:
+      pass
+
+    def text_in_table(line):
+      return soup.find("small",string=line).find_next("small").string
+
+    try:
+      type_string = text_in_table("Type of thesis: ")
+
+      if type_string == "Bachelor thesis":
+        result.kind = THESIS_BACHELOR
+        result.degree = DEGREE_BC
+      elif type_string == "Diploma thesis":
+        result.kind = THESIS_MASTER
+        result.degree = DEGREE_ING
+      elif type_string == "Dissertation thesis":
+        result.kind = THESIS_PHD
+        result.degree = DEGREE_PHD
+    except Exception as e:
+      print("could not resolve type/degree: " + str(e))
+
+    try:
+      result.author = Person(text_in_table("Written by (author): "))
+      result.supervisor = Person(text_in_table("Thesis supervisor: "))
+
+      if result.kind == THESIS_PHD: 
+        result.opponents.append(Person(text_in_table("Opponent 1:")))
+        result.opponents.append(Person(text_in_table("Opponent 2:")))
+        result.opponents.append(Person(text_in_table("Opponent 3:")))
+      else:
+        result.opponents = [Person(text_in_table("Opponent:"))]
+
+    except Exception as e:
+      debug_print("could not resolve author/supervisor/opponent: " + str(e))
+
+    try:
+      defended_string = text_in_table("Final thesis progress:")
+
+      if defended_string.find("was success") >= 0:
+        result.defended = True
+    except Exception as e:
+      debug_print("could not resolve status: " + str(e))
+
+    try:
+      lang_string = text_in_table("Language of final thesis:")
+
+      if lang_string == "Czech":
+        result.lang_string = LANGUAGE_CS
+      elif lang_string == "English":
+        result.language = LANGUAGE_EN
+      elif lang_string == "Slovak":
+        result.language = LANGUAGE_SL
+    except Exception as e:
+      print("could not resolve language: " + str(e))
+
+    try:
+      title_string = text_in_table("Title of the thesis:")
+      abstract_string = text_in_table("Summary:")
+
+      if result.language == LANGUAGE_EN:
+        result.title_en = title_string
+        result.abstract_en = abstract_string
+      else:
+        result.title_cs = title_string
+        result.abstract_cs = abstract_string
+    except Exception as e:
+      print("could not resolve title/abstract: " + str(e))
+
+    if title_string in self.name_to_year:
+      result.year = self.name_to_year[title_string]
+
+    try:
+      result.keywords = beautify_list(text_in_table("Key words:").split(","))
+      result.field = guess_field_from_keywords(result.keywords)
+    except Exception as e:
+      print("could not resolve keywords: " + str(e))
+
+    try:
+      fulltext_string = soup.find("a",string="Final thesis")["href"]
+      result.url_fulltext = PefMendeluDownloader.BASE_URL + fulltext_string[fulltext_string.find("?"):]
+    except Exception as e:
+      print("could not resolve fulltext: " + str(e))
+
+    try:
+      pdf_info = download_and_analyze_pdf(result.url_fulltext)
+      result.incorporate_pdf_info(pdf_info)
+    except Exception as e:
+      print("could not analyze pdf: " + str(e))
+
+    result.normalize()
+    return result
+
+  def get_thesis_list(self):
+    result = []
+
+    #programs = (3,397,7,9,885,63)
+    programs = [9] 
+
+    for program in programs:
+      param_string = "?razeni=fakulta;prehled=program;obor=0;forma=0;program=" + str(program) + ";obdobi=2013;obdobi=2014;obdobi=2015;obdobi=2016;obdobi=2017;obdobi=2018;dohledat=Dohledat;jazyk=1;jazyk=2;jazyk=3;lang=en"
+      soup = BeautifulSoup(download_webpage(PefMendeluDownloader.BASE_URL + param_string),"lxml")
+
+      temp_list = iterative_load(soup,
+        lambda t: t.name == "a" and t.get("title") == "Displaying the final thesis",
+        lambda t: (
+          "",
+          t.find_previous("small").find_previous("small").find_previous("small").find_previous("small").find_previous("small").string,
+          int(t.find_previous("small").find_previous("small").find_previous("small").find_previous("small").string)
+        ))
+
+      for item in temp_list:
+        self.name_to_year[item[1]] = item[2]
+
+      result += map(lambda item: item[0],temp_list)
+
+    return result
+
+#----------------------------------------
+
 class UcDownloader(FacultyDownloader):
 
   BASE_URL = "https://www.unicorncollege.cz/bakalarske-prace/"
@@ -2179,14 +2320,23 @@ class UcDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-fit_vut = FitButDownloader()
+fit_but = FitButDownloader()
 ctu = CtuDownloader()
 ctu_extra = CtuExtraDownloader()
 fai_utb = FaiUtbDownloader()
 mff_cuni = MffCuniDownloader()
 fei_vsb = FeiVsbDownloader()
 fi_muni = FiMuniDownloader()
+pef_mendelu = PefMendeluDownloader()
+uc = UcDownloader()
 
-print(ctu_extra.get_thesis_info("https://dspace.cvut.cz/handle/10467/10300"))
+print(pef_mendelu.get_thesis_info("https://is.mendelu.cz/zp/portal_zp.pl?podrobnosti_zp=36190;zpet=;prehled=program;program=9;obor=0;forma=0;dohledat=Dohledat;obdobi=2019%2C2020%2C2021%2C2022%2C2023%2C2024%2C2025%2C2026%2C2027%2C2028%2C2029%2C2030%2C2031%2C2032%2C2033%2C2034%2C2035%2C2036%2C2037%2C2038;obdobi=2018;obdobi=2017;obdobi=2016;obdobi=2015;obdobi=2014;jazyk=1;jazyk=3;jazyk=2;lang=en"))
+
+
+
+
+
+
+
 
 
