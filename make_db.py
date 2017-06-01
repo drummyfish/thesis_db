@@ -2149,7 +2149,7 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more theses w
       pdf_info = download_and_analyze_pdf(result.url_fulltext)
       result.incorporate_pdf_info(pdf_info)
     except Exception as e:
-      print("could not analyze pdf: " + str(e))
+      debug_print("could not analyze pdf: " + str(e))
 
     result.normalize()
     return result
@@ -2194,7 +2194,7 @@ class PefMendeluDownloader(FacultyDownloader):
         result.kind = THESIS_PHD
         result.degree = DEGREE_PHD
     except Exception as e:
-      print("could not resolve type/degree: " + str(e))
+      debug_print("could not resolve type/degree: " + str(e))
 
     try:
       result.author = Person(text_in_table("Written by (author): "))
@@ -2228,7 +2228,7 @@ class PefMendeluDownloader(FacultyDownloader):
       elif lang_string == "Slovak":
         result.language = LANGUAGE_SL
     except Exception as e:
-      print("could not resolve language: " + str(e))
+      debug_print("could not resolve language: " + str(e))
 
     try:
       # try to lead info in other language:
@@ -2238,7 +2238,6 @@ class PefMendeluDownloader(FacultyDownloader):
       else:
         url2 = url + "jazyk_zalozka=3;lang=en"
 
-      print(url2)
       soup2 = BeautifulSoup(download_webpage(url2),"lxml")
 
       if result.language == LANGUAGE_EN:
@@ -2262,7 +2261,7 @@ class PefMendeluDownloader(FacultyDownloader):
         result.title_cs = title_string
         result.abstract_cs = abstract_string
     except Exception as e:
-      print("could not resolve title/abstract: " + str(e))
+      debug_print("could not resolve title/abstract: " + str(e))
 
     if title_string in self.name_to_year:
       result.year = self.name_to_year[title_string]
@@ -2271,19 +2270,19 @@ class PefMendeluDownloader(FacultyDownloader):
       result.keywords = beautify_list(text_in_table("Key words:").split(","))
       result.field = guess_field_from_keywords(result.keywords)
     except Exception as e:
-      print("could not resolve keywords: " + str(e))
+      debug_print("could not resolve keywords: " + str(e))
 
     try:
       fulltext_string = soup.find("a",string="Final thesis")["href"]
       result.url_fulltext = PefMendeluDownloader.BASE_URL + fulltext_string[fulltext_string.find("?"):]
     except Exception as e:
-      print("could not resolve fulltext: " + str(e))
+      debug_print("could not resolve fulltext: " + str(e))
 
     try:
       pdf_info = download_and_analyze_pdf(result.url_fulltext)
       result.incorporate_pdf_info(pdf_info)
     except Exception as e:
-      print("could not analyze pdf: " + str(e))
+      debug_print("could not analyze pdf: " + str(e))
 
     result.normalize()
     return result
@@ -2446,7 +2445,7 @@ if __name__ == "__main__":
 
     progress_print("------- link file done -------")
 
-  def shuffle_list_file():
+  def shuffle_list_file():                 # shuffles the links so that the request rate on web servers is spread more evenly
     lines = get_file_text(LINK_FILE_NAME).split("\n")
     random.shuffle(lines)
     
@@ -2541,6 +2540,4 @@ if __name__ == "__main__":
 
   #make_thesis_list_file()
   #shuffle_list_file()
-  #download_theses(16301)
-
   download_theses()
