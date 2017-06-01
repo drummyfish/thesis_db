@@ -47,6 +47,15 @@ class Stats(object):
         FACULTY_FJFI_CTU: 0,
         FACULTY_FSV_CTU: 0,
 
+        GRADE_A: 0,
+        GRADE_B: 0,
+        GRADE_C: 0,
+        GRADE_D: 0,
+        GRADE_E: 0,
+        GRADE_F: 0,
+
+        "not defended": 0,
+
         "male": 0,
         "female": 0,
 
@@ -72,32 +81,37 @@ class Stats(object):
   def nice_print(self):
     print("================= thesis DB stats ================ ")
 
-    print("faculties:")
+    print("\nfaculties:")
     faculties = [FACULTY_FIT_BUT, FACULTY_FI_MUNI, FACULTY_MFF_CUNI, FACULTY_FELK_CTU, FACULTY_FAI_UTB, unicode(FACULTY_FEI_VSB), FACULTY_PEF_MENDELU, FACULTY_UC, FACULTY_MVSO]
     faculty_sums = [self.records[f] for f in faculties]
     faculty_sums.append( len( filter(lambda item: not item["faculty"] in faculties,theses)))
-    print(table_row( faculties + ["other","total"] ,16) )
-    print(table_row( faculty_sums + [len(theses)] ,16 ))
-    print("")    
+    print("  " + table_row( faculties + ["other","total"] ,16) )
+    print("  " + table_row( faculty_sums + [len(theses)] ,16 ))
 
-    print("degrees:")
+    print("\ndegrees:")
     degrees = [DEGREE_BC, DEGREE_ING, DEGREE_MGR, DEGREE_PHD, DEGREE_DOC, DEGREE_RNDR, DEGREE_PHDR]
     degree_sums = [self.records[d] for d in degrees]
-    print(table_row( degrees ,16) )
-    print(table_row( degree_sums ,16) )
-    print("")
+    print("  " + table_row( degrees ,16) )
+    print("  " + table_row( degree_sums ,16) )
 
-    print("years:")
-    print(table_row(YEAR_RANGE,5))
-    print("")
+    print("\ngrades:")
+    print("  " + table_row(ALL_GRADES + ["failed"],8))
+    print("  " + table_row([self.records[g] for g in ALL_GRADES] + [self.records["not defended"]],8))
 
-    print("records:")
+    print("\nyears:")
+    print("  year:  " + table_row(YEAR_RANGE,5))
+    print("  total: " + table_row([self.records[r] for r in YEAR_RANGE],5))
 
-    print("longest title (cs): " + str(self.records["longest title cs"]))
-    print("longest title (en): " + str(self.records["longest title en"]))
-    print("shortest title (cs): " + str(self.records["shortest title cs"]))
-    print("shortest title (en): " + str(self.records["shortest title en"]))
-
+    print("\nrecords:")
+    print("  longest title (cs): " + str(self.records["longest title cs"]))
+    print("  longest title (en): " + str(self.records["longest title en"]))
+    print("  shortest title (cs): " + str(self.records["shortest title cs"]))
+    print("  shortest title (en): " + str(self.records["shortest title en"]))
+    print("  most pages: ")
+    print("  least pages: ")
+    print("  most common keywords: ")
+    print("  most common field (estimated): ")
+    print("  person with most degrees: ")
 
 stats = Stats()
 
@@ -109,8 +123,12 @@ for thesis in theses:
     stats.try_increment(thesis["kind"])
     stats.try_increment(thesis["year"])
     stats.try_increment(thesis["faculty"])
-    stats.try_increment(thesis["degree"])
-  
+    stats.try_increment(thesis["degree"]) 
+    stats.try_increment(thesis["grade"])
+
+    if thesis["defended"] == False:
+      stats.try_increment("not defended")
+
     if thesis["title_cs"] != None and len(thesis["title_cs"]) > len(stats.records["longest title cs"]):
       stats.records["longest title cs"] = thesis["title_cs"] 
  
@@ -118,7 +136,6 @@ for thesis in theses:
       stats.records["longest title en"] = thesis["title_en"] 
 
     if thesis["title_cs"] != None and len(thesis["title_cs"]) > 0 and len(thesis["title_cs"]) < len(stats.records["shortest title cs"]):
-      print("sasas")
       stats.records["shortest title cs"] = thesis["title_cs"] 
  
     if thesis["title_en"] != None and len(thesis["title_en"]) > 0 and len(thesis["title_en"]) < len(stats.records["shortest title en"]):
