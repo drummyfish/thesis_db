@@ -16,7 +16,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-ANALYZE_PDFS = False
+ANALYZE_PDFS = True
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
@@ -671,6 +671,8 @@ class Thesis(object):
       print_norm("correcting oppoentnts (None to [])")
       self.opponents = []
 
+    self.opponents = filter(lambda item: item != None and isinstance(item,Person),self.opponents)
+
     if self.keywords == None: 
       print_norm("correcting keywords (None to [])")
       self.keywords = []
@@ -841,15 +843,6 @@ class FacultyDownloader(object):      # base class for downloaders of theses of 
   def get_thesis_info(self,url):
     return Thesis()
 
-  def get_theses(self):
-    result = []
-    these_list = self.get_thesis_list()
-    
-    for thesis_url in these_list:
-      result.append(self.get_thesis_info(thesis_url))
-
-    return result
-
 #----------------------------------------
 
 class FitButDownloader(FacultyDownloader):
@@ -918,6 +911,15 @@ class FitButDownloader(FacultyDownloader):
     try:
       result.title_en = soup_en.find("h2").string
       result.title_cs = soup.find("h2").string
+
+      if result.title_cs == result.title_en:
+        likely_title_language = langdetect.detect(result.title_cs)
+
+        if likely_title_language == "cs":
+          result.title_en = None
+        elif likely_title_language == "en":
+          result.title_cs = None 
+
     except Exception as e:
       debug_print("could not resolve title(s):" + str(e))
     
@@ -956,7 +958,7 @@ class FitButDownloader(FacultyDownloader):
         (u"Inteligentní",           FIELD_AI),
         (u"Počítačové sítě",        FIELD_NET),
         (u"Bioinformatika",         FIELD_BIO),
-        ("Management",             FIELD_MAN)
+        ("Management",              FIELD_MAN)
         )
 
       for item in prefix_fields:
@@ -996,15 +998,8 @@ class FitButDownloader(FacultyDownloader):
     if result.field == None:
       result.field = guess_field_from_keywords(result.keywords)
 
-    if result.field == None and result.department != None:
-      department_to_field = {
-        DEPARTMENT_FIT_BUT_UPGM: FIELD_CG,
-        DEPARTMENT_FIT_BUT_UPSY: FIELD_HW,
-        DEPARTMENT_FIT_BUT_UIFS: FIELD_IS,
-        DEPARTMENT_FIT_BUT_UITS: FIELD_AI
-        }
-
-      result.field = department_to_field[result.department]
+    if result.field == None and result.department == DEPARTMENT_FIT_BUT_UPGM:
+      result.field = FIELD_CG
    
     try: 
       if result.kind == THESIS_DOC:
@@ -1052,7 +1047,7 @@ class FitButDownloader(FacultyDownloader):
       debug_print("language not found: " + str(e))
 
     try:
-      pdf_info = download_and_analyze_pdf(FitButDownloader.BASE_URL + result.url_fulltext) 
+      pdf_info = download_and_analyze_pdf(result.url_fulltext) 
       result.incorporate_pdf_info(pdf_info) 
     except Exception as e:
       debug_print("pdf could not be analyzed: " + str(e))
@@ -1082,7 +1077,7 @@ class FitButDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-class CtuDownloader(FacultyDownloader):      # for FEI and FELK don't forget to get extra theset with get_others
+class CtuDownloader(FacultyDownloader):      # for FEI and FELK don't forget to get extra theses with get_others
 
   BASE_URL = "https://dip.felk.cvut.cz/browse/"
 
@@ -1145,7 +1140,7 @@ class CtuDownloader(FacultyDownloader):      # for FEI and FELK don't forget to 
       departments = range(101,106) if faculty == "F8" else (13136,13139)
 
       for department in departments:
-        progress_print("downloading CTU these list for " + faculty + " " + str(department))
+        progress_print("downloading CTU thesis list for " + faculty + " " + str(department))
 
         url = CtuDownloader.BASE_URL + "department.php?f=" + faculty + "&d=K" + str(department)
 
@@ -1776,7 +1771,7 @@ class FeiVsbDownloader(FacultyDownloader):
     offset = 0
 
     while True:    # for each page
-      progress_print("downloading FEI VSB these list, offset " + str(offset))      
+      progress_print("downloading FEI VSB thesis list, offset " + str(offset))      
 
       soup = BeautifulSoup(download_webpage(FeiVsbDownloader.BASE_URL + "handle/10084/2564/browse?order=ASC&rpp=" + str(records) + "&sort_by=2&etal=-1&offset=" + str(offset) + "&type=dateissued"),"lxml")
       current = soup.find("h2")
@@ -1894,14 +1889,14 @@ class FeiVsbDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these with get_others (after calling get_thesis_list)
+class FiMuniDownloader(FacultyDownloader):   # don't forget to get more theses with get_others (after calling get_thesis_list)
 
   BASE_URL = "https://is.muni.cz/"
 
   def __init__(self):
     super(FiMuniDownloader,self).__init__()
 
-    self.other_these_retrieved = False
+    self.other_theses_retrieved = False
     self.other_theses = []
 
     self.substring_to_branch = {
@@ -1927,7 +1922,7 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
       }
 
   def get_others(self):     # get_thesis_list must be called first
-    if not self.other_these_retrieved:
+    if not self.other_theses_retrieved:
       debug_print("WATCH OUT! calling get_others from FiMuniDownloader before get_thesis_list was called! Nothing will be returned.")
       return []
 
@@ -1985,7 +1980,7 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
     page_links = page_links[:len(page_links) / 2]
 
     for page in page_links:   # first page already loaded
-      progress_print("downloading FI MUNI these list for " + page)
+      progress_print("downloading FI MUNI theses list for " + page)
 
       soup = BeautifulSoup(download_webpage(page),"lxml")
 
@@ -1999,7 +1994,7 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more these wi
         lambda t: t.name == "div" and t.parent.get("id") == "aplikace" and t.contents[0].name == "b" and t.find("a") == None,
         lambda t: analyze_div(t,page))
 
-    self.other_these_retrieved = True
+    self.other_theses_retrieved = True
 
     return result
 
@@ -2245,7 +2240,7 @@ class PefMendeluDownloader(FacultyDownloader):
     programs = (3,397,7,9,885,63)
 
     for program in programs:
-      progress_print("downloading PF MENDELU these list, program " + str(program))
+      progress_print("downloading PF MENDELU thesis list, program " + str(program))
 
       param_string = "?razeni=fakulta;prehled=program;obor=0;forma=0;program=" + str(program) + ";obdobi=2013;obdobi=2014;obdobi=2015;obdobi=2016;obdobi=2017;obdobi=2018;dohledat=Dohledat;jazyk=1;jazyk=2;jazyk=3;lang=en"
       soup = BeautifulSoup(download_webpage(PefMendeluDownloader.BASE_URL + param_string),"lxml")
@@ -2354,7 +2349,7 @@ uc = UcDownloader()
 LINK_FILE_NAME = "links.txt"
 LINK_FILE_SHUFFLED = "links_shuffled.txt"
 
-def make_these_list_file():    # makes a text file with all these URLs to be downloaded
+def make_thesis_list_file():    # makes a text file with all thesis URLs to be downloaded
   progress_print("------ making link file ------")
 
   link_list = []
@@ -2406,7 +2401,7 @@ def shuffle_list_file():
 
   link_file_shuffled.close()
 
-def download_theses(start_from=0):       # downloads all these listed in the shuffled list file 
+def download_theses(start_from=0):       # downloads all theses listed in the shuffled list file 
   lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
 
   counter = 0
@@ -2435,7 +2430,6 @@ def download_theses(start_from=0):       # downloads all these listed in the shu
     else:
       progress_print("unknown link!!!")
 
-
     counter += 1
 
     if counter > 20:
@@ -2443,6 +2437,11 @@ def download_theses(start_from=0):       # downloads all these listed in the shu
 
 #======================
 
-#make_these_list_file()
+#make_thesis_list_file()
 #shuffle_list_file()
-download_theses(16301)
+#download_theses(16301)
+
+#print(fit_but.get_thesis_info("http://www.fit.vutbr.cz/study/DP/DP.php?id=2&y=0"))
+
+
+
