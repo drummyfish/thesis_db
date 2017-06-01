@@ -16,7 +16,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-ANALYZE_PDFS = True
+ANALYZE_PDFS = False
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
@@ -2047,6 +2047,10 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more theses w
         lambda t: t.name == "span" and t.get("class") != None and t.get("class")[0] == "tg5",
         lambda t: t.contents[0].string)
 
+      if len(result.keywords) > 0:
+        if result.keywords[-1][-1] == ".":
+          result.keywords[-1] = result.keywords[-1][:-1]
+
       result.field = guess_field_from_keywords(result.keywords)
     except Exception as e:
       debug_print("error at keywords/field: " + str(e))
@@ -2196,6 +2200,27 @@ class PefMendeluDownloader(FacultyDownloader):
         result.language = LANGUAGE_SL
     except Exception as e:
       print("could not resolve language: " + str(e))
+
+    try:
+      # try to lead info in other language:
+
+      if result.language == LANGUAGE_EN:
+        url2 = url + "jazyk_zalozka=1;lang=cz"
+      else:
+        url2 = url + "jazyk_zalozka=3;lang=en"
+
+      print(url2)
+      soup2 = BeautifulSoup(download_webpage(url2),"lxml")
+
+      if result.language == LANGUAGE_EN:
+        result.title_cs = soup2.find("small",string="Název práce:").find_next("small").string
+        result.abstract_cs = soup2.find("small",string="Abstrakt:").find_next("small").string
+      else:
+        result.title_en = soup2.find("small",string="Title of the thesis:").find_next("small").string
+        result.abstract_en = soup2.find("small",string="Summary:").find_next("small").string
+
+    except Exception as e:
+      debug_print("could not resolve other language info:" + str(e))
 
     try:
       title_string = text_in_table("Title of the thesis:")
@@ -2441,7 +2466,8 @@ def download_theses(start_from=0):       # downloads all theses listed in the sh
 #shuffle_list_file()
 #download_theses(16301)
 
-#print(fit_but.get_thesis_info("http://www.fit.vutbr.cz/study/DP/DP.php?id=2&y=0"))
+print(pef_mendelu.get_thesis_info(""))
+
 
 
 
