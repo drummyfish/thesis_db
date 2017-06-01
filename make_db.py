@@ -2273,7 +2273,7 @@ class PefMendeluDownloader(FacultyDownloader):
       temp_list = iterative_load(soup,
         lambda t: t.name == "a" and t.get("title") == "Displaying the final thesis",
         lambda t: (
-          t["href"],
+          PefMendeluDownloader.BASE_URL + t["href"][t["href"].find("?"):],
           t.find_previous("small").find_previous("small").find_previous("small").find_previous("small").find_previous("small").string,
           int(t.find_previous("small").find_previous("small").find_previous("small").find_previous("small").string)
         ))
@@ -2373,6 +2373,7 @@ uc = UcDownloader()
 
 LINK_FILE_NAME = "links.txt"
 LINK_FILE_SHUFFLED = "links_shuffled.txt"
+DB_FILE = "theses.json"         # final file to save the theses into
 
 def make_thesis_list_file():    # makes a text file with all thesis URLs to be downloaded
   progress_print("------ making link file ------")
@@ -2427,46 +2428,86 @@ def shuffle_list_file():
   link_file_shuffled.close()
 
 def download_theses(start_from=0):       # downloads all theses listed in the shuffled list file 
-  lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
+  #lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
+  lines = get_file_text("list_small.txt").split("\n")[start_from:]
 
   counter = 0
+
+  if start_from == 0:
+    db_file = open(DB_FILE,"w")
+    db_file.write("[\n")
+  else:
+    db_file = open(DB_FILE,"a")
+
+  first = True
+
+  # TODO: download other theses with get_others() !!!
 
   for line in lines:
     progress_print("downloading these " + str(counter) + "/" + str(len(lines)))
    
+    append_string = None
+
     if line.find("fit.vutbr.") >= 0:
       progress_print("FIT BUT")
+      thesis = fit_but.get_thesis_info(line) 
+      append_string = str(thesis) if thesis != None else None
     elif line.find("is.muni.cz") >= 0:
       progress_print("FI MUNI")
+      thesis = fi_muni.get_thesis_info(line)
+      append_string = str(thesis) if thesis != None else None
     elif line.find("felk.cvut") >= 0:
       progress_print("CTU")
+      thesis = ctu.get_thesis_info(line)
+      append_string = str(thesis) if thesis != None else None
     elif line.find("dspace.cvut") >= 0:
       progress_print("CTU2")
+      thesis = ctu_extra.get_thesis_info(line)
+      append_string = str(thesis) if thesis != None else None
     elif line.find("dspace.vsb") >= 0:
       progress_print("VSB")
+      thesis = fei_vsb.get_thesis_info(line)
+      append_string = str(thesis) if thesis != None else None
     elif line.find("is.cuni") >= 0:
       progress_print("MFF CUNI")
+      thesis = mff_cuni.get_thesis_info(line)
+      append_string = str(thesis) if thesis != None else None
     elif line.find(".utb.") >= 0:
       progress_print("FAI UTB")
+      thesis = fai_utb.get_thesis_info(line)
+      append_string = str(thesis) if thesis != None else None
     elif line.find("portal_zp.pl") >= 0:
       progress_print("PEF MENDELU")
+      thesis = pef_mendelu.get_thesis_info(line)
+      append_string = str(thesis) if thesis != None else None
     elif line.find(".unicorncollege.") >= 0:
       progress_print("UC")
+      thesis = uc.get_thesis_info(line)
+      append_string = str(thesis) if thesis != None else None
     else:
-      progress_print("unknown link!!!")
+      progress_print("unknown link!!!: " + line.replace("\n",""))
+
+    if append_string != None:
+      if first:
+        first = False
+      else:
+        db_file.write(",\n")
+
+      db_file.write(append_string)
 
     counter += 1
 
     if counter > 20:
       break
 
+  db_file.write("\n]\n")
+  db_file.close()
+
 #======================
 
 #make_thesis_list_file()
 #shuffle_list_file()
 #download_theses(16301)
-
 #print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/4128"))
 
-
-
+download_theses()
