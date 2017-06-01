@@ -12,11 +12,12 @@ from bs4 import element
 import random
 import os
 import sys
+import traceback
 
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-ANALYZE_PDFS = False
+ANALYZE_PDFS = True
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
@@ -542,7 +543,7 @@ def guess_field_from_keywords(keyword_list):
     histogram[field] = 0
 
   for keyword in keyword_list:
-    if keyword.lower() in KEYWORDS_TO_FIELD_LOWER:
+    if keyword != None and keyword.lower() in KEYWORDS_TO_FIELD_LOWER:
       histogram[KEYWORDS_TO_FIELD_LOWER[keyword.lower()]] += 1
 
   best_field = None
@@ -809,7 +810,9 @@ class PDFInfo(object):
       debug_print("could not analyze PDF: " + str(e))
 
 def beautify_list(keywords):  # removes duplicates, empties, strips etc.
-  return [item.decode("utf-8") for item in map(lambda s: s.lstrip().rstrip(), list(set(keywords))) if len(item) > 1]
+  return [item.decode("utf-8") for item in
+    map(lambda s: s.lstrip().rstrip(),
+      filter(lambda item: item != None,list(set(keywords)))) if len(item) > 1]
 
 def download_webpage(url):
   gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
@@ -837,7 +840,7 @@ def starts_with(what, prefix):
   return what[:len(prefix.decode("utf-8"))] == prefix
 
 class FacultyDownloader(object):      # base class for downloaders of theses of a single faculty
-  def get_thesis_list(self):          # get list of links to these pages
+  def get_thesis_list(self):          # get list of links to thesis pages
     return []
 
   def get_thesis_info(self,url):
@@ -1479,10 +1482,15 @@ class FaiUtbDownloader(FacultyDownloader):
       tag = soup.find("td",string=line).find_next("td")
       return tag.string if tag.string != None else tag.contents[1].string
 
-    result.year = int(text_in_table("dc.date.issued").split("-")[0])
+    try:
+      result.year = int(text_in_table("dc.date.issued").split("-")[0])
+    except Exception as e:
+      debug_print("could not resolve year: " + str(e))
 
-    result.author = Person()
-    result.author.from_string(text_in_table("dc.contributor.author"),False)
+    try:
+      result.author = Person(text_in_table("dc.contributor.author"),False)
+    except Exception as e:
+      debug_print("could not resolve author: " + str(e))
 
     try:
       result.supervisor = Person()
@@ -1491,10 +1499,16 @@ class FaiUtbDownloader(FacultyDownloader):
       result.supervisor = None 
       debug_print("supervisor not found: " + str(e))
 
-    result.language = text_in_table("dc.language.iso")
-    result.degree = text_in_table("dc.thesis.degree-name")
+    try:
+      result.language = text_in_table("dc.language.iso")
+    except Exception as e:
+      debug_print("could not resolve language: " + str(e))
 
-    result.kind = degree_to_thesis_type(result.degree)
+    try:
+      result.degree = text_in_table("dc.thesis.degree-name")
+      result.kind = degree_to_thesis_type(result.degree)
+    except Exception as e:
+      debug_print("could not resolve degree: " + str(e))
 
     try:
       if result.kind != THESIS_PHD:
@@ -1507,67 +1521,82 @@ class FaiUtbDownloader(FacultyDownloader):
     elif result.grade == GRADE_F:
       result.defended = False
 
-    result.title_cs = text_in_table("dc.title")
-    result.title_en = text_in_table("dc.title.alternative")
+    try:
+      result.title_cs = text_in_table("dc.title")
+      result.title_en = text_in_table("dc.title.alternative")
+    except Exception as e:
+      debug_print("could not resolve title: " + str(e))
 
     if result.title_cs == result.title_en:
       result.title_cs = None
 
-    result.abstract_cs = text_in_table("dc.description.abstract")
-    result.abstract_en = text_in_table("dc.description.abstract-translated")
+    try:
+      result.abstract_cs = text_in_table("dc.description.abstract")
+      result.abstract_en = text_in_table("dc.description.abstract-translated")
+    except Exception as e:
+      debug_print("abstract not found: " + str(e))
 
     result.opponents = iterative_load(soup,
       lambda t: t.name == "td" and t.string == "dc.contributor.referee",
       lambda t: Person(t.find_next("td").string,False)
       )
    
-    result.keywords = iterative_load(soup,
+    result.keywords = beautify_list(iterative_load(soup,
       lambda t: t.name == "td" and t.string == "dc.subject",
-      lambda t: t.find_next("td").contents[1].string)
+      lambda t: t.find_next("td").contents[1].string))
 
-    grantor_string = text_in_table("dc.thesis.degree-grantor")
- 
-    if grantor_string.find("aplikované in") >= 0:
-      result.department = DEPARTMENT_FAI_UTB_UAI
-    elif grantor_string.find("automatizace a") >= 0:
-      result.department = DEPARTMENT_FAI_UTB_UART
-    elif grantor_string.find("bezpečnostního in") >= 0:
-      result.department = DEPARTMENT_FAI_UTB_UBI
-      result.field = FIELD_SEC
-    elif grantor_string.find("elektrotechniky a") >= 0:
-      result.department = DEPARTMENT_FAI_UTB_UELM
-    elif grantor_string.find("umělé in") >= 0:
-      result.department = DEPARTMENT_FAI_UTB_UIUI
-    elif grantor_string.find("počítačových a kom") >= 0:
-      result.department = DEPARTMENT_FAI_UTB_UPKS
-    elif grantor_string.find("řízení proc") >= 0:
-      result.department = DEPARTMENT_FAI_UTB_URP
+    try:
+      grantor_string = text_in_table("dc.thesis.degree-grantor")
+   
+      if grantor_string.find("aplikované in") >= 0:
+        result.department = DEPARTMENT_FAI_UTB_UAI
+      elif grantor_string.find("automatizace a") >= 0:
+        result.department = DEPARTMENT_FAI_UTB_UART
+      elif grantor_string.find("bezpečnostního in") >= 0:
+        result.department = DEPARTMENT_FAI_UTB_UBI
+        result.field = FIELD_SEC
+      elif grantor_string.find("elektrotechniky a") >= 0:
+        result.department = DEPARTMENT_FAI_UTB_UELM
+      elif grantor_string.find("umělé in") >= 0:
+        result.department = DEPARTMENT_FAI_UTB_UIUI
+      elif grantor_string.find("počítačových a kom") >= 0:
+        result.department = DEPARTMENT_FAI_UTB_UPKS
+      elif grantor_string.find("řízení proc") >= 0:
+        result.department = DEPARTMENT_FAI_UTB_URP
+    except Exception as e:
+      debug_print("department not found: " + str(e))
 
-    branch_string = text_in_table("dc.thesis.degree-discipline")
+    try:
+      branch_string = text_in_table("dc.thesis.degree-discipline")
 
-    substring_to_branch = {
-      "Informační technologie": BRANCH_FAI_UTB_IT,
-      "Bezpečnostní technologie": BRANCH_FAI_UTB_BTSM,
-      "řídicí technologie": BRANCH_FAI_UTB_IRT,
-      "v administrativě": BRANCH_FAI_UTB_ITA,
-      "Automatizace a řídicí": BRANCH_FAI_UTB_ARI,
-      "Učitelství": BRANCH_FAI_UTB_UISS,
-      "komunikační systémy": BRANCH_FAI_UTB_PKS, 
-      "roboty": BRANCH_FAI_UTB_ISR,
-      "Softwarové": BRANCH_FAI_UTB_SWI,
-      "budovách": BRANCH_FAI_UTB_ISB 
-      }
+      substring_to_branch = {
+        "Informační technologie": BRANCH_FAI_UTB_IT,
+        "Bezpečnostní technologie": BRANCH_FAI_UTB_BTSM,
+        "řídicí technologie": BRANCH_FAI_UTB_IRT,
+        "v administrativě": BRANCH_FAI_UTB_ITA,
+        "Automatizace a řídicí": BRANCH_FAI_UTB_ARI,
+        "Učitelství": BRANCH_FAI_UTB_UISS,
+        "komunikační systémy": BRANCH_FAI_UTB_PKS, 
+        "roboty": BRANCH_FAI_UTB_ISR,
+        "Softwarové": BRANCH_FAI_UTB_SWI,
+        "budovách": BRANCH_FAI_UTB_ISB 
+        }
 
-    result.handle_branch(branch_string,substring_to_branch)
+      result.handle_branch(branch_string,substring_to_branch)
+    except Exception as e:
+      debug_print("could not resolve branch: " + str(e))
 
     if result.field == None:
       result.field = guess_field_from_keywords(result.keywords)
     
-    result.url_fulltext = FaiUtbDownloader.BASE_URL + soup.find("table",class_="ds-table file-list").find_next("a")["href"] 
+    try:
+      result.url_fulltext = FaiUtbDownloader.BASE_URL + soup.find("table",class_="ds-table file-list").find_next("a")["href"] 
 
-    if result.url_fulltext.find(".pdf") >= 0:
-      pdf_info = download_and_analyze_pdf(result.url_fulltext)
-      result.incorporate_pdf_info(pdf_info)
+      if result.url_fulltext.find(".pdf") >= 0:
+        pdf_info = download_and_analyze_pdf(result.url_fulltext)
+        result.incorporate_pdf_info(pdf_info)
+    except Exception as e:
+      debug_print("error at fulltext: " + str(e))
 
     result.normalize() 
     return result
@@ -2441,65 +2470,69 @@ if __name__ == "__main__":
       db_file = open(DB_FILE,"a")
 
     first = True
+    big_errors = 0
 
     # TODO: download other theses with get_others() !!!
 
     for line in lines:
-      progress_print("downloading these " + str(counter) + "/" + str(len(lines)))
-     
-      append_string = None
+      progress_print("downloading thesis " + str(counter) + "/" + str(len(lines)))
+    
+      try: 
+        append_string = None
 
-      if line.find("fit.vutbr.") >= 0:
-        progress_print("FIT BUT")
-        thesis = fit_but.get_thesis_info(line) 
-        append_string = str(thesis) if thesis != None else None
-      elif line.find("is.muni.cz") >= 0:
-        progress_print("FI MUNI")
-        thesis = fi_muni.get_thesis_info(line)
-        append_string = str(thesis) if thesis != None else None
-      elif line.find("felk.cvut") >= 0:
-        progress_print("CTU")
-        thesis = ctu.get_thesis_info(line)
-        append_string = str(thesis) if thesis != None else None
-      elif line.find("dspace.cvut") >= 0:
-        progress_print("CTU2")
-        thesis = ctu_extra.get_thesis_info(line)
-        append_string = str(thesis) if thesis != None else None
-      elif line.find("dspace.vsb") >= 0:
-        progress_print("VSB")
-        thesis = fei_vsb.get_thesis_info(line)
-        append_string = str(thesis) if thesis != None else None
-      elif line.find("is.cuni") >= 0:
-        progress_print("MFF CUNI")
-        thesis = mff_cuni.get_thesis_info(line)
-        append_string = str(thesis) if thesis != None else None
-      elif line.find(".utb.") >= 0:
-        progress_print("FAI UTB")
-        thesis = fai_utb.get_thesis_info(line)
-        append_string = str(thesis) if thesis != None else None
-      elif line.find("portal_zp.pl") >= 0:
-        progress_print("PEF MENDELU")
-        thesis = pef_mendelu.get_thesis_info(line)
-        append_string = str(thesis) if thesis != None else None
-      elif line.find(".unicorncollege.") >= 0:
-        progress_print("UC")
-        thesis = uc.get_thesis_info(line)
-        append_string = str(thesis) if thesis != None else None
-      else:
-        progress_print("unknown link!!!: " + line.replace("\n",""))
-
-      if append_string != None:
-        if first:
-          first = False
+        if line.find("fit.vutbr.") >= 0:
+          progress_print("FIT BUT")
+          thesis = fit_but.get_thesis_info(line) 
+          append_string = str(thesis) if thesis != None else None
+        elif line.find("is.muni.cz") >= 0:
+          progress_print("FI MUNI")
+          thesis = fi_muni.get_thesis_info(line)
+          append_string = str(thesis) if thesis != None else None
+        elif line.find("felk.cvut") >= 0:
+          progress_print("CTU")
+          thesis = ctu.get_thesis_info(line)
+          append_string = str(thesis) if thesis != None else None
+        elif line.find("dspace.cvut") >= 0:
+          progress_print("CTU2")
+          thesis = ctu_extra.get_thesis_info(line)
+          append_string = str(thesis) if thesis != None else None
+        elif line.find("dspace.vsb") >= 0:
+          progress_print("VSB")
+          thesis = fei_vsb.get_thesis_info(line)
+          append_string = str(thesis) if thesis != None else None
+        elif line.find("is.cuni") >= 0:
+          progress_print("MFF CUNI")
+          thesis = mff_cuni.get_thesis_info(line)
+          append_string = str(thesis) if thesis != None else None
+        elif line.find(".utb.") >= 0:
+          progress_print("FAI UTB")
+          thesis = fai_utb.get_thesis_info(line)
+          append_string = str(thesis) if thesis != None else None
+        elif line.find("portal_zp.pl") >= 0:
+          progress_print("PEF MENDELU")
+          thesis = pef_mendelu.get_thesis_info(line)
+          append_string = str(thesis) if thesis != None else None
+        elif line.find(".unicorncollege.") >= 0:
+          progress_print("UC")
+          thesis = uc.get_thesis_info(line)
+          append_string = str(thesis) if thesis != None else None
         else:
-          db_file.write(",\n")
+          progress_print("unknown link!!!: " + line.replace("\n",""))
 
-        db_file.write(append_string)
+        if append_string != None:
+          if first:
+            first = False
+          else:
+            db_file.write(",\n")
 
-      counter += 1
+          db_file.write(append_string)
 
-      if counter > 20:
-        break
+        counter += 1
+      except Exception as e:
+        progress_print("BIG ERROR: " + str(e))
+        traceback.print_exc(file=sys.stdout)
+        big_errors += 1
+        progress_print("there were " + str(big_errors) + " big errors so far")
 
     db_file.write("\n]\n")
     db_file.close()
@@ -2510,4 +2543,4 @@ if __name__ == "__main__":
   #shuffle_list_file()
   #download_theses(16301)
 
-  #download_theses()
+  download_theses()
