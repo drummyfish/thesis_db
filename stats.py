@@ -11,7 +11,7 @@ sys.setdefaultencoding("utf8")
 db_text = get_file_text("theses.json")
 theses = json.loads(db_text,encoding="utf8")
 
-YEAR_RANGE = range(1985,2018)
+YEAR_RANGE = range(1990,2018)
 
 def table_row(cells,cell_width=20):
   result = ""
@@ -23,7 +23,9 @@ def table_row(cells,cell_width=20):
 
 class Stats(object):
 
-  def __init__(self):
+  def __init__(self, thesis_list):
+    self.thesis_list = thesis_list
+
     self.records = {
         "total": 0,
         THESIS_BACHELOR: 0,
@@ -62,7 +64,8 @@ class Stats(object):
         "longest title cs": "",
         "longest title en": "",
         "shortest title cs": "                                      ",
-        "shortest title en": "                                      "
+        "shortest title en": "                                      ",
+        "most pages index": -1
       }
 
     for degree in DEGREES:
@@ -70,6 +73,8 @@ class Stats(object):
 
     for year in YEAR_RANGE:
       self.records[year] = 0
+      self.records[str(year) + " male"] = 0
+      self.records[str(year) + " female"] = 0
 
   def try_increment(self, key):
     if key in self.records:
@@ -82,38 +87,53 @@ class Stats(object):
     print("================= thesis DB stats ================ ")
 
     print("\nfaculties:")
+    cell_width = 16
     faculties = [FACULTY_FIT_BUT, FACULTY_FI_MUNI, FACULTY_MFF_CUNI, FACULTY_FELK_CTU, FACULTY_FAI_UTB, unicode(FACULTY_FEI_VSB), FACULTY_PEF_MENDELU, FACULTY_UC, FACULTY_MVSO]
     faculty_sums = [self.records[f] for f in faculties]
     faculty_sums.append( len( filter(lambda item: not item["faculty"] in faculties,theses)))
-    print("  " + table_row( faculties + ["other","total"] ,16) )
-    print("  " + table_row( faculty_sums + [len(theses)] ,16 ))
+    print("  " + table_row( faculties + ["other","total"],cell_width ) )
+    print("  " + table_row( faculty_sums + [len(theses)],cell_width ))
+
+    print("\ngender:")
+    cell_width = 16
+    print("  " + table_row( ["male","female","unknown"],cell_width ))
+    print("  " + table_row( [self.records["male"],self.records["female"],self.records["total"] - self.records["male"] - self.records["female"]], cell_width ))
 
     print("\ndegrees:")
+    cell_width = 16
     degrees = [DEGREE_BC, DEGREE_ING, DEGREE_MGR, DEGREE_PHD, DEGREE_DOC, DEGREE_RNDR, DEGREE_PHDR]
     degree_sums = [self.records[d] for d in degrees]
-    print("  " + table_row( degrees ,16) )
-    print("  " + table_row( degree_sums ,16) )
+    print("  " + table_row( degrees,cell_width) )
+    print("  " + table_row( degree_sums,cell_width) )
 
     print("\ngrades:")
-    print("  " + table_row(ALL_GRADES + ["failed"],8))
-    print("  " + table_row([self.records[g] for g in ALL_GRADES] + [self.records["not defended"]],8))
+    cell_width = 8
+    print("  " + table_row(ALL_GRADES + ["failed"],cell_width))
+    print("  " + table_row([self.records[g] for g in ALL_GRADES] + [self.records["not defended"]],cell_width))
 
     print("\nyears:")
-    print("  year:  " + table_row(YEAR_RANGE,5))
-    print("  total: " + table_row([self.records[r] for r in YEAR_RANGE],5))
+    cell_width = 6
+    female_male_ratios = ["{0:.2f}".format(float(self.records[str(y) + " female"]) / float(self.records[str(y) + " male"] + 0.0001)) for y in YEAR_RANGE]
+
+    print("  year:        " + table_row(YEAR_RANGE,cell_width))
+    print("  total:       " + table_row([self.records[r] for r in YEAR_RANGE],cell_width))
+    print("  female/male: " + table_row(female_male_ratios,cell_width))
 
     print("\nrecords:")
     print("  longest title (cs): " + str(self.records["longest title cs"]))
     print("  longest title (en): " + str(self.records["longest title en"]))
     print("  shortest title (cs): " + str(self.records["shortest title cs"]))
     print("  shortest title (en): " + str(self.records["shortest title en"]))
-    print("  most pages: ")
+
+    most_pages_thesis = self.thesis_list[self.records["most pages index"]] if self.records["most pages index"] >= 0 else None
+
+    print("  most pages: " + ((str(most_pages_thesis["pages"]) + " - " + str(most_pages_thesis["title_cs"])) if most_pages_thesis != None else "none"))
     print("  least pages: ")
     print("  most common keywords: ")
     print("  most common field (estimated): ")
     print("  person with most degrees: ")
 
-stats = Stats()
+stats = Stats(theses)
 
 thesis_no = 0
 
@@ -121,7 +141,18 @@ for thesis in theses:
   try:
     stats.try_increment("total")
     stats.try_increment(thesis["kind"])
+
     stats.try_increment(thesis["year"])
+
+    try:
+      stats.try_increment(str(thesis["year"]) + " " + thesis["author"]["sex"])
+    except Exception as e:
+      pass
+
+    if thesis["pages"] != None:
+      if stats.records["most pages index"] == -1 or thesis["pages"] > theses[stats.records["most pages index"]]:
+        stats.records["most pages index"] = thesis_no
+
     stats.try_increment(thesis["faculty"])
     stats.try_increment(thesis["degree"]) 
     stats.try_increment(thesis["grade"])
@@ -152,8 +183,7 @@ for thesis in theses:
   thesis_no += 1
 
 stats.nice_print()
-  
+#pprint(stats.records)  
   
     
-
 
