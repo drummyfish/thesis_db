@@ -1450,7 +1450,7 @@ class FaiUtbDownloader(FacultyDownloader):
         soup = BeautifulSoup(download_webpage("http://digilib.k.utb.cz/handle/10563/" + str(l[2]) + "/recent-submissions?offset=" + str(offset)),"lxml")
 
         links = iterative_load(soup,
-          lambda t: t.name == "a" and t.next_sibling != None and t["href"].find("=") == -1 and t["href"][:3] == "/ha" and t.string != "Next Page",
+          lambda t: t.name == "a" and t.next_sibling != None and t["href"].find("=") == -1 and t["href"][:3] == "/ha" and t.parent.name == "div",
           lambda t: FaiUtbDownloader.BASE_URL + t["href"][1:],
           )
 
@@ -2466,8 +2466,7 @@ def download_theses(start_from=0):       # downloads all theses listed in the sh
 #shuffle_list_file()
 #download_theses(16301)
 
-print(pef_mendelu.get_thesis_info(""))
-
+#print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/4128"))
 
 
 
