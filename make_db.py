@@ -491,7 +491,7 @@ NAMES_MALE = ["Jiří", "Jan", "Petr", "Pavel", "Jaroslav",
   "Dan", "Daniel", "Emanuel", "Čeněk", "Hynek",
   "Jarmil", "Matěj", "Mikoláš","Branislav","Matej",
   "Dávid", "Samuel", "Mohamed", "Moslem", "Gabriel",
-  "Zdeněk","Lubor"]
+  "Zdeněk","Lubor","Matúš","Marian"]
 
 NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Věra", "Lenka", "Alena", "Jaroslava", "Lucie",
@@ -2307,7 +2307,7 @@ class UcDownloader(FacultyDownloader):
       return soup.find("span",string=line).find_next("span").find_next("span").string
 
     try:
-      result.author = Person(text_in_table("Autor"))
+      result.author = Person(text_in_table("Autor"),False)
     except Exception as e:
       debug_print("could not resolve author: " + str(e)) 
 
@@ -2361,153 +2361,153 @@ class UcDownloader(FacultyDownloader):
 
 #----------------------------------------
 
-fit_but = FitButDownloader()
-ctu = CtuDownloader()
-ctu_extra = CtuExtraDownloader()
-fai_utb = FaiUtbDownloader()
-mff_cuni = MffCuniDownloader()
-fei_vsb = FeiVsbDownloader()
-fi_muni = FiMuniDownloader()
-pef_mendelu = PefMendeluDownloader()
-uc = UcDownloader()
+if __name__ == "__main__":
+  fit_but = FitButDownloader()
+  ctu = CtuDownloader()
+  ctu_extra = CtuExtraDownloader()
+  fai_utb = FaiUtbDownloader()
+  mff_cuni = MffCuniDownloader()
+  fei_vsb = FeiVsbDownloader()
+  fi_muni = FiMuniDownloader()
+  pef_mendelu = PefMendeluDownloader()
+  uc = UcDownloader()
 
-LINK_FILE_NAME = "links.txt"
-LINK_FILE_SHUFFLED = "links_shuffled.txt"
-DB_FILE = "theses.json"         # final file to save the theses into
+  LINK_FILE_NAME = "links.txt"
+  LINK_FILE_SHUFFLED = "links_shuffled.txt"
+  DB_FILE = "theses.json"         # final file to save the theses into
 
-def make_thesis_list_file():    # makes a text file with all thesis URLs to be downloaded
-  progress_print("------ making link file ------")
+  def make_thesis_list_file():    # makes a text file with all thesis URLs to be downloaded
+    progress_print("------ making link file ------")
 
-  link_list = []
+    link_list = []
 
-  progress_print("-- downloading links for MFF CUNI")
-  link_list += mff_cuni.get_thesis_list()
+    progress_print("-- downloading links for MFF CUNI")
+    link_list += mff_cuni.get_thesis_list()
 
-  progress_print("-- downloading links for FEI VSB")
-  link_list += fei_vsb.get_thesis_list()
+    progress_print("-- downloading links for FEI VSB")
+    link_list += fei_vsb.get_thesis_list()
 
-  progress_print("-- downloading links for PEF MENDELU")
-  link_list += pef_mendelu.get_thesis_list()
+    progress_print("-- downloading links for PEF MENDELU")
+    link_list += pef_mendelu.get_thesis_list()
 
-  progress_print("-- downloading links for UC")
-  link_list += uc.get_thesis_list()
+    progress_print("-- downloading links for UC")
+    link_list += uc.get_thesis_list()
 
-  progress_print("-- downloading links for FAI UTB")
-  link_list += fai_utb.get_thesis_list()
+    progress_print("-- downloading links for FAI UTB")
+    link_list += fai_utb.get_thesis_list()
 
-  progress_print("-- downloading links for CTU")
-  link_list += ctu.get_thesis_list()
+    progress_print("-- downloading links for CTU")
+    link_list += ctu.get_thesis_list()
 
-  progress_print("-- downloading links for CTU (extra)")
-  link_list += ctu_extra.get_thesis_list()
+    progress_print("-- downloading links for CTU (extra)")
+    link_list += ctu_extra.get_thesis_list()
 
-  progress_print("-- downloading links for FIT BUT")
-  link_list += fit_but.get_thesis_list()
+    progress_print("-- downloading links for FIT BUT")
+    link_list += fit_but.get_thesis_list()
 
-  progress_print("-- downloading links for FI MUNI")
-  link_list += fi_muni.get_thesis_list()
+    progress_print("-- downloading links for FI MUNI")
+    link_list += fi_muni.get_thesis_list()
 
-  link_file = open(LINK_FILE_NAME,"w")
+    link_file = open(LINK_FILE_NAME,"w")
 
-  for link in link_list:
-    link_file.write(link + "\n")
+    for link in link_list:
+      link_file.write(link + "\n")
 
-  link_file.close()
+    link_file.close()
 
-  progress_print("------- link file done -------")
+    progress_print("------- link file done -------")
 
-def shuffle_list_file():
-  lines = get_file_text(LINK_FILE_NAME).split("\n")
-  random.shuffle(lines)
-  
-  link_file_shuffled = open(LINK_FILE_SHUFFLED,"w")
+  def shuffle_list_file():
+    lines = get_file_text(LINK_FILE_NAME).split("\n")
+    random.shuffle(lines)
+    
+    link_file_shuffled = open(LINK_FILE_SHUFFLED,"w")
 
-  for line in lines:
-    link_file_shuffled.write(line + "\n")
+    for line in lines:
+      link_file_shuffled.write(line + "\n")
 
-  link_file_shuffled.close()
+    link_file_shuffled.close()
 
-def download_theses(start_from=0):       # downloads all theses listed in the shuffled list file 
-  #lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
-  lines = get_file_text("list_small.txt").split("\n")[start_from:]
+  def download_theses(start_from=0):       # downloads all theses listed in the shuffled list file 
+    #lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
+    lines = get_file_text("list_small.txt").split("\n")[start_from:]
 
-  counter = 0
+    counter = 0
 
-  if start_from == 0:
-    db_file = open(DB_FILE,"w")
-    db_file.write("[\n")
-  else:
-    db_file = open(DB_FILE,"a")
-
-  first = True
-
-  # TODO: download other theses with get_others() !!!
-
-  for line in lines:
-    progress_print("downloading these " + str(counter) + "/" + str(len(lines)))
-   
-    append_string = None
-
-    if line.find("fit.vutbr.") >= 0:
-      progress_print("FIT BUT")
-      thesis = fit_but.get_thesis_info(line) 
-      append_string = str(thesis) if thesis != None else None
-    elif line.find("is.muni.cz") >= 0:
-      progress_print("FI MUNI")
-      thesis = fi_muni.get_thesis_info(line)
-      append_string = str(thesis) if thesis != None else None
-    elif line.find("felk.cvut") >= 0:
-      progress_print("CTU")
-      thesis = ctu.get_thesis_info(line)
-      append_string = str(thesis) if thesis != None else None
-    elif line.find("dspace.cvut") >= 0:
-      progress_print("CTU2")
-      thesis = ctu_extra.get_thesis_info(line)
-      append_string = str(thesis) if thesis != None else None
-    elif line.find("dspace.vsb") >= 0:
-      progress_print("VSB")
-      thesis = fei_vsb.get_thesis_info(line)
-      append_string = str(thesis) if thesis != None else None
-    elif line.find("is.cuni") >= 0:
-      progress_print("MFF CUNI")
-      thesis = mff_cuni.get_thesis_info(line)
-      append_string = str(thesis) if thesis != None else None
-    elif line.find(".utb.") >= 0:
-      progress_print("FAI UTB")
-      thesis = fai_utb.get_thesis_info(line)
-      append_string = str(thesis) if thesis != None else None
-    elif line.find("portal_zp.pl") >= 0:
-      progress_print("PEF MENDELU")
-      thesis = pef_mendelu.get_thesis_info(line)
-      append_string = str(thesis) if thesis != None else None
-    elif line.find(".unicorncollege.") >= 0:
-      progress_print("UC")
-      thesis = uc.get_thesis_info(line)
-      append_string = str(thesis) if thesis != None else None
+    if start_from == 0:
+      db_file = open(DB_FILE,"w")
+      db_file.write("[\n")
     else:
-      progress_print("unknown link!!!: " + line.replace("\n",""))
+      db_file = open(DB_FILE,"a")
 
-    if append_string != None:
-      if first:
-        first = False
+    first = True
+
+    # TODO: download other theses with get_others() !!!
+
+    for line in lines:
+      progress_print("downloading these " + str(counter) + "/" + str(len(lines)))
+     
+      append_string = None
+
+      if line.find("fit.vutbr.") >= 0:
+        progress_print("FIT BUT")
+        thesis = fit_but.get_thesis_info(line) 
+        append_string = str(thesis) if thesis != None else None
+      elif line.find("is.muni.cz") >= 0:
+        progress_print("FI MUNI")
+        thesis = fi_muni.get_thesis_info(line)
+        append_string = str(thesis) if thesis != None else None
+      elif line.find("felk.cvut") >= 0:
+        progress_print("CTU")
+        thesis = ctu.get_thesis_info(line)
+        append_string = str(thesis) if thesis != None else None
+      elif line.find("dspace.cvut") >= 0:
+        progress_print("CTU2")
+        thesis = ctu_extra.get_thesis_info(line)
+        append_string = str(thesis) if thesis != None else None
+      elif line.find("dspace.vsb") >= 0:
+        progress_print("VSB")
+        thesis = fei_vsb.get_thesis_info(line)
+        append_string = str(thesis) if thesis != None else None
+      elif line.find("is.cuni") >= 0:
+        progress_print("MFF CUNI")
+        thesis = mff_cuni.get_thesis_info(line)
+        append_string = str(thesis) if thesis != None else None
+      elif line.find(".utb.") >= 0:
+        progress_print("FAI UTB")
+        thesis = fai_utb.get_thesis_info(line)
+        append_string = str(thesis) if thesis != None else None
+      elif line.find("portal_zp.pl") >= 0:
+        progress_print("PEF MENDELU")
+        thesis = pef_mendelu.get_thesis_info(line)
+        append_string = str(thesis) if thesis != None else None
+      elif line.find(".unicorncollege.") >= 0:
+        progress_print("UC")
+        thesis = uc.get_thesis_info(line)
+        append_string = str(thesis) if thesis != None else None
       else:
-        db_file.write(",\n")
+        progress_print("unknown link!!!: " + line.replace("\n",""))
 
-      db_file.write(append_string)
+      if append_string != None:
+        if first:
+          first = False
+        else:
+          db_file.write(",\n")
 
-    counter += 1
+        db_file.write(append_string)
 
-    if counter > 20:
-      break
+      counter += 1
 
-  db_file.write("\n]\n")
-  db_file.close()
+      if counter > 20:
+        break
 
-#======================
+    db_file.write("\n]\n")
+    db_file.close()
 
-#make_thesis_list_file()
-#shuffle_list_file()
-#download_theses(16301)
-#print(fai_utb.get_thesis_info("http://digilib.k.utb.cz/handle/10563/4128"))
+  #======================
 
-download_theses()
+  #make_thesis_list_file()
+  #shuffle_list_file()
+  #download_theses(16301)
+
+  #download_theses()
