@@ -143,6 +143,10 @@ class Stats(object):
         "least pages thesis": None,
         "most degrees person": None,
 
+        "longest abstract thesis": None,
+        "shortest abstract thesis": None,
+        "most keywords thesis": None,
+
         "largest thesis": None,
         "smallest thesis": None,
 
@@ -187,7 +191,10 @@ class Stats(object):
   def nice_print(self):
     print("================= thesis DB stats ================ ")
 
-    print("\nfaculties:")
+    def print_heading(heading_string):
+      print("\n~~~~~ " + heading_string + " ~~~~~\n")
+
+    print_heading("faculties")
     cell_width = 16
     faculties = [FACULTY_FIT_BUT, FACULTY_FI_MUNI, FACULTY_MFF_CUNI, FACULTY_FELK_CTU, FACULTY_FAI_UTB, unicode(FACULTY_FEI_VSB), FACULTY_PEF_MENDELU, FACULTY_UC, FACULTY_MVSO]
     faculty_sums = [self.records[f] for f in faculties]
@@ -195,24 +202,24 @@ class Stats(object):
     print("  " + table_row( faculties + ["other","total"],cell_width ) )
     print("  " + table_row( faculty_sums + [len(theses)],cell_width ))
 
-    print("\ngender:")
+    print_heading("gender")
     cell_width = 16
     print("  " + table_row( ["male","female","unknown"],cell_width ))
     print("  " + table_row( [self.records["male"],self.records["female"],self.records["total"] - self.records["male"] - self.records["female"]], cell_width ))
 
-    print("\ndegrees:")
+    print_heading("degrees")
     cell_width = 16
     degrees = [DEGREE_BC, DEGREE_ING, DEGREE_MGR, DEGREE_PHD, DEGREE_DOC, DEGREE_RNDR, DEGREE_PHDR]
     degree_sums = [self.records[d] for d in degrees]
     print("  " + table_row( degrees,cell_width) )
     print("  " + table_row( degree_sums,cell_width) )
 
-    print("\ngrades:")
+    print_heading("grades")
     cell_width = 17
     print("  " + table_row(ALL_GRADES + ["failed"],cell_width))
     print("  " + table_row([self.records[g] for g in ALL_GRADES] + [self.records["not defended"]],cell_width))
 
-    print("  average grade (1 = A, 4 = F) by group:")
+    print("\n  average grade (1 = A, 4 = F) by group:")
     groups = FACULTY_GRADE_AVERAGES + ["male","female"]
     averages = []
 
@@ -223,10 +230,7 @@ class Stats(object):
     print("  " + table_row(groups,cell_width))
     print("  " + table_row(averages,cell_width))
 
-    print(self.records["grade average male"])
-    print(self.records["grade average female"])
-
-    print("\nyears:")
+    print_heading("years")
     cell_width = 6
     female_male_ratios = ["{0:.2f}".format(float(self.records[str(y) + " female"]) / float(self.records[str(y) + " male"] + 0.0001)) for y in YEAR_RANGE]
 
@@ -234,38 +238,48 @@ class Stats(object):
     print("  total:       " + table_row([self.records[r] for r in YEAR_RANGE],cell_width))
     print("  female/male: " + table_row(female_male_ratios,cell_width))
 
-    print("\nother:")
-    print("  longest title (cs): " + thesis_to_string(self.records["longest title cs thesis"]))
-    print("  longest title (en): " + thesis_to_string(self.records["longest title en thesis"],lang="en"))
-    print("  shortest title (cs): " + thesis_to_string(self.records["shortest title cs thesis"]))
-    print("  shortest title (en): " + thesis_to_string(self.records["shortest title en thesis"],lang="en"))
-    print("  most pages: " + thesis_to_string(self.records["most pages thesis"])) 
-    print("  least pages: " + thesis_to_string(self.records["least pages thesis"]))
-    print("  typesetting systems: ")
-    print("    MS Word: " + str(self.records[SYSTEM_WORD]))
-    print("    Open/Libre Office: " + str(self.records[SYSTEM_OPEN_OFFICE]))
-    print("    LaTeX: " + str(self.records[SYSTEM_LATEX]))
-    print("    unknown: " + str(self.records["system unknown"]))
+    print_heading("other")
 
-    print("  largest thesis: " + thesis_to_string(self.records["largest thesis"]))
-    print("  smallest thesis: " + thesis_to_string(self.records["smallest thesis"]))
+    def print_record(title, lines):
+      print(" -- " + title + ": " + lines[0])
+ 
+      if len(lines) > 1:
+        for line in lines[1:]:
+          print("    " + line)
+
+      print("")
+
+    print_record("longest title (cs)", ["",thesis_to_string(self.records["longest title cs thesis"])])
+    print_record("longest title (en)", ["",thesis_to_string(self.records["longest title en thesis"],lang="en")])
+    print_record("shortest title (cs)", ["",thesis_to_string(self.records["shortest title cs thesis"])])
+    print_record("shortest title (en)", ["",thesis_to_string(self.records["shortest title en thesis"],lang="en")])
+    print_record("most pages", [thesis_to_string(self.records["most pages thesis"])]) 
+    print_record("least pages", [thesis_to_string(self.records["least pages thesis"])])
+
+    print_record("typesetting systems",["",
+      "MS Word: " + str(self.records[SYSTEM_WORD]),"Open/Libre Office: " + str(self.records[SYSTEM_OPEN_OFFICE]),"LaTeX: " + str(self.records[SYSTEM_LATEX]),"unknown: " + str(self.records["system unknown"])])
+
+    print_record("largest thesis", [thesis_to_string(self.records["largest thesis"])])
+    print_record("smallest thesis", [thesis_to_string(self.records["smallest thesis"])])
 
     keywords = [k for k in self.records if type(k) is unicode and starts_with(k,"keyword ")]
     keyword_histogram = sorted([(k[8:],self.records[k]) for k in keywords],key = lambda item: -1 * item[1])
 
-    print("  most common keywords: ")
-
-    for k in keyword_histogram[:5]:
-      print("    " + k[0] + " (" + str(k[1]) + ")")
+    print_record("most common keywords",[""] + map(lambda item: item[0] + " (" + str(item[1]) + ")",keyword_histogram[:5]))
 
     field_histogram = sorted([(f,self.records["field " + f]) for f in ALL_FIELDS],key = lambda item: -1 * item[1])
 
-    print("  most common field (estimated): ")
+    print_record("most common fields (estimated)",[""] + map(lambda item: item[0] + " (" + str(item[1]) + ")",field_histogram[:5]))
 
-    for f in field_histogram[:5]:
-      print("    " + f[0] + " (" + str(f[1]) + ")")
+    print_record("person with most degrees", [person_to_string(self.records["most degrees person"])])
 
-    print("  person with most degrees: " + person_to_string(self.records["most degrees person"]))
+    print_record("most keywords", [
+        thesis_to_string(self.records["most keywords thesis"]),
+        "keywords (" + str(len(self.records["most keywords thesis"])) + "): " + ", ".join(self.records["most keywords thesis"]["keywords"])
+       ])
+ 
+    print_record("longest abstract",["",thesis_to_string(self.records["longest abstract thesis"])])
+    print_record("shortest abstract",["",thesis_to_string(self.records["shortest abstract thesis"])])
 
 stats = Stats(theses)
 
@@ -350,6 +364,16 @@ for thesis in theses:
 
       if stats.records["smallest thesis"] == None or thesis["size"] < stats.records["smallest thesis"]["size"]:
         stats.records["smallest thesis"] = thesis
+
+    if thesis["abstract_cs"] != None:
+      if stats.records["longest abstract thesis"] == None or len(thesis["abstract_cs"]) > len(stats.records["longest abstract thesis"]["abstract_cs"]):
+        stats.records["longest abstract thesis"] = thesis 
+
+      if stats.records["shortest abstract thesis"] == None or len(thesis["abstract_cs"]) < len(stats.records["shortest abstract thesis"]["abstract_cs"]):
+        stats.records["shortest abstract thesis"] = thesis 
+
+    if stats.records["most keywords thesis"] == None or len(thesis["keywords"]) > len(stats.records["most keywords thesis"]):
+      stats.records["most keywords thesis"] = thesis
 
     people = []
 
