@@ -646,6 +646,7 @@ class Thesis(object):
     self.size = None                # in bytes
     self.public_university = None
     self.branch = None
+    self.note = None
 
   def __str__(self):
     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False)
@@ -749,6 +750,14 @@ class Thesis(object):
     if self.kind == THESIS_DOC and self.defended != True:
       print_norm("doc thesis and defended != True - correcting")
       self.defended = True
+
+    if type(self.pages) != int:
+      print_norm("number of pages not int - correcting")
+
+      try:
+        self.pages = int(self.pages)
+      except Exception:
+        self.pages = None
 
     if self.year != None and not isinstance(self.year,int):
       print_norm("year not int - correcting")
@@ -1909,7 +1918,7 @@ class FeiVsbDownloader(FacultyDownloader):
     # fulltexts are not available for FEI VSB
 
     try:
-      result.pages = text_in_table("dc.format").split(" ")[0]
+      result.pages = int(text_in_table("dc.format").split(" ")[0])
     except Exception as e:
       debug_print("could not retrieve number of pages: " + str(e))
 
@@ -2119,7 +2128,9 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more theses w
       debug_print("could not resolve defended state: " + str(e))
 
     try:
-      result.url_fulltext = FiMuniDownloader.BASE_URL[:-1] + soup.find("h5",string="Plný text práce").find_next("a")["href"]
+      fulltext_links = soup.find("h5",string="Plný text práce").find_next("ul").find_all(lambda t: t.name == "a" and t.find("img") == None) 
+      fulltext_links = filter(lambda item: item.string.find("_pv_") == -1 and item.string.find("posudek") == -1,fulltext_links)
+      result.url_fulltext = FiMuniDownloader.BASE_URL + fulltext_links[0]["href"]
     except Exception as e:
       debug_print("could not resolve fulltext: " + str(e))
 
@@ -2146,8 +2157,13 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more theses w
       )
 
     try:
-      pdf_info = download_and_analyze_pdf(result.url_fulltext)
-      result.incorporate_pdf_info(pdf_info)
+      if result.url_fulltext[-4:].lower() == ".doc":
+        result.typesetting_system = SYSTEM_WORD
+      elif result.url_fulltext[-4:].lower() == ".odt": 
+        result.typesetting_system = SYSTEM_OPEN_OFFICE
+      elif result.url_fulltext[-4:].lower() == ".pdf":
+        pdf_info = download_and_analyze_pdf(result.url_fulltext)
+        result.incorporate_pdf_info(pdf_info)
     except Exception as e:
       debug_print("could not analyze pdf: " + str(e))
 
@@ -2540,4 +2556,9 @@ if __name__ == "__main__":
 
   #make_thesis_list_file()
   #shuffle_list_file()
-  download_theses()
+  #download_theses()
+
+
+print(fi_muni.get_thesis_info("https://is.muni.cz/th/139776/fi_b/"))
+
+

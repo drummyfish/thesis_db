@@ -21,6 +21,37 @@ def table_row(cells,cell_width=20):
 
   return result
 
+def person_to_string(person):
+  if person == None:
+    return "none"
+
+  return str(person["name_first"]) + " " + str(person["name_last"])
+
+def thesis_to_string(thesis):
+  if thesis == None:
+    return "none"
+
+  result = ""
+
+  if thesis["author"] != None:
+    result += person_to_string(thesis["author"]) + ": "
+
+  result += str(thesis["title_cs"] if thesis["title_cs"] != None else thesis["title_en"])
+
+  if thesis["year"] != None:
+    result += ", " + str(thesis["year"])
+
+  if thesis["faculty"] != None:
+    result += ", " + thesis["faculty"]
+
+  if thesis["kind"] != None:
+    result += ", " + thesis["kind"] + " thesis"
+
+  if thesis["pages"] != None:
+    result += ", " + str(thesis["pages"]) + " pages"
+
+  return result
+
 class Stats(object):
 
   def __init__(self, thesis_list):
@@ -65,7 +96,8 @@ class Stats(object):
         "longest title en": "",
         "shortest title cs": "                                      ",
         "shortest title en": "                                      ",
-        "most pages index": -1
+        "most pages thesis": None,
+        "least pages thesis": None
       }
 
     for degree in DEGREES:
@@ -125,10 +157,9 @@ class Stats(object):
     print("  shortest title (cs): " + str(self.records["shortest title cs"]))
     print("  shortest title (en): " + str(self.records["shortest title en"]))
 
-    most_pages_thesis = self.thesis_list[self.records["most pages index"]] if self.records["most pages index"] >= 0 else None
 
-    print("  most pages: " + ((str(most_pages_thesis["pages"]) + " - " + str(most_pages_thesis["title_cs"])) if most_pages_thesis != None else "none"))
-    print("  least pages: ")
+    print("  most pages: " + thesis_to_string(self.records["most pages thesis"])) 
+    print("  least pages: " + thesis_to_string(self.records["least pages thesis"]))
     print("  most common keywords: ")
     print("  most common field (estimated): ")
     print("  person with most degrees: ")
@@ -150,8 +181,11 @@ for thesis in theses:
       pass
 
     if thesis["pages"] != None:
-      if stats.records["most pages index"] == -1 or thesis["pages"] > theses[stats.records["most pages index"]]:
-        stats.records["most pages index"] = thesis_no
+      if stats.records["most pages thesis"] == None or thesis["pages"] > stats.records["most pages thesis"]["pages"]:
+        stats.records["most pages thesis"] = thesis
+
+      if stats.records["least pages thesis"] == None or thesis["pages"] < stats.records["least pages thesis"]["pages"]:
+        stats.records["least pages thesis"] = thesis
 
     stats.try_increment(thesis["faculty"])
     stats.try_increment(thesis["degree"]) 
