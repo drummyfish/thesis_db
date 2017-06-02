@@ -751,7 +751,7 @@ class Thesis(object):
       print_norm("doc thesis and defended != True - correcting")
       self.defended = True
 
-    if type(self.pages) != int:
+    if self.pages != None and not type(self.pages) is int:
       print_norm("number of pages not int - correcting")
 
       try:
@@ -759,7 +759,7 @@ class Thesis(object):
       except Exception:
         self.pages = None
 
-    if self.year != None and not isinstance(self.year,int):
+    if self.year != None and not type(self.year) is int:
       print_norm("year not int - correcting")
       
       try:
@@ -2556,5 +2556,5 @@ if __name__ == "__main__":
 
   #make_thesis_list_file()
   #shuffle_list_file()
-  #download_theses()
+  download_theses()
 

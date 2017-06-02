@@ -42,7 +42,7 @@ def person_to_string(person):
 
   return result
 
-def thesis_to_string(thesis):
+def thesis_to_string(thesis, lang="cs"):
   if thesis == None:
     return "none"
 
@@ -51,7 +51,9 @@ def thesis_to_string(thesis):
   if thesis["author"] != None:
     result += person_to_string(thesis["author"]) + ": "
 
-  result += str(thesis["title_cs"] if thesis["title_cs"] != None else thesis["title_en"])
+  other_lang = "en" if lang == "cs" else "cs"
+
+  result += str(thesis["title_" + lang] if thesis["title_" + lang] != None else thesis["title_" + other_lang])
 
   if thesis["year"] != None:
     result += ", " + str(thesis["year"])
@@ -191,9 +193,9 @@ class Stats(object):
 
     print("\nother:")
     print("  longest title (cs): " + thesis_to_string(self.records["longest title cs thesis"]))
-    print("  longest title (en): " + thesis_to_string(self.records["longest title en thesis"]))
+    print("  longest title (en): " + thesis_to_string(self.records["longest title en thesis"],lang="en"))
     print("  shortest title (cs): " + thesis_to_string(self.records["shortest title cs thesis"]))
-    print("  shortest title (en): " + thesis_to_string(self.records["shortest title en thesis"]))
+    print("  shortest title (en): " + thesis_to_string(self.records["shortest title en thesis"],lang="en"))
     print("  most pages: " + thesis_to_string(self.records["most pages thesis"])) 
     print("  least pages: " + thesis_to_string(self.records["least pages thesis"]))
     print("  typesetting systems: ")
