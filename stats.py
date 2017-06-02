@@ -65,6 +65,9 @@ def thesis_to_string(thesis):
   if thesis["pages"] != None:
     result += ", " + str(thesis["pages"]) + " pages"
 
+  if thesis["size"] != None:
+    result += ", " + "{0:.2f}".format(thesis["size"] / 1000000.0) + " MB"
+
   return result
 
 class Stats(object):
@@ -113,7 +116,15 @@ class Stats(object):
         "shortest title en thesis": None,
         "most pages thesis": None,
         "least pages thesis": None,
-        "most degrees person": None
+        "most degrees person": None,
+
+        "largest thesis": None,
+        "smallest thesis": None,
+
+        SYSTEM_WORD: 0,
+        SYSTEM_OPEN_OFFICE: 0,
+        SYSTEM_LATEX: 0,
+        "system unknown": 0
       }
 
     for degree in DEGREES:
@@ -185,6 +196,14 @@ class Stats(object):
     print("  shortest title (en): " + thesis_to_string(self.records["shortest title en thesis"]))
     print("  most pages: " + thesis_to_string(self.records["most pages thesis"])) 
     print("  least pages: " + thesis_to_string(self.records["least pages thesis"]))
+    print("  typesetting systems: ")
+    print("    MS Word: " + str(self.records[SYSTEM_WORD]))
+    print("    Open/Libre Office: " + str(self.records[SYSTEM_OPEN_OFFICE]))
+    print("    LaTeX: " + str(self.records[SYSTEM_LATEX]))
+    print("    unknown: " + str(self.records["system unknown"]))
+
+    print("  largest thesis: " + thesis_to_string(self.records["largest thesis"]))
+    print("  smallest thesis: " + thesis_to_string(self.records["smallest thesis"]))
 
     keywords = [k for k in self.records if type(k) is unicode and starts_with(k,"keyword ")]
     keyword_histogram = sorted([(k[8:],self.records[k]) for k in keywords],key = lambda item: -1 * item[1])
@@ -230,6 +249,11 @@ for thesis in theses:
     stats.try_increment(thesis["degree"]) 
     stats.try_increment(thesis["grade"])
 
+    if thesis["typesetting_system"] != None:
+      stats.try_increment(thesis["typesetting_system"])
+    else:
+      stats.try_increment("system unknown")
+
     for keyword in thesis["keywords"]:
       stats.do_increment("keyword " + keyword.lower())
 
@@ -263,6 +287,13 @@ for thesis in theses:
       stats.try_increment(thesis["author"]["sex"])
     except Exception:
       pass
+
+    if thesis["size"] != None:
+      if stats.records["largest thesis"] == None or thesis["size"] > stats.records["largest thesis"]["size"]:
+        stats.records["largest thesis"] = thesis
+
+      if stats.records["smallest thesis"] == None or thesis["size"] < stats.records["smallest thesis"]["size"]:
+        stats.records["smallest thesis"] = thesis
 
     people = []
 
