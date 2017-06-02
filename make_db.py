@@ -597,7 +597,7 @@ class Person(object):
 
     self.degrees = [item for item in parts if item in DEGREES]
  
-    parts = filter(lambda item: item not in DEGREES,parts)
+    parts = filter(lambda item: item not in DEGREES and item != "et",parts)  # et for Ing. et Ing. etc.
 
     self.name_first = parts[0 if first_name_first else 1]
     self.name_last = parts[1 if first_name_first else 0]
@@ -2157,7 +2157,7 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more theses w
       )
 
     try:
-      if result.url_fulltext[-4:].lower() == ".doc":
+      if result.url_fulltext[-4:].lower() == ".doc" or result.url_fulltext[-5:].lower() == ".docx":
         result.typesetting_system = SYSTEM_WORD
       elif result.url_fulltext[-4:].lower() == ".odt": 
         result.typesetting_system = SYSTEM_OPEN_OFFICE
@@ -2557,7 +2557,4 @@ if __name__ == "__main__":
   #make_thesis_list_file()
   #shuffle_list_file()
   #download_theses()
-
-
-
 

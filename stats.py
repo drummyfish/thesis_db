@@ -25,7 +25,22 @@ def person_to_string(person):
   if person == None:
     return "none"
 
-  return str(person["name_first"]) + " " + str(person["name_last"])
+  result = ""
+
+  degrees_after = []
+
+  for degree in person["degrees"]:
+    if degree in DEGREES_AFTER:
+      degrees_after.append(degree)
+    else:
+      result += degree + " "
+
+  result += str(person["name_first"]) + " " + str(person["name_last"])
+
+  for degree in degrees_after:
+    result += " " + degree
+
+  return result
 
 def thesis_to_string(thesis):
   if thesis == None:
@@ -97,7 +112,8 @@ class Stats(object):
         "shortest title cs thesis": None,
         "shortest title en thesis": None,
         "most pages thesis": None,
-        "least pages thesis": None
+        "least pages thesis": None,
+        "most degrees person": None
       }
 
     for degree in DEGREES:
@@ -107,6 +123,9 @@ class Stats(object):
       self.records[year] = 0
       self.records[str(year) + " male"] = 0
       self.records[str(year) + " female"] = 0
+
+    for field in ALL_FIELDS:
+      self.records["field " + field] = 0
 
   def try_increment(self, key):
     if key in self.records:
@@ -173,10 +192,16 @@ class Stats(object):
     print("  most common keywords: ")
 
     for k in keyword_histogram[:5]:
-      print("    " + k[0] + "(" + str(k[1]) + ")")
+      print("    " + k[0] + " (" + str(k[1]) + ")")
+
+    field_histogram = sorted([(f,self.records["field " + f]) for f in ALL_FIELDS],key = lambda item: -1 * item[1])
 
     print("  most common field (estimated): ")
-    print("  person with most degrees: ")
+
+    for f in field_histogram[:5]:
+      print("    " + f[0] + " (" + str(f[1]) + ")")
+
+    print("  person with most degrees: " + person_to_string(self.records["most degrees person"]))
 
 stats = Stats(theses)
 
@@ -208,6 +233,9 @@ for thesis in theses:
     for keyword in thesis["keywords"]:
       stats.do_increment("keyword " + keyword.lower())
 
+    if thesis["field"] != None: 
+      stats.try_increment("field " + thesis["field"])
+
     if thesis["defended"] == False:
       stats.try_increment("not defended")
 
@@ -235,6 +263,21 @@ for thesis in theses:
       stats.try_increment(thesis["author"]["sex"])
     except Exception:
       pass
+
+    people = []
+
+    if thesis["author"] != None:
+      people.append(thesis["author"])
+    
+    if thesis["supervisor"] != None:
+      people.append(thesis["supervisor"])
+
+    people += thesis["opponents"]
+
+    for person in people:
+      if stats.records["most degrees person"] == None or len(person["degrees"]) > len(stats.records["most degrees person"]["degrees"]):
+        stats.records["most degrees person"] = person
+
   except Exception as e:
     print("error analysing thesis no. " + str(thesis_no) + ": " + str(e))
     traceback.print_exc(file=sys.stdout)
