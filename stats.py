@@ -117,7 +117,6 @@ class Stats(object):
         FACULTY_FAI_UTB: 0,
         FACULTY_PEF_MENDELU: 0,
         FACULTY_UC: 0,
-        FACULTY_MVSO: 0,
         FACULTY_FBMI_CTU: 0,
         FACULTY_FD_CTU: 0,
         FACULTY_FJFI_CTU: 0,
@@ -152,6 +151,11 @@ class Stats(object):
 
         "grade average male" : (0.0,0),    # (sum,count)
         "grade average female": (0.0,0),
+
+        LANGUAGE_CS: 0,
+        LANGUAGE_EN: 0,
+        LANGUAGE_SK: 0,
+        "unknown language": 0,
 
         SYSTEM_WORD: 0,
         SYSTEM_OPEN_OFFICE: 0,
@@ -195,8 +199,8 @@ class Stats(object):
       print("\n~~~~~ " + heading_string + " ~~~~~\n")
 
     print_heading("faculties")
-    cell_width = 16
-    faculties = [FACULTY_FIT_BUT, FACULTY_FI_MUNI, FACULTY_MFF_CUNI, FACULTY_FELK_CTU, FACULTY_FAI_UTB, unicode(FACULTY_FEI_VSB), FACULTY_PEF_MENDELU, FACULTY_UC, FACULTY_MVSO]
+    cell_width = 17
+    faculties = [FACULTY_FIT_BUT, FACULTY_FI_MUNI, FACULTY_MFF_CUNI, FACULTY_FELK_CTU, FACULTY_FAI_UTB, unicode(FACULTY_FEI_VSB), FACULTY_PEF_MENDELU, FACULTY_UC]
     faculty_sums = [self.records[f] for f in faculties]
     faculty_sums.append( len( filter(lambda item: not item["faculty"] in faculties,theses)))
     print("  " + table_row( faculties + ["other","total"],cell_width ) )
@@ -238,6 +242,12 @@ class Stats(object):
     print("  total:       " + table_row([self.records[r] for r in YEAR_RANGE],cell_width))
     print("  female/male: " + table_row(female_male_ratios,cell_width))
 
+    print_heading("languages")
+    cell_width = 10
+    languages = [LANGUAGE_CS,LANGUAGE_SK,LANGUAGE_EN]
+    print("  " + table_row(languages + ["unknown"],cell_width))
+    print("  " + table_row([self.records[l] for l in languages] + [self.records["unknown language"]],cell_width))
+
     print_heading("other")
 
     def print_record(title, lines):
@@ -278,8 +288,8 @@ class Stats(object):
         "keywords (" + str(len(self.records["most keywords thesis"])) + "): " + ", ".join(self.records["most keywords thesis"]["keywords"])
        ])
  
-    print_record("longest abstract",["",thesis_to_string(self.records["longest abstract thesis"])])
-    print_record("shortest abstract",["",thesis_to_string(self.records["shortest abstract thesis"])])
+    print_record("longest abstract",[thesis_to_string(self.records["longest abstract thesis"]),self.records["longest abstract thesis"]["abstract_cs"]])
+    print_record("shortest abstract",[thesis_to_string(self.records["shortest abstract thesis"]),self.records["shortest abstract thesis"]["abstract_cs"]])
 
 stats = Stats(theses)
 
@@ -291,6 +301,11 @@ for thesis in theses:
     stats.try_increment(thesis["kind"])
 
     stats.try_increment(thesis["year"])
+
+    if thesis["language"] == None:
+      stats.try_increment("unknown language")
+    else:
+      stats.try_increment(thesis["language"])
 
     try:
       stats.try_increment(str(thesis["year"]) + " " + thesis["author"]["sex"])
