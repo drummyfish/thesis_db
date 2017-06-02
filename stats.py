@@ -92,10 +92,10 @@ class Stats(object):
         "male": 0,
         "female": 0,
 
-        "longest title cs": "",
-        "longest title en": "",
-        "shortest title cs": "                                      ",
-        "shortest title en": "                                      ",
+        "longest title cs thesis": None,
+        "longest title en thesis": None,
+        "shortest title cs thesis": None,
+        "shortest title en thesis": None,
         "most pages thesis": None,
         "least pages thesis": None
       }
@@ -113,6 +113,14 @@ class Stats(object):
       self.records[key] += 1
       return True
 
+    return False
+
+  def do_increment(self, key):
+    if key in self.records:
+      self.records[key] += 1
+      return True
+    
+    self.records[key] = 1
     return False
 
   def nice_print(self):
@@ -151,16 +159,22 @@ class Stats(object):
     print("  total:       " + table_row([self.records[r] for r in YEAR_RANGE],cell_width))
     print("  female/male: " + table_row(female_male_ratios,cell_width))
 
-    print("\nrecords:")
-    print("  longest title (cs): " + str(self.records["longest title cs"]))
-    print("  longest title (en): " + str(self.records["longest title en"]))
-    print("  shortest title (cs): " + str(self.records["shortest title cs"]))
-    print("  shortest title (en): " + str(self.records["shortest title en"]))
-
-
+    print("\nother:")
+    print("  longest title (cs): " + thesis_to_string(self.records["longest title cs thesis"]))
+    print("  longest title (en): " + thesis_to_string(self.records["longest title en thesis"]))
+    print("  shortest title (cs): " + thesis_to_string(self.records["shortest title cs thesis"]))
+    print("  shortest title (en): " + thesis_to_string(self.records["shortest title en thesis"]))
     print("  most pages: " + thesis_to_string(self.records["most pages thesis"])) 
     print("  least pages: " + thesis_to_string(self.records["least pages thesis"]))
+
+    keywords = [k for k in self.records if type(k) is unicode and starts_with(k,"keyword ")]
+    keyword_histogram = sorted([(k[8:],self.records[k]) for k in keywords],key = lambda item: -1 * item[1])
+
     print("  most common keywords: ")
+
+    for k in keyword_histogram[:5]:
+      print("    " + k[0] + "(" + str(k[1]) + ")")
+
     print("  most common field (estimated): ")
     print("  person with most degrees: ")
 
@@ -191,20 +205,31 @@ for thesis in theses:
     stats.try_increment(thesis["degree"]) 
     stats.try_increment(thesis["grade"])
 
+    for keyword in thesis["keywords"]:
+      stats.do_increment("keyword " + keyword.lower())
+
     if thesis["defended"] == False:
       stats.try_increment("not defended")
 
-    if thesis["title_cs"] != None and len(thesis["title_cs"]) > len(stats.records["longest title cs"]):
-      stats.records["longest title cs"] = thesis["title_cs"] 
- 
-    if thesis["title_en"] != None and len(thesis["title_en"]) > len(stats.records["longest title en"]):
-      stats.records["longest title en"] = thesis["title_en"] 
+    def title_length_helper(lang, thesis, longest):
+      helper_str = "longest" if longest else "shortest"
 
-    if thesis["title_cs"] != None and len(thesis["title_cs"]) > 0 and len(thesis["title_cs"]) < len(stats.records["shortest title cs"]):
-      stats.records["shortest title cs"] = thesis["title_cs"] 
+      if thesis["title_" + lang] != None:
+        if stats.records[helper_str + " title " + lang + " thesis"] == None:
+          stats.records[helper_str + " title " + lang + " thesis"] = thesis 
+        else:
+          comparison = len(thesis["title_" + lang]) > len(stats.records[helper_str + " title " + lang + " thesis"]["title_" + lang])
+          
+          if not longest:
+            comparison = not comparison
+
+          if comparison:
+            stats.records[helper_str + " title " + lang + " thesis"] = thesis 
  
-    if thesis["title_en"] != None and len(thesis["title_en"]) > 0 and len(thesis["title_en"]) < len(stats.records["shortest title en"]):
-      stats.records["shortest title en"] = thesis["title_en"] 
+    title_length_helper("cs",thesis,True)
+    title_length_helper("cs",thesis,False)
+    title_length_helper("en",thesis,True)
+    title_length_helper("en",thesis,False)
 
     try:
       stats.try_increment(thesis["author"]["sex"])

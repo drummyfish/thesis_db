@@ -2559,6 +2559,5 @@ if __name__ == "__main__":
   #download_theses()
 
 
-print(fi_muni.get_thesis_info("https://is.muni.cz/th/139776/fi_b/"))
 
 
