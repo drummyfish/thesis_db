@@ -12,6 +12,15 @@ db_text = get_file_text("theses.json")
 theses = json.loads(db_text,encoding="utf8")
 
 YEAR_RANGE = range(1990,2018)
+FACULTY_GRADE_AVERAGES = [
+    FACULTY_FIT_BUT,
+    FACULTY_FI_MUNI,
+    FACULTY_FELK_CTU,
+    FACULTY_FAI_UTB,
+    FACULTY_MFF_CUNI,
+    FACULTY_UC,
+    FACULTY_PEF_MENDELU
+  ]
 
 def table_row(cells,cell_width=20):
   result = ""
@@ -20,6 +29,20 @@ def table_row(cells,cell_width=20):
     result += str(cell).ljust(cell_width)
 
   return result
+
+def grade_to_number(grade):
+  if grade == GRADE_A:
+    return 1.0
+  elif grade == GRADE_B:
+    return 1.5
+  elif grade == GRADE_C:
+    return 2.0
+  elif grade == GRADE_D:
+    return 2.5
+  elif grade == GRADE_E:
+    return 3.0
+  else:
+    return 4.0
 
 def person_to_string(person):
   if person == None:
@@ -123,11 +146,17 @@ class Stats(object):
         "largest thesis": None,
         "smallest thesis": None,
 
+        "grade average male" : (0.0,0),    # (sum,count)
+        "grade average female": (0.0,0),
+
         SYSTEM_WORD: 0,
         SYSTEM_OPEN_OFFICE: 0,
         SYSTEM_LATEX: 0,
         "system unknown": 0
       }
+
+    for faculty in FACULTY_GRADE_AVERAGES:
+      self.records["grade average " + faculty] = (0.0,0) 
 
     for degree in DEGREES:
       self.records[degree] = 0
@@ -179,9 +208,23 @@ class Stats(object):
     print("  " + table_row( degree_sums,cell_width) )
 
     print("\ngrades:")
-    cell_width = 8
+    cell_width = 17
     print("  " + table_row(ALL_GRADES + ["failed"],cell_width))
     print("  " + table_row([self.records[g] for g in ALL_GRADES] + [self.records["not defended"]],cell_width))
+
+    print("  average grade (1 = A, 4 = F) by group:")
+    groups = FACULTY_GRADE_AVERAGES + ["male","female"]
+    averages = []
+
+    for group in groups:
+      item = self.records["grade average " + group]
+      averages.append("{0:.2f}".format(item[0] / item[1]) if item[1] != 0 else "N/A")
+
+    print("  " + table_row(groups,cell_width))
+    print("  " + table_row(averages,cell_width))
+
+    print(self.records["grade average male"])
+    print(self.records["grade average female"])
 
     print("\nyears:")
     cell_width = 6
@@ -259,6 +302,17 @@ for thesis in theses:
     for keyword in thesis["keywords"]:
       stats.do_increment("keyword " + keyword.lower())
 
+    if thesis["grade"] != None:
+      if thesis["author"] != None and thesis["author"]["sex"] != None:
+        key_string = "grade average " + thesis["author"]["sex"]
+        current = stats.records[key_string]
+        stats.records[key_string] = (current[0] + grade_to_number(thesis["grade"]), current[1] + 1)
+
+      if thesis["faculty"] in FACULTY_GRADE_AVERAGES:
+        key_string = "grade average " + thesis["faculty"]
+        current = stats.records[key_string]
+        stats.records[key_string] = (current[0] + grade_to_number(thesis["grade"]), current[1] + 1)
+        
     if thesis["field"] != None: 
       stats.try_increment("field " + thesis["field"])
 
@@ -288,7 +342,7 @@ for thesis in theses:
     try:
       stats.try_increment(thesis["author"]["sex"])
     except Exception:
-      pass
+      pass 
 
     if thesis["size"] != None:
       if stats.records["largest thesis"] == None or thesis["size"] > stats.records["largest thesis"]["size"]:

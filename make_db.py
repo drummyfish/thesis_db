@@ -679,6 +679,8 @@ class Thesis(object):
       print_norm("correcting keywords (None to [])")
       self.keywords = []
 
+    self.keywords = filter(lambda item: item != None,self.keywords)
+
     if self.author != None and self.author.name_first == None and self.author.name_first == None:
       print_norm("correcting author (set but empty)")
       self.author = None
