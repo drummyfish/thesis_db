@@ -20,7 +20,7 @@ import traceback
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-ANALYZE_PDFS = True
+ANALYZE_PDFS = False #True
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
@@ -709,7 +709,13 @@ class Thesis(object):
       print_norm("correcting keywords (None to [])")
       self.keywords = []
 
-    self.keywords = filter(lambda item: item != None,self.keywords)
+    try:
+      self.abstract_cs = self.abstract_cs.replace("\n"," ").rstrip().lstrip()
+      self.abstract_en = self.abstract_en.replace("\n"," ").rstrip().lstrip()
+    except Exception:
+      pass
+
+    self.keywords = beautify_list(filter(lambda item: item != None,self.keywords))
 
     if self.author != None and self.author.name_first == None and self.author.name_first == None:
       print_norm("correcting author (set but empty)")
@@ -1766,8 +1772,8 @@ class MffCuniDownloader(FacultyDownloader):
     result.year = int(text_in_table("Datum obhajoby:").split(".")[-1])
 
     try:
-      result.abstract_cs = text_in_table("Abstrakt:")   
-      result.abstract_en = text_in_table("Abstract v angličtině:")   
+      result.abstract_cs = text_in_table("Abstrakt:").replace("\n"," ")   
+      result.abstract_en = text_in_table("Abstract v angličtině:").replace("\n"," ")   
     except Exception as e:
       debug_print("could not resolve abstract: " + str(e))
 
@@ -2326,7 +2332,7 @@ class PefMendeluDownloader(FacultyDownloader):
       lang_string = text_in_table("Language of final thesis:")
 
       if lang_string == "Czech":
-        result.lang_string = LANGUAGE_CS
+        result.language = LANGUAGE_CS
       elif lang_string == "English":
         result.language = LANGUAGE_EN
       elif lang_string == "Slovak":
@@ -2677,4 +2683,6 @@ if __name__ == "__main__":
   #shuffle_list_file()
   #download_theses()
   #print(PDFInfo("test_smrcka.pdf").typesetting_system)
-  #print(fit_but.get_thesis_info("http://www.fit.vutbr.cz/study/DP/DP.php?id=20229&y=2016"))
+  download_theses()
+  #print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/49648/25061566/?q=%7B%22______searchform___search%22%3A%22%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A%22158%22%7D&lang=cs"))
+
