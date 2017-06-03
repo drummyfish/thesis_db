@@ -49,6 +49,8 @@ DEGREE_MDDR = "MDDr."
 DEGREE_MVDR = "MVDr."
 DEGREE_JUDR = "JUDr."
 DEGREE_THDR = "ThDr."
+DEGREE_THD = "Th.D."
+DEGREE_THDR = "ThDr."
 
 DEGREES_BC = [
   DEGREE_BC,
@@ -94,7 +96,14 @@ DEGREES = [
   DEGREE_MBA,
   DEGREE_DR,
   DEGREE_MGA,
-  DEGREE_BCA
+  DEGREE_BCA,
+  DEGREE_MUDR,
+  DEGREE_MDDR,
+  DEGREE_MVDR,
+  DEGREE_JUDR,
+  DEGREE_THDR,
+  DEGREE_THD,
+  DEGREE_THDR
   ]
 
 
@@ -468,6 +477,7 @@ SYSTEM_LATEX = "LaTeX"
 SYSTEM_WORD = "MS Word"
 SYSTEM_OPEN_OFFICE = "Open Office"
 SYSTEM_TYPEWRITER = "typewriter"
+SYSTEM_GHOSTSCRIPT = "ghostscript"
 SYSTEM_OTHER = "other"
 
 NAMES_MALE = ["Jiří", "Jan", "Petr", "Pavel", "Jaroslav",
@@ -492,7 +502,9 @@ NAMES_MALE = ["Jiří", "Jan", "Petr", "Pavel", "Jaroslav",
   "Dan", "Daniel", "Emanuel", "Čeněk", "Hynek",
   "Jarmil", "Matěj", "Mikoláš","Branislav","Matej",
   "Dávid", "Samuel", "Mohamed", "Moslem", "Gabriel",
-  "Zdeněk","Lubor","Matúš","Marian"]
+  "Zdeněk","Lubor","Matúš","Marian","Ľubomír","Ján",
+  "Ondrej","Peter","Vratislav","Zdenek","Jeroným",
+  "Vladan","Matouš","Andrzej","Boris","Zdeněk"]
 
 NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Věra", "Lenka", "Alena", "Jaroslava", "Lucie",
@@ -805,8 +817,11 @@ class PDFInfo(object):
       self.characters = len(self.pdf_text)
 
       self.language = langdetect.detect(self.pdf_text)    # we suppose page 10 exists and has some text
- 
-      created_with = input_pdf.getDocumentInfo().creator
+
+      if input_pdf.getDocumentInfo().creator != None:
+        created_with = input_pdf.getDocumentInfo().creator
+      else:
+        created_with = input_pdf.documentInfo["/Producer"]
 
       if created_with[:5].lower() == "latex":
         self.typesetting_system = SYSTEM_LATEX
@@ -814,8 +829,10 @@ class PDFInfo(object):
         self.typesetting_system = SYSTEM_WORD 
       elif created_with.lower().find("writer") >= 0:
         self.typesetting_system = SYSTEM_OPEN_OFFICE
+      elif created_with.lower().find("ghostscript") >= 0:
+        self.typesetting_system = SYSTEM_GHOSTSCRIPT
       else:
-        self.typesetting_system = None
+        self.typesetting_system = SYSTEM_OTHER
 
     except Exception as e:
       debug_print("could not analyze PDF: " + str(e))
@@ -830,6 +847,7 @@ def download_webpage(url):
   return urllib2.urlopen(url,context=gcontext).read()
 
 def download_to_file(url, filename):
+  progress_print("downloading file: " + url)
   gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
   web_file = urllib2.urlopen(url,context=gcontext)
 
@@ -2558,5 +2576,7 @@ if __name__ == "__main__":
 
   #make_thesis_list_file()
   #shuffle_list_file()
-  download_theses()
+  #download_theses()
 
+  print(PDFInfo("test_smrcka.pdf").typesetting_system)
+  #print(fi_muni.get_thesis_info("https://is.muni.cz/th/324669/fi_m/"))

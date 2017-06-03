@@ -160,6 +160,7 @@ class Stats(object):
         SYSTEM_WORD: 0,
         SYSTEM_OPEN_OFFICE: 0,
         SYSTEM_LATEX: 0,
+        SYSTEM_GHOSTSCRIPT: 0,
         "system unknown": 0
       }
 
@@ -267,7 +268,11 @@ class Stats(object):
     print_record("least pages", [thesis_to_string(self.records["least pages thesis"])])
 
     print_record("typesetting systems",["",
-      "MS Word: " + str(self.records[SYSTEM_WORD]),"Open/Libre Office: " + str(self.records[SYSTEM_OPEN_OFFICE]),"LaTeX: " + str(self.records[SYSTEM_LATEX]),"unknown: " + str(self.records["system unknown"])])
+      "MS Word: " + str(self.records[SYSTEM_WORD]),
+      "Open/Libre Office: " + str(self.records[SYSTEM_OPEN_OFFICE]),
+      "LaTeX: " + str(self.records[SYSTEM_LATEX]),
+      "ghostscript: " + str(self.records[SYSTEM_GHOSTSCRIPT]),
+      "unknown: " + str(self.records["system unknown"])])
 
     print_record("largest thesis", [thesis_to_string(self.records["largest thesis"])])
     print_record("smallest thesis", [thesis_to_string(self.records["smallest thesis"])])
