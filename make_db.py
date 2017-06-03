@@ -942,8 +942,11 @@ class FitButDownloader(FacultyDownloader):
         return None
 
     try:
-      result.author = person_from_table(u"Student:")
-      result.supervisor = person_from_table(u"Vedoucí:")
+      if result.kind == THESIS_DOC:
+        result.author = Person(soup.find("h2",string="Habilitace").find_next("a").string,False)
+      else:
+        result.author = person_from_table(u"Student:")
+        result.supervisor = person_from_table(u"Vedoucí:")
     except Exception as e:
       debug_print("could not resolve author/supervisor:" + str(e))
 
@@ -953,26 +956,13 @@ class FitButDownloader(FacultyDownloader):
     try:
       if result.kind == THESIS_PHD:
         result.year = int(text_in_table(u"Disertace:"))
+      elif result.kind == THESIS_DOC:
+        result.year = int(text_in_table(u"Rok:"))
       else: 
         result.year = int(text_in_table(u"Ak.rok:").split("/")[1])
     except Exception as e:
       debug_print("year not found: " + str(e))
-
-    try:
-      result.title_en = soup_en.find("h2").string
-      result.title_cs = soup.find("h2").string
-
-      if result.title_cs == result.title_en:
-        likely_title_language = langdetect.detect(result.title_cs)
-
-        if likely_title_language == "cs":
-          result.title_en = None
-        elif likely_title_language == "en":
-          result.title_cs = None 
-
-    except Exception as e:
-      debug_print("could not resolve title(s):" + str(e))
-    
+ 
     try:
       if result.kind == THESIS_BACHELOR:
         result.branch = BRANCH_FIT_BUT_BIT     # only one branch for Bc.
@@ -1085,7 +1075,10 @@ class FitButDownloader(FacultyDownloader):
       debug_print("error with fulltext/defended/grade: " + str(e))
 
     try:
-      lang_string = text_in_table("Jazyk:")
+      if result.kind == THESIS_DOC:
+        lang_string = text_in_table("Jazyk publikace:")  
+      else:
+        lang_string = text_in_table("Jazyk:")
 
       if lang_string == "čeština":
         result.language = LANGUAGE_CS
@@ -1097,10 +1090,48 @@ class FitButDownloader(FacultyDownloader):
       debug_print("language not found: " + str(e))
 
     try:
+      if result.kind == THESIS_DOC:
+        title_string = text_in_table("Název publikace:")
+
+        if result.language == None:
+          result.language = langdetect(title_string)
+
+          if not result.language in (LANGUAGE_CS,LANGUAGE_SK,LANGUAGE_EN):
+            result.language = None
+
+        if result.language != LANGUAGE_EN:
+          result.title_cs = title_string
+          result.title_en = text_in_table("Název (en):")
+        else:
+          result.title_en = title_string
+          result.title_cs = text_in_table("Název (cs):")
+      else:
+        result.title_en = soup_en.find("h2").string
+        result.title_cs = soup.find("h2").string
+
+        if result.title_cs == result.title_en:
+          likely_title_language = langdetect.detect(result.title_cs)
+
+          if likely_title_language == "cs":
+            result.title_en = None
+          elif likely_title_language == "en":
+            result.title_cs = None 
+
+    except Exception as e:
+      debug_print("could not resolve title(s):" + str(e))
+
+    try:
       pdf_info = download_and_analyze_pdf(result.url_fulltext) 
-      result.incorporate_pdf_info(pdf_info) 
+      result.incorporate_pdf_info(pdf_info)
+
     except Exception as e:
       debug_print("pdf could not be analyzed: " + str(e))
+
+    try:
+      if result.pages == None:
+        result.pages = int(text_in_table("Strany:")) 
+    except Exception:
+      pass
 
     result.normalize() 
     return result
@@ -2644,6 +2675,6 @@ if __name__ == "__main__":
 
   #make_thesis_list_file()
   #shuffle_list_file()
-  download_theses()
+  #download_theses()
   #print(PDFInfo("test_smrcka.pdf").typesetting_system)
-  #print(fi_muni.get_thesis_info("https://is.muni.cz/th/324669/fi_m/"))
+  #print(fit_but.get_thesis_info("http://www.fit.vutbr.cz/study/DP/DP.php?id=20229&y=2016"))
