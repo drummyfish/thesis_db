@@ -36,6 +36,7 @@ DEGREE_PHD = "PhD."
 DEGREE_PHD2 = "Ph.D."
 DEGREE_PHDR = "PhDr."
 DEGREE_RNDR = "RNDr."
+DEGREE_PAEDDR = "PaedDr."
 DEGREE_PROF = "prof."
 DEGREE_DOC = "doc."
 DEGREE_CSC = "CSc."
@@ -45,6 +46,8 @@ DEGREE_MSC = "MSc"
 DEGREE_MGA = "MgA."
 DEGREE_BCA = "BcA."
 DEGREE_DIPLING = "Dipl.-Ing."
+DEGREE_ARCH = "arch."         # for Ing. arch.
+DEGREE_DIS = "DiS."
 
 # just in case:
 
@@ -82,7 +85,8 @@ DEGREES_DR = [
   DEGREE_MDDR,
   DEGREE_MVDR,
   DEGREE_JUDR,
-  DEGREE_THDR
+  DEGREE_THDR,
+  DEGREE_PAEDDR
   ]
 
 DEGREES = [
@@ -108,7 +112,10 @@ DEGREES = [
   DEGREE_THDR,
   DEGREE_THD,
   DEGREE_THDR,
-  DEGREE_DIPLING
+  DEGREE_DIPLING,
+  DEGREE_ARCH,
+  DEGREE_DIS,
+  DEGREE_PAEDDR
   ]
 
 
@@ -509,7 +516,13 @@ NAMES_MALE = ["Jiří", "Jan", "Petr", "Pavel", "Jaroslav",
   "Dávid", "Samuel", "Mohamed", "Moslem", "Gabriel",
   "Zdeněk","Lubor","Matúš","Marian","Ľubomír","Ján",
   "Ondrej","Peter","Vratislav","Zdenek","Jeroným",
-  "Vladan","Matouš","Andrzej","Boris","Zdeněk"]
+  "Vladan","Matouš","Andrzej","Boris","Zdeněk",
+  "Viliam","Jonáš","Leo","Artur","Pavol","Boleslav",
+  "Bohdan","Patrick","Ota","Věroslav","Antonín",
+  "Vlastimil","Karol","Rastislav","Kristián","Rostislav",
+  "Johny","Bohdan","Zdenko","Slavomír","Fedor","Řehoř",
+  "Bruno","Lačezar","Vilém","Matyáš","Cyril","Karel",
+  "Leonard","Aleksei"]
 
 NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Věra", "Lenka", "Alena", "Jaroslava", "Lucie",
@@ -2136,8 +2149,8 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more theses w
       debug_print("error at keywords/field: " + str(e))
 
     try:
-      result.abstract_cs = soup.find("i",string="Anotace:").next_sibling.string.replace("\n","").rstrip().lstrip()
-      result.abstract_en = soup.find("i",string="Abstract:").next_sibling.string.replace("\n","").rstrip().lstrip()
+      result.abstract_cs = soup.find("i",string="Anotace:").next_sibling.string.replace("\n"," ").rstrip().lstrip()
+      result.abstract_en = soup.find("i",string="Abstract:").next_sibling.string.replace("\n"," ").rstrip().lstrip()
     except Exception as e:
       debug_print("could not resolve abstract:" + str(e))
 
@@ -2561,8 +2574,7 @@ if __name__ == "__main__":
 
     first = True
     big_errors = 0
-
-    
+   
     for line in lines:
       progress_print("downloading thesis " + str(counter) + "/" + str(len(lines)))
     
@@ -2630,6 +2642,6 @@ if __name__ == "__main__":
 
   #make_thesis_list_file()
   #shuffle_list_file()
-  #download_theses()
+  download_theses()
   #print(PDFInfo("test_smrcka.pdf").typesetting_system)
   #print(fi_muni.get_thesis_info("https://is.muni.cz/th/324669/fi_m/"))

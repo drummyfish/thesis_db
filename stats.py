@@ -8,7 +8,7 @@ from make_db import *
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-db_text = get_file_text("other_theses.json")
+db_text = get_file_text("theses.json")
 theses = json.loads(db_text,encoding="utf8")
 
 YEAR_RANGE = range(1990,2018)
@@ -152,6 +152,8 @@ class Stats(object):
         "grade average male" : (0.0,0),    # (sum,count)
         "grade average female": (0.0,0),
 
+        "oldest thesis": None,
+
         LANGUAGE_CS: 0,
         LANGUAGE_EN: 0,
         LANGUAGE_SK: 0,
@@ -266,6 +268,7 @@ class Stats(object):
     print_record("shortest title (en)", ["",thesis_to_string(self.records["shortest title en thesis"],lang="en")])
     print_record("most pages", [thesis_to_string(self.records["most pages thesis"])]) 
     print_record("least pages", [thesis_to_string(self.records["least pages thesis"])])
+    print_record("oldest thesis",[thesis_to_string(self.records["oldest thesis"])])
 
     print_record("typesetting systems",["",
       "MS Word: " + str(self.records[SYSTEM_WORD]),
@@ -401,6 +404,10 @@ for thesis in theses:
 
     if stats.records["most keywords thesis"] == None or len(thesis["keywords"]) > len(stats.records["most keywords thesis"]):
       stats.records["most keywords thesis"] = thesis
+
+    if thesis["year"] != None:
+      if stats.records["oldest thesis"] == None or thesis["year"] < stats.records["oldest thesis"]["year"]:
+        stats.records["oldest thesis"] = thesis
 
     people = []
 
