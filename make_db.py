@@ -1170,9 +1170,11 @@ class CtuDownloader(FacultyDownloader):      # for FEI and FELK don't forget to 
             result[-1].title_en = current.contents[1].string
             
             if current.contents[1].name == "a":
-              result[-1].url_fulltext = current.contents[1]["href"] 
-              # FIXME: for habilitation the links are relative!!!!
+              result[-1].url_fulltext = current.contents[1]["href"]
 
+              if other_type == 1:
+                result[-1].url_fulltext = "https://www.fit.cvut.cz" + result[-1].url_fulltext 
+ 
             try:
               if result[-1].url_fulltext != None:
                 pdf_info = download_and_analyze_pdf(result[-1].url_fulltext)
