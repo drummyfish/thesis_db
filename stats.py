@@ -8,7 +8,7 @@ from make_db import *
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-db_text = get_file_text("theses.json")
+db_text = get_file_text("other_theses.json")
 theses = json.loads(db_text,encoding="utf8")
 
 YEAR_RANGE = range(1990,2018)
@@ -293,8 +293,15 @@ class Stats(object):
         "keywords (" + str(len(self.records["most keywords thesis"])) + "): " + ", ".join(self.records["most keywords thesis"]["keywords"])
        ])
  
-    print_record("longest abstract",[thesis_to_string(self.records["longest abstract thesis"]),self.records["longest abstract thesis"]["abstract_cs"]])
-    print_record("shortest abstract",[thesis_to_string(self.records["shortest abstract thesis"]),self.records["shortest abstract thesis"]["abstract_cs"]])
+    if self.records["longest abstract thesis"] != None:
+      print_record("longest abstract",[thesis_to_string(self.records["longest abstract thesis"]),self.records["longest abstract thesis"]["abstract_cs"]])
+    else:
+      print_record("longest abstract",["unresolved"])    
+
+    if self.records["longest abstract thesis"] != None:
+      print_record("shortest abstract",[thesis_to_string(self.records["shortest abstract thesis"]),self.records["shortest abstract thesis"]["abstract_cs"]])
+    else:
+      print_record("shortest abstract",["unresolved"])    
 
 stats = Stats(theses)
 

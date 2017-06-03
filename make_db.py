@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# BEWARE!!! This script doesn't work out of the box, so don't just run it.
+# It only provides tools for downloading theses.
+
 import urllib
 import urllib2
 import ssl
@@ -41,6 +44,7 @@ DEGREE_DR = "Dr."
 DEGREE_MSC = "MSc"
 DEGREE_MGA = "MgA."
 DEGREE_BCA = "BcA."
+DEGREE_DIPLING = "Dipl.-Ing."
 
 # just in case:
 
@@ -103,7 +107,8 @@ DEGREES = [
   DEGREE_JUDR,
   DEGREE_THDR,
   DEGREE_THD,
-  DEGREE_THDR
+  DEGREE_THDR,
+  DEGREE_DIPLING
   ]
 
 
@@ -1127,41 +1132,55 @@ class CtuDownloader(FacultyDownloader):      # for FEI and FELK don't forget to 
       state = 0
 
       while True:
-        current = current.find_next("td")
-        
-        if current == None:
-          break
+        progress_print("downloading other thesis, CTU")
 
-        if state == 0:    # author
-          result.append(Thesis())
-
-          result[-1].defended = True
-          result[-1].public_university = True
-          result[-1].faculty = FACULTY_FIT_CTU
-          result[-1].kind = THESIS_PHD if other_type == 0 else THESIS_DOC
-          result[-1].degree = DEGREE_PHD if other_type == 0 else DEGREE_DOC
-
-          result[-1].author = Person()
-          result[-1].author.from_string(current.string)
-          state += 1
-        elif state == 1:  # title and link
-          result[-1].title_en = current.contents[1].string
+        try:
+          current = current.find_next("td")
           
-          if current.contents[1].name == "a":
-            result[-1].url_fulltext = current.contents[1]["href"] 
+          if current == None:
+            break
 
-          result[-1].url_page = url_phd
-          state += 1
-        elif state == 2:
+          if state == 0:    # author
+            result.append(Thesis())
 
-          if other_type == 0:
-            result[-1].year = int(current.contents[1].string.split(".")[2])
-          else:
-            result[-1].year = int(current.string.split(".")[2])
+            result[-1].defended = True
+            result[-1].defended = CITY_PRAHA
+            result[-1].public_university = True
+            result[-1].faculty = FACULTY_FIT_CTU
+            result[-1].kind = THESIS_PHD if other_type == 0 else THESIS_DOC
+            result[-1].degree = DEGREE_PHD if other_type == 0 else DEGREE_DOC
 
-          state += 1
-        elif state == 3:
-          state = 0
+            result[-1].author = Person()
+            result[-1].author.from_string(current.string)
+            state += 1
+          elif state == 1:  # title and link
+            result[-1].title_en = current.contents[1].string
+            
+            if current.contents[1].name == "a":
+              result[-1].url_fulltext = current.contents[1]["href"] 
+              # FIXME: for habilitation the links are relative!!!!
+
+            try:
+              if result[-1].url_fulltext != None:
+                pdf_info = download_and_analyze_pdf(result[-1].url_fulltext)
+                result[-1].incorporate_pdf_info(pdf_info)
+            except Exception:
+              debug_print("could not download pdf")
+
+            result[-1].url_page = url_phd
+            state += 1
+          elif state == 2:
+
+            if other_type == 0:
+              result[-1].year = int(current.contents[1].string.split(".")[2])
+            else:
+              result[-1].year = int(current.string.split(".")[2])
+
+            state += 1
+          elif state == 3:
+            state = 0
+        except Exception as e:
+          debug_print("there was an error: " + str(e))
 
     return result
 
@@ -2008,6 +2027,9 @@ class FiMuniDownloader(FacultyDownloader):   # don't forget to get more theses w
 
         result.language = langdetect.detect(title_string) 
 
+        if result.language not in (LANGUAGE_CS,LANGUAGE_SK,LANGUAGE_EN):
+          result.language = None
+
         if result.language in (LANGUAGE_CS,LANGUAGE_SK):
           result.title_cs = title_string
         else:        
@@ -2262,7 +2284,7 @@ class PefMendeluDownloader(FacultyDownloader):
       elif lang_string == "English":
         result.language = LANGUAGE_EN
       elif lang_string == "Slovak":
-        result.language = LANGUAGE_SL
+        result.language = LANGUAGE_SK
     except Exception as e:
       debug_print("could not resolve language: " + str(e))
 
@@ -2438,7 +2460,8 @@ if __name__ == "__main__":
 
   LINK_FILE_NAME = "links.txt"
   LINK_FILE_SHUFFLED = "links_shuffled.txt"
-  DB_FILE = "theses.json"         # final file to save the theses into
+  DB_FILE = "theses.json"                    # final file to save the theses into
+  OTHER_THESES_FILE = "other_theses.json"
 
   def make_thesis_list_file():    # makes a text file with all thesis URLs to be downloaded
     progress_print("------ making link file ------")
@@ -2492,9 +2515,41 @@ if __name__ == "__main__":
 
     link_file_shuffled.close()
 
-  def download_theses(start_from=0):       # downloads all theses listed in the shuffled list file 
+  def download_theses(start_from=0, download_other=False):       # downloads all theses listed in the shuffled list file 
     #lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
     lines = get_file_text("list_small.txt").split("\n")[start_from:]
+
+    if download_other:
+      db_file = open(OTHER_THESES_FILE,"w")
+      db_file.write("[\n")
+
+      progress_print("downloading other theses from CTU")
+      
+      first = True
+
+      for thesis in ctu.get_others():
+        if first:
+          first = False
+        else:
+          db_file.write(",\n")
+
+        if thesis != None:
+          db_file.write(str(thesis))
+      
+      progress_print("downloading other theses from FI MUNI")
+      fi_muni.get_thesis_list()   # has to be done
+
+      for thesis in fi_muni.get_others():
+        db_file.write(",\n")
+
+        if thesis != None:
+          db_file.write(str(thesis))
+
+      db_file.write("\n]\n")
+      db_file.close()
+      return
+
+    # normal download:
 
     counter = 0
 
@@ -2507,8 +2562,7 @@ if __name__ == "__main__":
     first = True
     big_errors = 0
 
-    # TODO: download other theses with get_others() !!!
-
+    
     for line in lines:
       progress_print("downloading thesis " + str(counter) + "/" + str(len(lines)))
     
@@ -2577,6 +2631,5 @@ if __name__ == "__main__":
   #make_thesis_list_file()
   #shuffle_list_file()
   #download_theses()
-
-  print(PDFInfo("test_smrcka.pdf").typesetting_system)
+  #print(PDFInfo("test_smrcka.pdf").typesetting_system)
   #print(fi_muni.get_thesis_info("https://is.muni.cz/th/324669/fi_m/"))
