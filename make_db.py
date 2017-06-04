@@ -20,7 +20,7 @@ import traceback
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-ANALYZE_PDFS = False #True
+ANALYZE_PDFS = True
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
@@ -117,7 +117,6 @@ DEGREES = [
   DEGREE_DIS,
   DEGREE_PAEDDR
   ]
-
 
 DEGREES_AFTER = [DEGREE_PHD, DEGREE_CSC, DEGREE_MBA] 
 
