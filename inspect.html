@@ -1,0 +1,150 @@
+<html>
+
+  <!-- NOTE!!! Chromium has to be run with flags: --args --disable-web-security --allow-file-access-from-files  -->
+
+  <head>
+    <meta charset="ISO-8859-1">
+
+    <style>
+      td
+        {
+          border: 1px solid black;
+          padding: 5px;
+        }
+
+      table
+        {
+          border-collapse: collapse;
+        }
+
+      a
+        {
+          text-decoration: none;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script>
+
+      function person_to_string(person)
+        {
+          result = "";
+
+          for (i in person.degrees)
+            result += person.degrees[i] + " ";
+
+          result += person.name_first + " " + person.name_last;
+
+          return result;
+        }
+
+      function to_str(thing)
+        {
+          if (thing == null) 
+            return "";
+
+          return "" + thing;
+        }
+
+      function display_thesis_list(thesis_list)
+        {
+          $("#thesis_list").empty();
+
+          for (i in thesis_list)
+            {
+              t = thesis_list[i];
+
+              table_row = "<tr> " +
+                "<td>" + to_str(t.degree) + "</td>" +
+                "<td>" + to_str(t.faculty) + "</td>" +
+                "<td>" + to_str(t.language) + "</td>" +
+                "<td>" + person_to_string(t.author) + "</td>" +
+                "<td>" + person_to_string(t.supervisor) + "</td>" +
+                "<td>" + to_str(t.grade) + "</td>" +
+                "<td> <a href=\"" + t.url_page + "\">" +  (t.title_cs != null ? t.title_cs : t.tile_en) + "</a> </td>";
+
+              if (t.url_fulltext != null)
+                table_row += "<td> <a href=\"" + t.url_fulltext + "\"> full </a> </td>"
+              else
+                table_row += "<td> </td>"
+
+
+              table_row += "<td>" + to_str(t.pages) + "</td>" +
+                "</tr>";
+
+
+              $("#thesis_list").append(table_row);
+            }
+        }
+
+      $.getJSON("theses.json", function(json)
+        {
+          display_thesis_list(json);
+        });
+
+    </script>
+
+  </head>
+
+  <body>
+
+    <h1> Czech Computer Science Theses </h1>
+
+    <form>
+      search for: <input type="text" name="search_for">
+      max results: <input type="number" name="max_results" value="50"> <br/>
+
+      search title: <input type="checkbox" name="do_title" checked="checked">
+      search names: <input type="checkbox" name="do_name" checked="checked">
+      search keywords: <input type="checkbox" name="do_keywords" checked="checked">
+      search abstract: <input type="checkbox" name="do_abstract" checked="checked"> <br />
+
+      bachelor: <input type="checkbox" name="do_bachelor" checked="checked">
+      master: <input type="checkbox" name="do_master" checked="checked">
+      dr: <input type="checkbox" name="do_dr" checked="checked">
+      PhD: <input type="checkbox" name="do_phd" checked="checked">
+      doc: <input type="checkbox" name="do_doc" checked="checked"> <br />
+
+      A: <input type="checkbox" name="do_a" checked="checked">
+      B: <input type="checkbox" name="do_b" checked="checked">
+      C: <input type="checkbox" name="do_c" checked="checked">
+      D: <input type="checkbox" name="do_d" checked="checked">
+      E: <input type="checkbox" name="do_e" checked="checked">
+      F: <input type="checkbox" name="do_f" checked="checked">
+      unknown: <input type="checkbox" name="do_grade_unknown" checked="checked"> <br />
+
+      czech: <input type="checkbox" name="do_cs" checked="checked">
+      slovak: <input type="checkbox" name="do_sk" checked="checked">
+      english: <input type="checkbox" name="do_en" checked="checked">
+      unknown: <input type="checkbox" name="do_lang_na" checked="checked"> <br />
+
+      MFF CUNI: <input type="checkbox" name="do_mff_cuni" checked="checked">
+      FI CTU: <input type="checkbox" name="do_fit_ctu" checked="checked">
+      FELK CTU: <input type="checkbox" name="do_felk_ctu" checked="checked">
+      FIT VUT: <input type="checkbox" name="do_fit_vut" checked="checked">
+      FEI VSB: <input type="checkbox" name="do_fei_vsb" checked="checked">
+      FAI UTB: <input type="checkbox" name="do_fai_utb" checked="checked">
+      PEF MENDELU: <input type="checkbox" name="do_pef_mendelu" checked="checked">
+      UC: <input type="checkbox" name="do_uc" checked="checked">
+      other: <input type="checkbox" name="do_faculty_other" checked="checked"> <br />
+
+      Praha: <input type="checkbox" name="do_praha" checked="checked">
+      Brno: <input type="checkbox" name="do_brno" checked="checked">
+      Ostrava: <input type="checkbox" name="do_ostrava" checked="checked">
+      Zlin: <input type="checkbox" name="do_zlin" checked="checked"> <br />
+
+      fulltext available: <input type="checkbox" name="do_fulltext" checked="checked"> <br />
+
+      year from: <input type="number" value="1990">
+      year to: <input type="number" value="2020"> <br />
+
+      <input type="button" value="search">
+    </form>
+
+    <table id="thesis_list">
+    </table>
+
+  </body>
+
+</html>

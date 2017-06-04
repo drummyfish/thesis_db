@@ -150,9 +150,9 @@ FACULTY_MVSO        = "MVŠO"
 
 # non-CS:
 FACULTY_FBMI_CTU    = "FBMI CTU"   # fakulta biomedicinskeho inzenyrstvi
-FACULTY_FD_CTU      = "FD CTU"       # fakulta dopravni
+FACULTY_FD_CTU      = "FD CTU"     # fakulta dopravni
 FACULTY_FJFI_CTU    = "FJFI CTU"   # fakulta jaderna a fyzikalne inzenyrska
-FACULTY_FSV_CTU     = "FSV CTU"     # fakulta stavebni
+FACULTY_FSV_CTU     = "FSV CTU"    # fakulta stavebni
 
 # branches:
 

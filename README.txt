@@ -9,9 +9,17 @@ search interface, provides different information etc. Hence the
 project.
 
 A Python script is made to crawl the websites and gather info
-about the theses. Note that sometimes some information is unavailable,
-the crawler can make mistakes due to bugs, wrong estimations etc.,
-so don't take the info in DB as granted.
+about the theses.
+
+IMPORTANT NOTES:
+
+  - Sometimes some information is unavailable, the crawler can make
+    mistakes due to bugs, wrong estimations etc., so don't take the
+    info in DB for granted, double check everything.
+
+  - The script make_db.py does not work out of the box and shouldn't
+    be just run. It's here more or less for reference and I
+    recommend no one uses it.
 
 The database is stored in theses.json file as a JSON array of object
 in format:
@@ -61,6 +69,17 @@ where Person is another JSON object:
   degrees:            [String]                  list of degrees
   sex:                "male", "female", null    estimated sex/gender
 }
+
+These faculties have been crawled:
+
+ -- MFF CUNI (Praha)
+ -- FIT, FELK, FBMI, FD, FJFI, FSV CTU (Praha)
+ -- FIT BUT (Brno)
+ -- FI MUNI (Brno)
+ -- PEF MENDELU (Brno)
+ -- FEI VSB (Ostrava)
+ -- FAI UTB (Zlin)
+ -- Unicorn College (Praha)
 
 How to work with the DB
 
