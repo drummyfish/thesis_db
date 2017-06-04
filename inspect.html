@@ -21,11 +21,38 @@
         {
           text-decoration: none;
         }
+
+      form
+        {
+          font-size: 10px;
+          background-color: rgb(240,240,240);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 30xp;
+        }
+
+      .tab
+        {
+          display: inline-block;
+          width: 100px;
+          height: 30px;
+          padding: 0;
+          margin: 0;
+        }
+
+       .search
+        {
+          width: 100%;
+          height: 30px;
+          font-weight: bold;
+        }
+
     </style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <script>
+      theses = null;
 
       function person_to_string(person)
         {
@@ -80,8 +107,85 @@
 
       $.getJSON("theses.json", function(json)
         {
-          display_thesis_list(json);
+          theses = json;
         });
+
+      function input_value(input_name)
+        {
+          return $("input[name=" + input_name + "]").val();
+        }
+
+      function checkbox_checked(checkbox_name)
+        {
+          return $("input[name=" + checkbox_name + "]").is(":checked");
+        }
+
+      function meets_criteria(thesis)
+        {
+
+          if (!checkbox_checked("do_bachelor") && thesis.kind == "bachelor")
+            return false;
+
+          if (!checkbox_checked("do_master") && thesis.kind == "master")
+            return false;
+
+          if (!checkbox_checked("do_dr") && thesis.kind == "small doctorate")
+            return false;
+
+          if (!checkbox_checked("do_phd") && thesis.kind == "PhD")
+            return false;
+
+          if (!checkbox_checked("do_doc") && thesis.kind == "habilitation")
+            return false;
+
+          if (!checkbox_checked("do_grade_unknown") && thesis.grade == null)
+            return false;
+
+          if (thesis.grade == "A" && !checkbox_checked("do_a"))
+            return false;
+
+          if (thesis.grade == "B" && !checkbox_checked("do_b"))
+            return false;
+
+          if (thesis.grade == "C" && !checkbox_checked("do_c"))
+            return false;
+
+          if (thesis.grade == "D" && !checkbox_checked("do_d"))
+            return false;
+
+          if (thesis.grade == "E" && !checkbox_checked("do_e"))
+            return false;
+
+          if (thesis.grade == "F" && !checkbox_checked("do_f"))
+            return false;
+
+          if (thesis.language == null && !checkbox_checked("do_lang_unknown"))
+            return false;
+
+          if (thesis.language == "cs" && !checkbox_checked("do_cs"))
+            return false;
+
+          if (thesis.language == "sk" && !checkbox_checked("do_sk"))
+            return false;
+          
+          if (thesis.language == "en" && !checkbox_checked("do_en"))
+            return false;
+          
+          return true;
+        }
+
+      function search_clicked()
+        {
+          result = [];
+
+          for (i in theses)
+            {
+              if (meets_criteria(theses[i]))
+                result.push(theses[i]);
+            }
+
+          display_thesis_list(result);
+        }
 
     </script>
 
@@ -93,53 +197,55 @@
 
     <form>
       search for: <input type="text" name="search_for">
-      max results: <input type="number" name="max_results" value="50"> <br/>
+      max results: <input type="number" name="max_results" value="50"> <br/> <br/>
 
-      search title: <input type="checkbox" name="do_title" checked="checked">
-      search names: <input type="checkbox" name="do_name" checked="checked">
-      search keywords: <input type="checkbox" name="do_keywords" checked="checked">
-      search abstract: <input type="checkbox" name="do_abstract" checked="checked"> <br />
+      <span class="tab"> <input type="checkbox" name="do_title" checked="checked"> in title </span>
+      <span class="tab"> <input type="checkbox" name="do_names" checked="checked"> in names </span>
+      <span class="tab"> <input type="checkbox" name="do_keywords" checked="checked"> in keyword </span>
+      <span class="tab"> <input type="checkbox" name="do_abstract" checked="checked"> in abstract </span> <br />
 
-      bachelor: <input type="checkbox" name="do_bachelor" checked="checked">
-      master: <input type="checkbox" name="do_master" checked="checked">
-      dr: <input type="checkbox" name="do_dr" checked="checked">
-      PhD: <input type="checkbox" name="do_phd" checked="checked">
-      doc: <input type="checkbox" name="do_doc" checked="checked"> <br />
+      <span class="tab"> <input type="checkbox" name="do_bachelor" checked="checked"> Bc. </span>
+      <span class="tab"> <input type="checkbox" name="do_master" checked="checked"> master </span>
+      <span class="tab"> <input type="checkbox" name="do_dr" checked="checked"> dr. </span>
+      <span class="tab"> <input type="checkbox" name="do_phd" checked="checked"> PhD. </span>
+      <span class="tab"> <input type="checkbox" name="do_doc" checked="checked"> doc. </span> <br />
 
-      A: <input type="checkbox" name="do_a" checked="checked">
-      B: <input type="checkbox" name="do_b" checked="checked">
-      C: <input type="checkbox" name="do_c" checked="checked">
-      D: <input type="checkbox" name="do_d" checked="checked">
-      E: <input type="checkbox" name="do_e" checked="checked">
-      F: <input type="checkbox" name="do_f" checked="checked">
-      unknown: <input type="checkbox" name="do_grade_unknown" checked="checked"> <br />
+      <span class="tab"> <input type="checkbox" name="do_a" checked="checked"> A </span>
+      <span class="tab"> <input type="checkbox" name="do_b" checked="checked"> B </span>
+      <span class="tab"> <input type="checkbox" name="do_c" checked="checked"> C </span>
+      <span class="tab"> <input type="checkbox" name="do_d" checked="checked"> D </span>
+      <span class="tab"> <input type="checkbox" name="do_e" checked="checked"> E </span>
+      <span class="tab"> <input type="checkbox" name="do_f" checked="checked"> F </span>
+      <span class="tab"> <input type="checkbox" name="do_grade_unknown" checked="checked"> N/A </span> <br />
 
-      czech: <input type="checkbox" name="do_cs" checked="checked">
-      slovak: <input type="checkbox" name="do_sk" checked="checked">
-      english: <input type="checkbox" name="do_en" checked="checked">
-      unknown: <input type="checkbox" name="do_lang_na" checked="checked"> <br />
+      <span class="tab"> <input type="checkbox" name="do_cs" checked="checked"> cs </span>
+      <span class="tab"> <input type="checkbox" name="do_sk" checked="checked"> sk </span>
+      <span class="tab"> <input type="checkbox" name="do_en" checked="checked"> en </span>
+      <span class="tab"> <input type="checkbox" name="do_lang_unknown" checked="checked"> N/A </span> <br />
 
-      MFF CUNI: <input type="checkbox" name="do_mff_cuni" checked="checked">
-      FI CTU: <input type="checkbox" name="do_fit_ctu" checked="checked">
-      FELK CTU: <input type="checkbox" name="do_felk_ctu" checked="checked">
-      FIT VUT: <input type="checkbox" name="do_fit_vut" checked="checked">
-      FEI VSB: <input type="checkbox" name="do_fei_vsb" checked="checked">
-      FAI UTB: <input type="checkbox" name="do_fai_utb" checked="checked">
-      PEF MENDELU: <input type="checkbox" name="do_pef_mendelu" checked="checked">
-      UC: <input type="checkbox" name="do_uc" checked="checked">
-      other: <input type="checkbox" name="do_faculty_other" checked="checked"> <br />
+      <span class="tab"> <input type="checkbox" name="do_mff_cuni" checked="checked"> MFF CUNI </span>
+      <span class="tab"> <input type="checkbox" name="do_fit_ctu" checked="checked"> FIT CTU </span>
+      <span class="tab"> <input type="checkbox" name="do_fi_muni" checked="checked"> FI MUNI </span>
+      <span class="tab"> <input type="checkbox" name="do_felk_ctu" checked="checked"> FELK CTU </span>
+      <span class="tab"> <input type="checkbox" name="do_fit_vut" checked="checked"> FIT BUT </span>
+      <span class="tab"> <input type="checkbox" name="do_fei_vsb" checked="checked"> FEI VSB </span>
+      <span class="tab"> <input type="checkbox" name="do_fai_utb" checked="checked"> FAI UTB </span>
+      <span class="tab"> <input type="checkbox" name="do_pef_mendelu" checked="checked"> PEF MEND </span>
+      <span class="tab"> <input type="checkbox" name="do_uc" checked="checked"> UC </span>
+      <span class="tab"> <input type="checkbox" name="do_faculty_other" checked="checked"> other </span> <br />
 
-      Praha: <input type="checkbox" name="do_praha" checked="checked">
-      Brno: <input type="checkbox" name="do_brno" checked="checked">
-      Ostrava: <input type="checkbox" name="do_ostrava" checked="checked">
-      Zlin: <input type="checkbox" name="do_zlin" checked="checked"> <br />
+      <span class="tab"> <input type="checkbox" name="do_praha" checked="checked"> Praha </span>
+      <span class="tab"> <input type="checkbox" name="do_brno" checked="checked"> Brno </span>
+      <span class="tab"> <input type="checkbox" name="do_ostrava" checked="checked"> Ostrava </span>
+      <span class="tab"> <input type="checkbox" name="do_zlin" checked="checked"> Zlin </span> <br />
 
-      fulltext available: <input type="checkbox" name="do_fulltext" checked="checked"> <br />
+      <span class="tab"> <input type="checkbox" name="do_fulltext" checked="checked"> fulltext </span> <br />
 
       year from: <input type="number" value="1990">
-      year to: <input type="number" value="2020"> <br />
+      year to: <input type="number" value="2020">
+      <input type="checkbox" name="do_year_unknown" checked="checked"> unknown <br /> <br />
 
-      <input type="button" value="search">
+      <input class="search" type="button" value="search" onclick="search_clicked()">
     </form>
 
     <table id="thesis_list">

@@ -11,6 +11,16 @@ sys.setdefaultencoding("utf8")
 db_text = get_file_text("theses.json")
 theses = json.loads(db_text,encoding="utf8")
 
+RECORDED_FACULTIES = [FACULTY_MFF_CUNI,
+  FACULTY_FIT_BUT,
+  FACULTY_FI_MUNI,
+  FACULTY_FIT_CTU,
+  FACULTY_FELK_CTU,
+  unicode(FACULTY_FEI_VSB),
+  FACULTY_FAI_UTB,
+  FACULTY_PEF_MENDELU,
+  FACULTY_UC]
+
 YEAR_RANGE = range(1990,2018)
 FACULTY_GRADE_AVERAGES = [
     FACULTY_FIT_BUT,
@@ -108,20 +118,6 @@ class Stats(object):
         THESIS_DR: 0,
         THESIS_DOC: 0,
   
-        FACULTY_MFF_CUNI: 0,
-        FACULTY_FIT_BUT: 0,
-        FACULTY_FI_MUNI: 0,
-        FACULTY_FELK_CTU: 0,
-        unicode(FACULTY_FEI_VSB): 0,
-        FACULTY_FIT_CTU: 0,
-        FACULTY_FAI_UTB: 0,
-        FACULTY_PEF_MENDELU: 0,
-        FACULTY_UC: 0,
-        FACULTY_FBMI_CTU: 0,
-        FACULTY_FD_CTU: 0,
-        FACULTY_FJFI_CTU: 0,
-        FACULTY_FSV_CTU: 0,
-
         GRADE_A: 0,
         GRADE_B: 0,
         GRADE_C: 0,
@@ -166,6 +162,9 @@ class Stats(object):
         "system unknown": 0
       }
 
+    for faculty in RECORDED_FACULTIES:
+      self.records[faculty] = 0
+
     for faculty in FACULTY_GRADE_AVERAGES:
       self.records["grade average " + faculty] = (0.0,0) 
 
@@ -203,10 +202,9 @@ class Stats(object):
 
     print_heading("faculties")
     cell_width = 17
-    faculties = [FACULTY_FIT_BUT, FACULTY_FI_MUNI, FACULTY_MFF_CUNI, FACULTY_FELK_CTU, FACULTY_FAI_UTB, unicode(FACULTY_FEI_VSB), FACULTY_PEF_MENDELU, FACULTY_UC]
-    faculty_sums = [self.records[f] for f in faculties]
-    faculty_sums.append( len( filter(lambda item: not item["faculty"] in faculties,theses)))
-    print("  " + table_row( faculties + ["other","total"],cell_width ) )
+    faculty_sums = [self.records[f] for f in RECORDED_FACULTIES]
+    faculty_sums.append( len( filter(lambda item: not item["faculty"] in RECORDED_FACULTIES,theses)))
+    print("  " + table_row( RECORDED_FACULTIES + ["other","total"],cell_width ) )
     print("  " + table_row( faculty_sums + [len(theses)],cell_width ))
 
     print_heading("gender")
