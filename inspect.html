@@ -6,13 +6,13 @@
     <meta charset="ISO-8859-1">
 
     <style>
-      td
+      #thesis_list td
         {
           border: 1px solid black;
           padding: 5px;
         }
 
-      table
+      #thesis_list
         {
           border-collapse: collapse;
         }
@@ -22,13 +22,31 @@
           text-decoration: none;
         }
 
+      input[type="number"]
+        {
+          width: 60px;
+        }
+
       form
         {
           font-size: 10px;
-          background-color: rgb(240,240,240);
+          background-color: rgb(0,0,0);
           padding: 20px;
           border-radius: 10px;
-          margin: 30xp;
+          margin: 30px;
+        }
+
+      form table
+        {
+          border-collapse: collapse;
+          table-layout: fixed;
+          width: 100%;
+          color: white;
+        }
+
+      form table td
+        {
+          padding: 3px 0;
         }
 
       .tab
@@ -74,6 +92,56 @@
           return "" + thing;
         }
 
+      function sort_theses(thesis_list)
+        {
+          sort_by = $("select[name=sort_by]").val();
+
+          desc = checkbox_checked("do_descending");
+
+          sort_year = function(a,b)
+            {
+              if (!desc)
+                return (a.year == null ? 0 : a.year) - (b.year == null ? 0 : b.year);
+              
+              return (b.year == null ? 0 : b.year) - (a.year == null ? 0 : a.year); 
+            };
+
+          sort_title = function(a,b)
+            {
+              s1 = ("" + a.title_cs).toLowerCase();
+              s2 = ("" + b.title_cs).toLowerCase();
+
+              if (desc)
+                return s2.localeCompare(s1);  
+
+              return s1.localeCompare(s2);  
+            };
+
+          sort_author = function(a,b)
+            {
+              s1 = ("" + a.author.name_last + a.author.name_first).toLowerCase();
+              s2 = ("" + b.author.name_last + a.author.name_first).toLowerCase();
+
+              if (desc)
+                return s2.localeCompare(s1);  
+
+              return s1.localeCompare(s2);  
+            };
+
+          if (sort_by == 0)
+            sort_func = sort_year;
+          else if (sort_by == 1)
+            sort_func = sort_title;
+          else
+            sort_func = sort_author;
+
+          thesis_list.sort(sort_func);
+
+          return thesis_list;
+
+          //return thesis_list;
+        }
+
       function display_thesis_list(thesis_list)
         {
           $("#thesis_list").empty();
@@ -96,10 +164,9 @@
               else
                 table_row += "<td> </td>"
 
-
-              table_row += "<td>" + to_str(t.pages) + "</td>" +
+              table_row += "<td>" + to_str(t.year) + "</td>" +
+                "<td>" + to_str(t.pages) + "</td>" +
                 "</tr>";
-
 
               $("#thesis_list").append(table_row);
             }
@@ -184,7 +251,7 @@
                 result.push(theses[i]);
             }
 
-          display_thesis_list(result);
+          display_thesis_list(sort_theses(result));
         }
 
     </script>
@@ -196,56 +263,137 @@
     <h1> Czech Computer Science Theses </h1>
 
     <form>
-      search for: <input type="text" name="search_for">
-      max results: <input type="number" name="max_results" value="50"> <br/> <br/>
+      <table>
+        <tr>
+          <td colspan="3"> search for: <input type="text" name="search_for"> </td>
+          <td colspan="3"> max results: <input type="number" name="max_results" value="50"> </td>
+          <td colspan="2">
+            sort by
+            <select name="sort_by">
+              <option value="0"> year </option>
+              <option value="1"> title </option>
+              <option value="2"> author </option>
+            </select>
+          </td>
+          <td> <input type="checkbox" name="do_descending" checked="checked"> desc. </td>
+          <td></td>
+          <td></td>
+        </tr>
 
-      <span class="tab"> <input type="checkbox" name="do_title" checked="checked"> in title </span>
-      <span class="tab"> <input type="checkbox" name="do_names" checked="checked"> in names </span>
-      <span class="tab"> <input type="checkbox" name="do_keywords" checked="checked"> in keyword </span>
-      <span class="tab"> <input type="checkbox" name="do_abstract" checked="checked"> in abstract </span> <br />
+        <tr>
+          <td> search </td>
+          <td> <input type="checkbox" name="do_title" checked="checked"> in title </td>
+          <td> <input type="checkbox" name="do_names" checked="checked"> in names </td>
+          <td> <input type="checkbox" name="do_keywords" checked="checked"> in keyword </td>
+          <td> <input type="checkbox" name="do_abstract" checked="checked"> in abstract </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
 
-      <span class="tab"> <input type="checkbox" name="do_bachelor" checked="checked"> Bc. </span>
-      <span class="tab"> <input type="checkbox" name="do_master" checked="checked"> master </span>
-      <span class="tab"> <input type="checkbox" name="do_dr" checked="checked"> dr. </span>
-      <span class="tab"> <input type="checkbox" name="do_phd" checked="checked"> PhD. </span>
-      <span class="tab"> <input type="checkbox" name="do_doc" checked="checked"> doc. </span> <br />
+        <tr>
+          <td> type </td>
+          <td> <input type="checkbox" name="do_bachelor" checked="checked"> Bc. </td>
+          <td> <input type="checkbox" name="do_master" checked="checked"> master </td>
+          <td> <input type="checkbox" name="do_dr" checked="checked"> dr. </td>
+          <td> <input type="checkbox" name="do_phd" checked="checked"> PhD. </td>
+          <td> <input type="checkbox" name="do_doc" checked="checked"> doc. </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
 
-      <span class="tab"> <input type="checkbox" name="do_a" checked="checked"> A </span>
-      <span class="tab"> <input type="checkbox" name="do_b" checked="checked"> B </span>
-      <span class="tab"> <input type="checkbox" name="do_c" checked="checked"> C </span>
-      <span class="tab"> <input type="checkbox" name="do_d" checked="checked"> D </span>
-      <span class="tab"> <input type="checkbox" name="do_e" checked="checked"> E </span>
-      <span class="tab"> <input type="checkbox" name="do_f" checked="checked"> F </span>
-      <span class="tab"> <input type="checkbox" name="do_grade_unknown" checked="checked"> N/A </span> <br />
+        <tr>
+          <td> grade </td>
+          <td> <input type="checkbox" name="do_a" checked="checked"> A </td>
+          <td> <input type="checkbox" name="do_b" checked="checked"> B </td>
+          <td> <input type="checkbox" name="do_c" checked="checked"> C </td>
+          <td> <input type="checkbox" name="do_d" checked="checked"> D </td>
+          <td> <input type="checkbox" name="do_e" checked="checked"> E </td>
+          <td> <input type="checkbox" name="do_f" checked="checked"> F </td>
+          <td> <input type="checkbox" name="do_grade_unknown" checked="checked"> N/A </td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
 
-      <span class="tab"> <input type="checkbox" name="do_cs" checked="checked"> cs </span>
-      <span class="tab"> <input type="checkbox" name="do_sk" checked="checked"> sk </span>
-      <span class="tab"> <input type="checkbox" name="do_en" checked="checked"> en </span>
-      <span class="tab"> <input type="checkbox" name="do_lang_unknown" checked="checked"> N/A </span> <br />
+        <tr>
+          <td> language </td>
+          <td> <input type="checkbox" name="do_cs" checked="checked"> cs </td>
+          <td> <input type="checkbox" name="do_sk" checked="checked"> sk </td>
+          <td> <input type="checkbox" name="do_en" checked="checked"> en </td>
+          <td> <input type="checkbox" name="do_lang_unknown" checked="checked"> N/A </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
 
-      <span class="tab"> <input type="checkbox" name="do_mff_cuni" checked="checked"> MFF CUNI </span>
-      <span class="tab"> <input type="checkbox" name="do_fit_ctu" checked="checked"> FIT CTU </span>
-      <span class="tab"> <input type="checkbox" name="do_fi_muni" checked="checked"> FI MUNI </span>
-      <span class="tab"> <input type="checkbox" name="do_felk_ctu" checked="checked"> FELK CTU </span>
-      <span class="tab"> <input type="checkbox" name="do_fit_vut" checked="checked"> FIT BUT </span>
-      <span class="tab"> <input type="checkbox" name="do_fei_vsb" checked="checked"> FEI VSB </span>
-      <span class="tab"> <input type="checkbox" name="do_fai_utb" checked="checked"> FAI UTB </span>
-      <span class="tab"> <input type="checkbox" name="do_pef_mendelu" checked="checked"> PEF MEND </span>
-      <span class="tab"> <input type="checkbox" name="do_uc" checked="checked"> UC </span>
-      <span class="tab"> <input type="checkbox" name="do_faculty_other" checked="checked"> other </span> <br />
+        <tr>
+          <td>faculty </td>
+          <td> <input type="checkbox" name="do_mff_cuni" checked="checked"> MFF CUNI </td>
+          <td> <input type="checkbox" name="do_fit_ctu" checked="checked"> FIT CTU </td>
+          <td> <input type="checkbox" name="do_fi_muni" checked="checked"> FI MUNI </td>
+          <td> <input type="checkbox" name="do_felk_ctu" checked="checked"> FELK CTU </td>
+          <td> <input type="checkbox" name="do_fit_vut" checked="checked"> FIT BUT </td>
+          <td> <input type="checkbox" name="do_fei_vsb" checked="checked"> FEI VSB </td>
+          <td> <input type="checkbox" name="do_fai_utb" checked="checked"> FAI UTB </td>
+          <td> <input type="checkbox" name="do_pef_mendelu" checked="checked"> PEF MEND </td>
+          <td> <input type="checkbox" name="do_uc" checked="checked"> UC </td>
+          <td> <input type="checkbox" name="do_faculty_other" checked="checked"> other </td>
+        </tr>
 
-      <span class="tab"> <input type="checkbox" name="do_praha" checked="checked"> Praha </span>
-      <span class="tab"> <input type="checkbox" name="do_brno" checked="checked"> Brno </span>
-      <span class="tab"> <input type="checkbox" name="do_ostrava" checked="checked"> Ostrava </span>
-      <span class="tab"> <input type="checkbox" name="do_zlin" checked="checked"> Zlin </span> <br />
+        <tr>
+          <td> city </td>
+          <td> <input type="checkbox" name="do_praha" checked="checked"> Praha </td>
+          <td> <input type="checkbox" name="do_brno" checked="checked"> Brno </td>
+          <td> <input type="checkbox" name="do_ostrava" checked="checked"> Ostrava </td>
+          <td> <input type="checkbox" name="do_zlin" checked="checked"> Zlin </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
 
-      <span class="tab"> <input type="checkbox" name="do_fulltext" checked="checked"> fulltext </span> <br />
+        <tr>
+          <td> other </td>
+          <td> <input type="checkbox" name="do_fulltext" checked="checked"> fulltext </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
 
-      year from: <input type="number" value="1990">
-      year to: <input type="number" value="2020">
-      <input type="checkbox" name="do_year_unknown" checked="checked"> unknown <br /> <br />
+        <tr>
+          <td> year </td>
+          <td colspan="2"> year from: <input type="number" value="1990"> </td>
+          <td colspan="2"> year to: <input type="number" value="2020"> </td>
+          <td> <input type="checkbox" name="do_year_unknown" checked="checked"> unknown </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
 
-      <input class="search" type="button" value="search" onclick="search_clicked()">
+        <tr>
+          <td colspan="11"> <input class="search" type="button" value="search" onclick="search_clicked()"> </td>
+        </tr>
+      </table>
     </form>
 
     <table id="thesis_list">
