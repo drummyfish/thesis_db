@@ -6,6 +6,11 @@
     <meta charset="ISO-8859-1">
 
     <style>
+      body
+        {
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
       #thesis_list td
         {
           border: 1px solid black;
@@ -15,6 +20,51 @@
       #thesis_list
         {
           border-collapse: collapse;
+        }
+
+      #thesis_detail
+        {
+          background-color: rgb(240,240,240);
+          border-radius: 10px;
+          padding: 30px;
+          position: fixed;
+          display: block;
+          top: 20px;
+          left: 20px;
+          height: 400px;
+          width: 400px;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+          visibility: hidden;
+        }
+
+      #info_info
+        {
+          font-size: 18px;
+        }
+
+      #thesis_detail span
+        {
+          display: block;
+          margin-bottom: 10px;
+          width: 100%;
+        }
+
+      #info_title_cs, #info_title_en
+        {
+          font-size: 18px;
+          font-weight: bold;
+        }
+
+      #info_abstract_cs, #info_abstract_en
+        {
+          font-size: 11px;
+        }
+
+      #info_keywords
+        {
+          font-size: 12px;
+          border-bottom: 1px solid black;
+          padding-bottom: 10px;
         }
 
       a
@@ -71,12 +121,13 @@
 
     <script>
       theses = null;
+      current_list = null;
 
       function person_to_string(person)
         {
-          result = "";
+          var result = "";
 
-          for (i in person.degrees)
+          for (var i in person.degrees)
             result += person.degrees[i] + " ";
 
           result += person.name_first + " " + person.name_last;
@@ -94,9 +145,9 @@
 
       function sort_theses(thesis_list)
         {
-          sort_by = $("select[name=sort_by]").val();
+          var sort_by = $("select[name=sort_by]").val();
 
-          desc = checkbox_checked("do_descending");
+          var desc = checkbox_checked("do_descending");
 
           sort_year = function(a,b)
             {
@@ -108,8 +159,8 @@
 
           sort_title = function(a,b)
             {
-              s1 = ("" + a.title_cs).toLowerCase();
-              s2 = ("" + b.title_cs).toLowerCase();
+              var s1 = ("" + a.title_cs).toLowerCase();
+              var s2 = ("" + b.title_cs).toLowerCase();
 
               if (desc)
                 return s2.localeCompare(s1);  
@@ -119,8 +170,8 @@
 
           sort_author = function(a,b)
             {
-              s1 = ("" + a.author.name_last + a.author.name_first).toLowerCase();
-              s2 = ("" + b.author.name_last + a.author.name_first).toLowerCase();
+              var s1 = ("" + a.author.name_last + a.author.name_first).toLowerCase();
+              var s2 = ("" + b.author.name_last + a.author.name_first).toLowerCase();
 
               if (desc)
                 return s2.localeCompare(s1);  
@@ -138,17 +189,72 @@
           thesis_list.sort(sort_func);
 
           return thesis_list;
+        }
 
-          //return thesis_list;
+      function shorten(text,length)
+        {
+          if (text.length <= length)
+            return text;
+
+          return text.substring(0,length - 1) + "...";
+        }
+
+      function display_info(index)
+        {
+          $("#thesis_detail").css("visibility","visible");
+
+          var thesis = current_list[index];
+
+          $("#info_title_cs").html(to_str(thesis.title_cs));
+          $("#info_title_en").html(to_str(thesis.title_en));
+
+          var info_str = "";
+
+          if (thesis.kind != null)
+            info_str += thesis.kind + " thesis";
+ 
+            if (thesis.degree != null)
+              info_str += " (" + thesis.degree + ")";
+
+            info_str += ", ";
+
+          info_str += person_to_string(thesis.author) + ", " + thesis.faculty; 
+          
+          if (thesis.year != null)
+            info_str += " " + to_str(thesis.year);
+          
+          if (thesis.supervisor != null)
+            info_str += ", superv. " + person_to_string(thesis.supervisor);
+
+          if (thesis.pages != null)
+            info_str += ", " + to_str(thesis.pages) + " pages";
+
+          if (thesis.opponents.length != 0)
+            info_str += ", opponents:"
+ 
+            for (var o in thesis.opponents)
+              info_str += " " + person_to_string(thesis.opponents[o]);
+
+          $("#info_info").html(info_str);
+          $("#info_abstract_cs").html(shorten(to_str(thesis.abstract_cs),320));
+          $("#info_abstract_en").html(shorten(to_str(thesis.abstract_en),320));
+          $("#info_keywords").html(thesis.keywords.join(", "));
+        }
+
+      function hide_info()
+        {
+          $("#thesis_detail").css("visibility","hidden");
         }
 
       function display_thesis_list(thesis_list)
         {
           $("#thesis_list").empty();
 
-          for (i in thesis_list)
+          var c = 0;
+
+          for (var i in thesis_list)
             {
-              t = thesis_list[i];
+              var t = thesis_list[i];
 
               table_row = "<tr> " +
                 "<td>" + to_str(t.degree) + "</td>" +
@@ -157,7 +263,7 @@
                 "<td>" + person_to_string(t.author) + "</td>" +
                 "<td>" + person_to_string(t.supervisor) + "</td>" +
                 "<td>" + to_str(t.grade) + "</td>" +
-                "<td> <a href=\"" + t.url_page + "\">" +  (t.title_cs != null ? t.title_cs : t.tile_en) + "</a> </td>";
+                "<td onmouseenter=\"display_info(" + c + ")\" onmouseleave=\"hide_info()\"> <a href=\"" + t.url_page + "\">" +  (t.title_cs != null ? t.title_cs : t.tile_en) + "</a> </td>";
 
               if (t.url_fulltext != null)
                 table_row += "<td> <a href=\"" + t.url_fulltext + "\"> full </a> </td>"
@@ -169,6 +275,8 @@
                 "</tr>";
 
               $("#thesis_list").append(table_row);
+
+              c += 1;
             }
         }
 
@@ -187,8 +295,57 @@
           return $("input[name=" + checkbox_name + "]").is(":checked");
         }
 
+      function strings_contain(what, strings)
+        {
+          for (j in strings)
+            {
+              if (strings[j] && strings[j].toLowerCase().indexOf(what) >= 0)
+                return true;
+            }
+
+          return false;
+        }
+
       function meets_criteria(thesis)
         {
+          if (!thesis)
+            return false;
+
+          var search_for = input_value("search_for").trim().toLowerCase();
+
+          if (search_for.length != 0)
+            {
+              var search_strings = [];
+
+              if (checkbox_checked("do_title"))
+                {
+                  search_strings.push(thesis.title_cs);
+                  search_strings.push(thesis.title_en);
+                }
+ 
+              if (checkbox_checked("do_abstract"))
+                {
+                  search_strings.push(thesis.abstract_cs);
+                  search_strings.push(thesis.abstract_en);
+                }
+
+              if (checkbox_checked("do_keywords"))
+                {
+                  search_strings = search_strings.concat(thesis.keywords);
+                }
+
+              if (checkbox_checked("do_names"))
+                {
+                  search_strings.push(person_to_string(thesis.author));
+                  search_strings.push(person_to_string(thesis.supervisor));
+
+                  for (var k in thesis.opponents)
+                    search_strings.push(person_to_string(thesis.opponents[k]));
+                }
+
+              if (!strings_contain(search_for,search_strings))
+                return false;
+            }
 
           if (!checkbox_checked("do_bachelor") && thesis.kind == "bachelor")
             return false;
@@ -243,7 +400,7 @@
 
       function search_clicked()
         {
-          result = [];
+          var result = [];
 
           for (i in theses)
             {
@@ -251,7 +408,9 @@
                 result.push(theses[i]);
             }
 
-          display_thesis_list(sort_theses(result));
+          current_list = sort_theses(result);
+
+          display_thesis_list(current_list);
         }
 
     </script>
@@ -259,6 +418,14 @@
   </head>
 
   <body>
+    <div id="thesis_detail">
+      <span id="info_title_cs"></span>
+      <span id="info_title_en"></span>
+      <span id="info_info"></span>
+      <span id="info_keywords"></span>
+      <span id="info_abstract_cs"></span>
+      <span id="info_abstract_en"></span>
+    </div>
 
     <h1> Czech Computer Science Theses </h1>
 
@@ -282,10 +449,10 @@
 
         <tr>
           <td> search </td>
-          <td> <input type="checkbox" name="do_title" checked="checked"> in title </td>
-          <td> <input type="checkbox" name="do_names" checked="checked"> in names </td>
-          <td> <input type="checkbox" name="do_keywords" checked="checked"> in keyword </td>
-          <td> <input type="checkbox" name="do_abstract" checked="checked"> in abstract </td>
+          <td> <input type="checkbox" name="do_title" checked="checked"> title </td>
+          <td> <input type="checkbox" name="do_names" checked="checked"> names </td>
+          <td> <input type="checkbox" name="do_keywords" checked="checked"> keyw. </td>
+          <td> <input type="checkbox" name="do_abstract" checked="checked"> abstr. </td>
           <td></td>
           <td></td>
           <td></td>
