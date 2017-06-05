@@ -394,7 +394,56 @@
           
           if (thesis.language == "en" && !checkbox_checked("do_en"))
             return false;
-          
+         
+          if (thesis.faculty == "FIT BUT")
+            {
+              if (!checkbox_checked("do_fit_but"))
+                return false;
+            }
+          else if (thesis.faculty == "FI MUNI")
+            {
+              if (!checkbox_checked("do_fi_muni"))
+                return false;
+            }
+          else if (thesis.faculty == "MFF CUNI")
+            {
+              if (!checkbox_checked("do_mff_cuni"))
+                return false;
+            }
+          else if (thesis.faculty == "FIT CTU") 
+            {
+              if (!checkbox_checked("do_fit_ctu"))
+                return false;
+            }
+          else if (thesis.faculty == "FELK CTU")
+            {
+              if (!checkbox_checked("do_felk_ctu"))
+                return false;
+            }
+          else if (thesis.faculty.substring(0,4) == "FEI ")
+            {
+              if (!checkbox_checked("do_fei_vsb"))
+                return false;
+            }
+          else if (thesis.faculty == "FAI UTB")
+            {
+              if (!checkbox_checked("do_fai_utb"))
+                return false;
+            }
+          else if (thesis.faculty == "PEF MENDELU")
+            {
+              if  (!checkbox_checked("do_pef_mendelu"))
+                return false;
+            }
+          else if (thesis.faculty == "Unicorn College")
+            {
+              if (!checkbox_checked("do_uc"))
+                return false;
+            }
+          else if (!checkbox_checked("do_faculty_other"))
+            return false;
+
+
           return true;
         }
 
@@ -509,7 +558,7 @@
           <td> <input type="checkbox" name="do_fit_ctu" checked="checked"> FIT CTU </td>
           <td> <input type="checkbox" name="do_fi_muni" checked="checked"> FI MUNI </td>
           <td> <input type="checkbox" name="do_felk_ctu" checked="checked"> FELK CTU </td>
-          <td> <input type="checkbox" name="do_fit_vut" checked="checked"> FIT BUT </td>
+          <td> <input type="checkbox" name="do_fit_but" checked="checked"> FIT BUT </td>
           <td> <input type="checkbox" name="do_fei_vsb" checked="checked"> FEI VSB </td>
           <td> <input type="checkbox" name="do_fai_utb" checked="checked"> FAI UTB </td>
           <td> <input type="checkbox" name="do_pef_mendelu" checked="checked"> PEF MEND </td>

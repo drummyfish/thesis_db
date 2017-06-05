@@ -138,7 +138,7 @@ LANGUAGES = [LANGUAGE_CS, LANGUAGE_SK, LANGUAGE_EN]
 FACULTY_MFF_CUNI    = "MFF CUNI"
 FACULTY_FIT_BUT     = "FIT BUT"
 FACULTY_FI_MUNI     = "FI MUNI"
-FACULTY_FELK_CTU    = "FELK CVUT"
+FACULTY_FELK_CTU    = "FELK CTU"
 FACULTY_FIT_CTU     = "FIT CTU"
 FACULTY_FEI_VSB     = "FEI VŠB"
 FACULTY_FAI_UTB     = "FAI UTB"
@@ -228,12 +228,12 @@ BRANCH_FAI_UTB_ISB    = "FAI UTB ISB"          # (ing) integrovane systemy v bud
 BRANCH_FAI_UTB_PKS    = "FAI UTB PKS"          # (ing) pocitacove a komunikacni systemy
 BRANCH_FAI_UTB_UISS   = "FAI UTB UISŠ"         # (ing) ucitelstvi informatiky pro stredni skoly
 
-BRANCH_FEI_VSB_RIS    = "FEI VSB RIS"          # (bc/ing) ridici a informacni systemy
-BRANCH_FEI_VSB_IVT    = "FEI VSB IVT"          # (bc/ing) informacni a vypocetni technika
-BRANCH_FEI_VSB_MT     = "FEI VSB MT"           # (bc/ing) mobilni technologie
-BRANCH_FEI_VSB_TT     = "FEI VSB TT"           # (bc/ing) telekomunikacni technika
-BRANCH_FEI_VSB_VM     = "FEI VSB VM"           # (bc/ing) vypocetni matematika
-BRANCH_FEI_VSB_IKB    = "FEI VSB IKB"          # (ing) informacni a komunikacni bezpecnost
+BRANCH_FEI_VSB_RIS    = "FEI VŠB RIS"          # (bc/ing) ridici a informacni systemy
+BRANCH_FEI_VSB_IVT    = "FEI VŠB IVT"          # (bc/ing) informacni a vypocetni technika
+BRANCH_FEI_VSB_MT     = "FEI VŠB MT"           # (bc/ing) mobilni technologie
+BRANCH_FEI_VSB_TT     = "FEI VŠB TT"           # (bc/ing) telekomunikacni technika
+BRANCH_FEI_VSB_VM     = "FEI VŠB VM"           # (bc/ing) vypocetni matematika
+BRANCH_FEI_VSB_IKB    = "FEI VŠB IKB"          # (ing) informacni a komunikacni bezpecnost
 
 # departments:
 
