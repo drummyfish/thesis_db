@@ -13,13 +13,21 @@
 
       #thesis_list td
         {
-          border: 1px solid black;
+          border: 1px solid rgb(100,100,000);
           padding: 5px;
         }
 
       #thesis_list
         {
           border-collapse: collapse;
+          margin: 20px;
+        }
+
+      #thesis_list th
+        {
+          padding: 10px 0;
+          background-color: rgb(0,0,150);
+          color: white;
         }
 
       #thesis_detail
@@ -57,14 +65,16 @@
 
       #info_abstract_cs, #info_abstract_en
         {
+          border-top: 1px solid black;
+          padding-top: 7px;
           font-size: 11px;
         }
 
       #info_keywords
         {
           font-size: 12px;
-          border-bottom: 1px solid black;
           padding-bottom: 10px;
+          font-style: italic;
         }
 
       a
@@ -252,6 +262,20 @@
 
           var c = 0;
 
+          $("#thesis_list").append("<tr>" +
+            "<th> degree </th>" +
+            "<th> faculty </th>" +
+            "<th> lang </th>" +
+            "<th> author </th>" +
+            "<th> supervisor </th>" +
+            "<th> grade </th>" +
+            "<th> title </th>" +
+            "<th> fulltext </th>" +
+            "<th> year </th>" +
+            "<th> pages </th>" +
+            "<th> field (est.) </th>" +
+            "</tr>");
+
           for (var i in thesis_list)
             {
               var t = thesis_list[i];
@@ -263,15 +287,16 @@
                 "<td>" + person_to_string(t.author) + "</td>" +
                 "<td>" + person_to_string(t.supervisor) + "</td>" +
                 "<td>" + to_str(t.grade) + "</td>" +
-                "<td onmouseenter=\"display_info(" + c + ")\" onmouseleave=\"hide_info()\"> <a href=\"" + t.url_page + "\">" +  (t.title_cs != null ? t.title_cs : t.tile_en) + "</a> </td>";
+                "<td onmouseenter=\"display_info(" + c + ")\" onmouseleave=\"hide_info()\"> <a href=\"" + t.url_page + "\">" +  (t.title_cs ? t.title_cs : t.title_en) + "</a> </td>";
 
-              if (t.url_fulltext != null)
+              if (t.url_fulltext)
                 table_row += "<td> <a href=\"" + t.url_fulltext + "\"> full </a> </td>"
               else
                 table_row += "<td> </td>"
 
               table_row += "<td>" + to_str(t.year) + "</td>" +
                 "<td>" + to_str(t.pages) + "</td>" +
+                "<td>" + to_str(t.field) + "</td>" +
                 "</tr>";
 
               $("#thesis_list").append(table_row);
