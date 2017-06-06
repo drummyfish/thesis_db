@@ -16,11 +16,12 @@ import random
 import os
 import sys
 import traceback
+import requests
 
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-ANALYZE_PDFS = True
+ANALYZE_PDFS = False #True
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
@@ -865,9 +866,41 @@ def beautify_list(keywords):  # removes duplicates, empties, strips etc.
     map(lambda s: s.lstrip().rstrip(),
       filter(lambda item: item != None,list(set(keywords)))) if len(item) > 1]
 
-def download_webpage(url):
-  gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-  return urllib2.urlopen(url,context=gcontext).read()
+PROXIES = [
+    "105.28.119.228:8080",
+    "78.156.49.241:53281",
+    "45.58.124.164:1080",
+    "111.68.115.22:53281",
+    "103.248.233.156:80",
+    "109.169.6.152:8080",
+    "24.244.168.13:8080",
+    "189.99.227.231:8080",
+    "52.144.46.176:8080",
+    "45.32.163.55:3128",
+    "45.58.124.166:1080",
+    "100.12.34.36:8080",
+    "45.58.124.164:1080",
+    "68.11.154.37:53281",
+    "45.58.124.166:1080",
+    "23.94.102.180:1080",
+    "23.94.102.178:1080",
+    "170.55.15.175:3128",
+    "23.94.102.179:1080",
+    None
+  ]
+
+def download_webpage(url,encoding="utf-8"):
+  random_proxy = random.choice(PROXIES)
+  progress_print("using proxy " + str(random_proxy))
+
+  if random_proxy != None:
+    proxies = { "http": random_proxy, "https": random_proxy }
+    r = requests.get(url, proxies=proxies, verify=False)
+  else:
+    r = requests.get(url, verify=False)
+
+  r.encoding = encoding
+  return r.text
 
 def download_to_file(url, filename):
   progress_print("downloading file: " + url)
@@ -928,7 +961,7 @@ class FitButDownloader(FacultyDownloader):
       result.degree = DEGREE_DOC
 
     url = url.replace(".php.cs",".php").replace(".php.en",".php") 
-    soup = BeautifulSoup(download_webpage(url.replace(".php",".php.cs",1)),"lxml")
+    soup = BeautifulSoup(download_webpage(url.replace(".php",".php.cs",1),"ISO-8859-2"),"lxml")
     soup_en = BeautifulSoup(download_webpage(url.replace(".php",".php.en",1)),"lxml")
 
     def text_in_table(line, cs=True):
@@ -1264,7 +1297,7 @@ class CtuDownloader(FacultyDownloader):      # for FEI and FELK don't forget to 
 
     # branch info is unavailable at the CTU website
 
-    soup = BeautifulSoup(download_webpage(url),"lxml")
+    soup = BeautifulSoup(download_webpage(url,"ISO-8859-2"),"lxml")
  
     result.url_page = url
     result.city = CITY_PRAHA 
@@ -2008,7 +2041,7 @@ class FeiVsbDownloader(FacultyDownloader):
     # fulltexts are not available for FEI VSB
 
     try:
-      result.pages = int(text_in_table("dc.format").split(" ")[0])
+      result.pages = int(text_in_table("dc.format").split(" ").replace(",","")[0])
     except Exception as e:
       debug_print("could not retrieve number of pages: " + str(e))
 
@@ -2280,7 +2313,7 @@ class PefMendeluDownloader(FacultyDownloader):
     result.public_university = True
     result.city = CITY_BRNO
 
-    soup = BeautifulSoup(download_webpage(url),"lxml")
+    soup = BeautifulSoup(download_webpage(url,"ISO-8859-2"),"lxml")
 
     try:
       result.url_page = result.url_page[:result.url_page.find(";")]
@@ -2361,6 +2394,10 @@ class PefMendeluDownloader(FacultyDownloader):
 
     try:
       title_string = text_in_table("Title of the thesis:")
+
+      if title_string in self.name_to_year:
+        result.year = self.name_to_year[title_string]
+
       abstract_string = text_in_table("Summary:")
 
       if result.language == LANGUAGE_EN:
@@ -2371,9 +2408,6 @@ class PefMendeluDownloader(FacultyDownloader):
         result.abstract_cs = abstract_string
     except Exception as e:
       debug_print("could not resolve title/abstract: " + str(e))
-
-    if title_string in self.name_to_year:
-      result.year = self.name_to_year[title_string]
 
     try:
       result.keywords = beautify_list(text_in_table("Key words:").split(","))
@@ -2513,6 +2547,7 @@ if __name__ == "__main__":
   LINK_FILE_SHUFFLED = "links_shuffled.txt"
   DB_FILE = "theses.json"                    # final file to save the theses into
   OTHER_THESES_FILE = "other_theses.json"
+  DONE_FILE = "already_done.txt"
 
   def make_thesis_list_file():    # makes a text file with all thesis URLs to be downloaded
     progress_print("------ making link file ------")
@@ -2567,8 +2602,8 @@ if __name__ == "__main__":
     link_file_shuffled.close()
 
   def download_theses(start_from=0, download_other=False):       # downloads all theses listed in the shuffled list file 
-    #lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
-    lines = get_file_text("list_small.txt").split("\n")[start_from:]
+    lines = get_file_text(LINK_FILE_SHUFFLED).split("\n")[start_from:]
+    #lines = get_file_text("list_small.txt").split("\n")[start_from:]
 
     if download_other:
       db_file = open(OTHER_THESES_FILE,"w")
@@ -2604,76 +2639,81 @@ if __name__ == "__main__":
 
     counter = 0
 
-    if start_from == 0:
-      db_file = open(DB_FILE,"w")
-      db_file.write("[\n")
-    else:
-      db_file = open(DB_FILE,"a")
+    #if start_from == 0:
+    db_file = open(DB_FILE,"w")
+    #db_file.write("[\n")
+    #else:
+    #db_file = open(DB_FILE,"a")
 
     first = True
     big_errors = 0
    
     for line in lines:
       progress_print("downloading thesis " + str(counter) + "/" + str(len(lines)))
-    
-      try: 
-        append_string = None
+  
+      for i in range(5):  # try 5 times  
+        try: 
+          append_string = None
 
-        if line.find("fit.vutbr.") >= 0:
-          progress_print("FIT BUT")
-          thesis = fit_but.get_thesis_info(line) 
-          append_string = str(thesis) if thesis != None else None
-        elif line.find("is.muni.cz") >= 0:
-          progress_print("FI MUNI")
-          thesis = fi_muni.get_thesis_info(line)
-          append_string = str(thesis) if thesis != None else None
-        elif line.find("felk.cvut") >= 0:
-          progress_print("CTU")
-          thesis = ctu.get_thesis_info(line)
-          append_string = str(thesis) if thesis != None else None
-        elif line.find("dspace.cvut") >= 0:
-          progress_print("CTU2")
-          thesis = ctu_extra.get_thesis_info(line)
-          append_string = str(thesis) if thesis != None else None
-        elif line.find("dspace.vsb") >= 0:
-          progress_print("VSB")
-          thesis = fei_vsb.get_thesis_info(line)
-          append_string = str(thesis) if thesis != None else None
-        elif line.find("is.cuni") >= 0:
-          progress_print("MFF CUNI")
-          thesis = mff_cuni.get_thesis_info(line)
-          append_string = str(thesis) if thesis != None else None
-        elif line.find(".utb.") >= 0:
-          progress_print("FAI UTB")
-          thesis = fai_utb.get_thesis_info(line)
-          append_string = str(thesis) if thesis != None else None
-        elif line.find("portal_zp.pl") >= 0:
-          progress_print("PEF MENDELU")
-          thesis = pef_mendelu.get_thesis_info(line)
-          append_string = str(thesis) if thesis != None else None
-        elif line.find(".unicorncollege.") >= 0:
-          progress_print("UC")
-          thesis = uc.get_thesis_info(line)
-          append_string = str(thesis) if thesis != None else None
-        else:
-          progress_print("unknown link!!!: " + line.replace("\n",""))
-
-        if append_string != None:
-          if first:
-            first = False
+          if line.find("fit.vutbr.") >= 0:
+            progress_print("FIT BUT")
+            thesis = fit_but.get_thesis_info(line) 
+            append_string = str(thesis) if thesis != None else None
+          elif line.find("is.muni.cz") >= 0:
+            progress_print("FI MUNI")
+            thesis = fi_muni.get_thesis_info(line)
+            append_string = str(thesis) if thesis != None else None
+          elif line.find("felk.cvut") >= 0:
+            progress_print("CTU")
+            thesis = ctu.get_thesis_info(line)
+            append_string = str(thesis) if thesis != None else None
+          elif line.find("dspace.cvut") >= 0:
+            progress_print("CTU2")
+            thesis = ctu_extra.get_thesis_info(line)
+            append_string = str(thesis) if thesis != None else None
+          elif line.find("dspace.vsb") >= 0:
+            progress_print("VSB")
+            thesis = fei_vsb.get_thesis_info(line)
+            append_string = str(thesis) if thesis != None else None
+          elif line.find("is.cuni") >= 0:
+            progress_print("MFF CUNI")
+            thesis = mff_cuni.get_thesis_info(line)
+            append_string = str(thesis) if thesis != None else None
+          elif line.find(".utb.") >= 0:
+            progress_print("FAI UTB")
+            thesis = fai_utb.get_thesis_info(line)
+            append_string = str(thesis) if thesis != None else None
+          elif line.find("portal_zp.pl") >= 0:
+            progress_print("PEF MENDELU")
+            thesis = pef_mendelu.get_thesis_info(line)
+            append_string = str(thesis) if thesis != None else None
+          elif line.find(".unicorncollege.") >= 0:
+            progress_print("UC")
+            thesis = uc.get_thesis_info(line)
+            append_string = str(thesis) if thesis != None else None
           else:
-            db_file.write(",\n")
+            progress_print("unknown link!!!: " + line.replace("\n",""))
 
-          db_file.write(append_string)
+          if append_string != None:
+            if first:
+              first = False
+            else:
+              db_file.write(",\n")
 
-        counter += 1
-      except Exception as e:
-        progress_print("BIG ERROR: " + str(e))
-        traceback.print_exc(file=sys.stdout)
-        big_errors += 1
-        progress_print("there were " + str(big_errors) + " big errors so far")
+            db_file.write(append_string)
 
-    db_file.write("\n]\n")
+          counter += 1
+          break
+        except Exception as e:
+          progress_print("BIG ERROR: " + str(e))
+          traceback.print_exc(file=sys.stdout)
+          big_errors += 1
+          progress_print("there were " + str(big_errors) + " big errors so far")
+
+          if i < 4:
+            progress_print("trying again...")
+
+    #db_file.write("\n]\n")
     db_file.close()
 
   #======================
@@ -2682,6 +2722,15 @@ if __name__ == "__main__":
   #shuffle_list_file()
   #download_theses()
   #print(PDFInfo("test_smrcka.pdf").typesetting_system)
-  download_theses()
+  #download_theses()
+
   #print(mff_cuni.get_thesis_info("https://is.cuni.cz/webapps/zzp/detail/49648/25061566/?q=%7B%22______searchform___search%22%3A%22%22%2C%22______searchform___butsearch%22%3A%22Vyhledat%22%2C%22______facetform___facets___faculty%22%3A%5B%2211320%22%5D%2C%22PNzzpSearchListbasic%22%3A%22158%22%7D&lang=cs"))
+  #print(fi_muni.get_thesis_info("https://is.muni.cz/th/359420/fi_b/"))
+  print(fit_but.get_thesis_info("http://www.fit.vutbr.cz/study/DP/DP.php?id=19244&y=2016"))
+  #print(ctu.get_thesis_info("https://dip.felk.cvut.cz/browse/details.php?f=F3&d=K13136&y=2007&a=bilekj2&t=dipl")  )
+  #print(pef_mendelu.get_thesis_info("https://is.mendelu.cz/zp/portal_zp.pl?podrobnosti_zp=56535"))
+
+#  print(download_webpage("http://is.muni.cz/thesis/"))
+#  print( BeautifulSoup(download_webpage("http://torguard.net/whats-my-ip.php"),"lxml").find("strong").find_next("strong").next_sibling   )
+
 
