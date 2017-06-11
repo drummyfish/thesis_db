@@ -32,6 +32,29 @@ FACULTY_GRADE_AVERAGES = [
     FACULTY_PEF_MENDELU
   ]
 
+DEGREE_SCORES = {
+  DEGREE_DOC: 3.0,
+  DEGREE_PROF: 3.7,
+  DEGREE_CSC: 2.5,
+  DEGREE_THD: 2.1,
+  DEGREE_DIPLING: 1.6,
+  DEGREE_DIS: 0.5,
+  DEGREE_DR: 2.1,
+  DEGREE_MBA: 2.0
+  }
+
+for d in DEGREES_BC:
+  DEGREE_SCORES[d] = 1.0
+
+for d in DEGREES_MASTER:
+  DEGREE_SCORES[d] = 1.7
+
+for d in DEGREES_DR:
+  DEGREE_SCORES[d] = 2.1
+
+for d in DEGREES_PHD:
+  DEGREE_SCORES[d] = 2.5
+
 def table_row(cells,cell_width=20):
   result = ""
 
@@ -105,6 +128,21 @@ def thesis_to_string(thesis, lang="cs"):
 
   return result
 
+def degree_score(person):
+  if person == None or not "degrees" in person:
+    return 0.0
+
+  result = 0.0
+
+  for d in person["degrees"]:
+    if d in DEGREE_SCORES:
+      result += DEGREE_SCORES[d]
+    else:
+      result += 0.1
+
+  return result
+
+
 class Stats(object):
 
   def __init__(self, thesis_list):
@@ -137,6 +175,7 @@ class Stats(object):
         "most pages thesis": None,
         "least pages thesis": None,
         "most degrees person": None,
+        "greatest degree score person": None,
 
         "longest abstract thesis": None,
         "shortest abstract thesis": None,
@@ -288,6 +327,8 @@ class Stats(object):
     print_record("most common fields (estimated)",[""] + map(lambda item: item[0] + " (" + str(item[1]) + ")",field_histogram[:5]))
 
     print_record("person with most degrees", [person_to_string(self.records["most degrees person"])])
+    
+    print_record("person with greatest degree score", [person_to_string(self.records["greatest degree score person"])])
 
     print_record("most keywords", [
         thesis_to_string(self.records["most keywords thesis"]),
@@ -420,6 +461,11 @@ for thesis in theses:
     for person in people:
       if stats.records["most degrees person"] == None or len(person["degrees"]) > len(stats.records["most degrees person"]["degrees"]):
         stats.records["most degrees person"] = person
+
+      score = degree_score(person)
+
+      if stats.records["greatest degree score person"] == None or score > degree_score(stats.records["greatest degree score person"]):
+        stats.records["greatest degree score person"] = person
 
   except Exception as e:
     print("error analysing thesis no. " + str(thesis_no) + ": " + str(e))
