@@ -3,12 +3,12 @@
 
 import json
 from pprint import pprint
-from make_db import *
+from common import *
 
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-db_text = get_file_text("theses.json")
+db_text = get_file_text("theses_uncompressed.json")
 theses = json.loads(db_text,encoding="utf8")
 
 RECORDED_FACULTIES = [FACULTY_MFF_CUNI,
@@ -214,7 +214,7 @@ class Stats(object):
 
     print_heading("degrees")
     cell_width = 16
-    degrees = [DEGREE_BC, DEGREE_ING, DEGREE_MGR, DEGREE_PHD, DEGREE_DOC, DEGREE_RNDR, DEGREE_PHDR]
+    degrees = [DEGREE_BC, DEGREE_ING, DEGREE_MGR, DEGREE_PHD, DEGREE_DOC, DEGREE_RNDR]
     degree_sums = [self.records[d] for d in degrees]
     print("  " + table_row( degrees,cell_width) )
     print("  " + table_row( degree_sums,cell_width) )
@@ -428,7 +428,4 @@ for thesis in theses:
   thesis_no += 1
 
 stats.nice_print()
-#pprint(stats.records)  
-  
-    
 
