@@ -1,0 +1,98 @@
+================= thesis DB stats ================ 
+
+~~~~~ faculties ~~~~~
+
+  MFF CUNI         FIT BUT          FI MUNI          FIT CTU          FELK CTU         FEI VŠB         FAI UTB          PEF MENDELU      Unicorn College  other            total            
+  2727             7398             7776             888              3319             8794             4370             419              205              231              36127            
+
+~~~~~ gender ~~~~~
+
+  male            female          unknown         
+  31872           2654            1601            
+
+~~~~~ degrees ~~~~~
+
+  Bc.             Ing.            Mgr.            PhD.            doc.            RNDr.           
+  18638           7116            4617            956             58              334             
+
+~~~~~ grades ~~~~~
+
+  A                B                C                D                E                F                failed           
+  4353             2810             2177             828              525              309              315              
+
+  average grade (1 = A, 4 = F) by group:
+  FIT BUT          FI MUNI          FELK CTU         FAI UTB          MFF CUNI         Unicorn College  PEF MENDELU      male             female           
+  1.81             N/A              N/A              1.48             1.42             N/A              N/A              1.63             1.49             
+
+~~~~~ years ~~~~~
+
+  year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
+  total:       0     1     4     71    59    103   152   125   252   209   362   434   495   590   641   919   2050  2324  2858  3032  2919  3085  3121  3164  2878  2259  2146  562   
+  female/male: 0.00  0.00  0.00  0.05  0.02  0.23  0.10  0.05  0.06  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.14  0.14  0.11  
+
+~~~~~ languages ~~~~~
+
+  cs        sk        en        unknown   
+  25333     2350      3090      5354      
+
+~~~~~ other ~~~~~
+
+ -- longest title (cs): 
+    Pavel Heřman: Navrhněte a ve VRML naplementujte systém pro 3-D internetovou galerii, která umožní tvorbu virtuálních výstav libovolných uměleckých děl. Následná internetová aplikace umožní do galerie vkládat libovolné 2-D i 3-D modely uměleckých děl a tím realizovat vlastní výstavy., 2008, FELK CTU, bachelor thesis
+
+ -- longest title (en): 
+    Pavel Heřman: Create and implement 3-D internet gallery system in VRML language, which enable to create any virtual expositions of artwork. The next internet application enable to insert  any  2-D and 3-D artwork models to the gallery and create your own expositions. , 2008, FELK CTU, bachelor thesis
+
+ -- shortest title (cs): 
+    Bc. Miroslav Štola: Risk, 2013, MFF CUNI, bachelor thesis
+
+ -- shortest title (en): 
+    František Dostál: ru, 2011, FEI VŠB, PhD thesis
+
+ -- most pages: Ing. Jaroslav Sýkora PhD.: Programmable and Customizable Hardware Accelerators for Self-adaptive Virtual Processors in FPGA, 2014, FIT CTU, PhD thesis, 239 pages, 4.22 MB
+
+ -- least pages: Bc. Miloslav Číž: Zobrazování pokřivených zrcadel, 2017, FIT BUT, master thesis, 42 pages, 11.93 MB
+
+ -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
+
+ -- typesetting systems: 
+    MS Word: 454
+    Open/Libre Office: 46
+    LaTeX: 7
+    ghostscript: 0
+    unknown: 35618
+
+ -- largest thesis: Ing. Petr Žejdl PhD.: Low-Latency Video Transmissions for Real-Time Collaboration with a Scalable Hardware Acceleration, 2014, FIT CTU, PhD thesis, 139 pages, 13.87 MB
+
+ -- smallest thesis: Ing. Michal Košťál PhD.: Market-based Resource Allocation in Non-Dedicated Clusters, 2012, FIT CTU, PhD thesis, 62 pages, 0.60 MB
+
+ -- most common keywords: 
+    php (1159)
+    java (1108)
+    mysql (878)
+    informační systém (688)
+    databáze (610)
+
+ -- most common fields (estimated): 
+    computer graphics (3233)
+    hardware (3111)
+    information systems (2461)
+    software engineering (839)
+    theoretical computer science (638)
+
+ -- person with most degrees: Dr. RNDr. Mgr. Bc. Jan Křetínský PhD.
+
+ -- person with greatest degree score: prof. RNDr. Ing. Ivana Kolingerová CSc.
+
+ -- most keywords: Martin Řezáč: Parametrizovatelný hudební nástroj pro mobilní platformy, 2014, FIT BUT, master thesis
+    keywords (26): protocol, real time., matematická syntéza, dálkové ovládání, tone, Android, ASIO, Hudební nástroj, polyfonie, network, accelerometer, WiFi, mathematical synthesis, přítlak, polyphony, DAW, music, tablet, síť, gyroscope, syntetizér, tón, synthetiser, pressure, Musical instrument, reálný čas., VST, hudba, gyroskop, MIDI, signál, akcelerometr, remote control, protokol, signal
+
+ -- longest abstract: Martin Krahulík: Reprezentace BRDF v počítačové grafice, 2005, FELK CTU, master thesis
+    BRDF (angl. Bi-directional Reflectance Distribution Function) jsou funkce, které se používají v počítačové
+ grafice pro popis odrazu světla na povrchu těles tvořených různými druhy materiálů.
+ 
+ Od počátků počítačové grafiky se její tvůrci snažili vyvinout postupy, pomocí kterých by bylo možné vytvářet obrazy k nerozeznání od skutečných. Jednou z nejdůležitějších vlastností pro lidské vnímání je, jakým způsobem objekty odráží světlo, protože tak získáváme informaci o hloubce obrazu. Byla vytvořena řada postupů, jakým způsobem světlo prostupuje scénou a více či méně přesných modelů odrazu světla na povrchu těles.Tyto snahy narážely a naráží nejen na komplexnost fyzikální podstaty problému, ale zejména na výpočetní složitost algoritmů. Časová náročnost výpočtů tvoří v současné době hlavní limitující faktor a je důvodem, proč se v různých aplikacích dosud hojně používají jednoduché a nepřesné grafické modely, zejména v situacích, má-li se scéna zobrazovat v reálném čase. Snahou této práce je předložit co nejucelenějží popis současného stavu dané problematiky. Pro snadnější pochopení komplikovanějších modelů byly v práci zahrnuty i starší jednoduché modely, které ještě nebyly definovány pomocí BRDF. V úvodu do problematiky práce popisuje základní fyzikální pojmy odrazu světla, ideální zrcadlový odraz, difúzní a reálný odraz. V počítačové grafice řada modelů přistupuje k odrazu světla, jako by se skládal ze tří složek: ambientní, difúzní a zrcadlové a případně ještě směrově difúzní. Ambientní složka představuje světlo, které vzniká mnohanásobnými odrazy ve scéně, je v ní rovnoměrně rozprostřeno a odráží se od tělesa stejně do všech směrů. Složky difúzní a zrcadlová jsou vázány na konkrétní zdroj světla.Tento přístup zjednodušuje pohled na model a pro řadu materiálů, např. plasty působí věrohodně. Na druhou stranu je toto zbytečné u kovů, kde je difúzní odraz zanedbatelný a zcela selhává pro leštěné povrchy. Práce podrobně tuto problematiku rozvádí v části popisující členění modelů. V další části teoretického úvodu práce vysvětluje metody sledování paprsků. Na historii ray tracingu navazuje vysvětlení matematického základu a podrobný popis Monte Carlo integrace. Je zde popsána technika vzorkování podle důležitosti (angl. Importance sampling) a její vztah k BRDF. Stručně jsou zde popsány i další postupy vzorkování. Asi nejčastěji používanou funkcí, kterou se různé druhy zobrazovacích modelů popisují, je dvousměrová distribuční funkce (angl. Bi-directional Reflectance Distribution Function ), dále označovaná jako BRDF . Práce podává její vysvětlení a definování. Uvádí i omezující podmínky: Helmholtzovu reciprocitu, zákon zachování energie a nezápornost funkce pro všechny směry (úhly) nad hemisférou. Hlavní částí práce je popis jednotlivých zobrazovacích modelů. Provádí jejich rozčlenění podle povahy povrchu na izotropní a anizotropní a podle fyzikálního základu, na kterém je model postaven na čistě empirické modely, modely založené na optice paprsku a vlnové modely. Práce se zabývá nejčastěji používanými osvětlovacími modely a pakliže to je možné, využívá k tomu BRDF. Podrobně popisuje 15 modelů, přičemž Blinnův model je pro malou odlišnost zahrnut v části, věnující se motelu Torrance a Sparrow. Historicky první model byl model Lambertův, který byl představen před více než 200 lety. Dodnes nejběžnějším používaným modelem je Phongův model z roku 1975. Jedná se pouze o empirický model bez hlubšího fyzikálního základu, který je velmi populární pro svou jednoduchost a snadnou implementaci v hardwaru. Tento model byl Lewisem upraven, aby splňoval zákon zachování energie a Helmholtzovu reciprocitu a dále několikrát modifikován, aby poskytoval věrohodnější obraz různých materiálů. Velmi rozšířený je model Torrance a Sparrowa a jeho modifikace. Model je na rozdíl od Phongova modelu založen na geometrické optice využívající představu, že povrch tělesa je tvořen dlouhými úzkými náhodně orientovanými žlábky ve tvaru písmena V, tvořenými ze zrcadel. To umožňuje využít efektů jako je stínění, maskování, a efekt, kdy pro velké úhly dopadu se většina světla odráží pod větším úhlem, než je úhel dopadu. Blinn tento model dále upravil, aby snížil jeho výpočetní náročnost. Oren a Nayar vyšli z modelu Torrance a Sparrowa a zkonstruovali model pro nelambertská tělesa. V tomto modelu jsou žlábky tvořeny perfektně difúzními mikroplochami. Poulin a Fournier podobně odvodili anizotropní model, předpokládající, že povrch je složen z velmi malých válcových ploch. Kajiya vytvořil výpočetně velmi náročný anizotropní model, který je založen na Kirchhoffových zákonech. He a kol. publikovali velmi propracovaný model, ale bohužel náročný na výpočet, neboť obsahuje pomalu konvergující řady. Řada moderních modelů vychází z modelů Lewise a Blinna a snaží se je rozšířit o nové vlastnosti a aproximovat jejich členy. Takovými modely jsou například Neumann, Neumann, Szirmay-Kalos pro kovové materiály a Ashikhmina a Shirleyho anizotropní Phongův model. Velmi komplexní model založený na aproximaci Blinnova modelu, vhodný i pro dvouvrstvé materiály vytvořil Schlick. Jedním z mála modelů založených na vlnové optice je model Gondek, Mayer, Newman. Z empirických modelů je zde uveden rovněž Wardův model, který je velmi rychlý a jednoduchý. Shirley, Hu, Smits a Lafortune vytvořili zdařilý model pro materiály, kde poměr mezi zrcadlovou a difúzní složkou závisí na úhlu odrazu. S tvorbou modelů vyvstala i otázka jejich reprezentace. I tato problematika je v práci zahrnuta. Druhým úkolem diplomové práce bylo vytvořit z popisovaných modelů knihovnu. Z uváděných 15 modelů bylo 12 implementováno. Aby bylo možné si porovnat vlastnosti a možnosti implementovaných modelů, byla nad knihovnou implementována aplikace, která umožňuje si chování vybraného modelu prohlédnout v jednoduché scéně. V aplikaci je možné si interaktivně nastavovat parametry jednotlivých BRDF a osvětlení scény a pozorovat dopad jednotlivých parametrů na tvar BRDF i vizuální dopad na obraz scény. Tím může program sloužit jako účinná pomůcka pro studenty počítačové grafiky i pro programátory jednak k seznámení s vlastnostmi modelů, jednak jako podklad při rozhodování o volbě modelu pro konkrétní použití. Textová část práce obsahuje podrobný popis implementace programu a je členěna na knihovní část a popis grafického uživatelského rozhraní. Následuje popis ovládání programu a závěrečná část práce, která obsahuje výsledky a shrnutí. K velmi podstatným parametrům patří rychlost vykreslování scény. Bylo provedeno a je dokumentováno měření 12 modelů. Jednotlivé analyzované modely jsou zhodnoceny, jsou uvedeny jejich přednosti a nedostatky a je doplněno jejich vhodné využití. Práce je doplněna velkým množstvím obrázků, vytvořených ve vypracovaném demonstračním programu, které názorně dokumentují uvedené vlastnosti jednotlivých modelů. Knihovna modelů je snadno rozšiřitelná, proto by do budoucna bylo možné tuto práci ještě doplnit a obohatit popisem a implementací dalších modelů.
+
+ -- shortest abstract: Ondřej Svačina: Analýza RFID čipů prostřednictvím mikroskopické analýzy, 2012, FIT BUT, bachelor thesis
+    NIC
+
