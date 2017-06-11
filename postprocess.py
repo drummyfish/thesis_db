@@ -1,9 +1,9 @@
 from common import *
 import json
 
-INPUT_FILE = "theses_uncompressed.json"
+INPUT_FILE = "theses.json"
 OUTPUT_COMPRESSED_FILE = "theses_compressed.json"
-OUTPUT_UNCOMPRESSED_FILE = "theses_uncompressed.json"
+OUTPUT_UNCOMPRESSED_FILE = "theses.json"
 
 reload(sys)
 sys.setdefaultencoding("utf8")

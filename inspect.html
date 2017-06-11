@@ -47,7 +47,8 @@
 
       #info_info
         {
-          font-size: 18px;
+          font-size: 14px;
+          background-color: white; 
         }
 
       #thesis_detail span
@@ -57,10 +58,22 @@
           width: 100%;
         }
 
+      #info_text
+        {
+          margin-left: 50px;
+        }
+
       #info_title_cs, #info_title_en
         {
           font-size: 18px;
           font-weight: bold;
+          padding: 10px 0;
+        }
+
+      #info_title_en
+        {
+          font-size: 15px;
+          color: rgb(150,150,150);
         }
 
       #info_abstract_cs, #info_abstract_en
@@ -135,6 +148,9 @@
 
       function person_to_string(person)
         {
+          if (person === null)
+            return "";
+
           var result = "";
 
           for (var i in person.degrees)
@@ -304,11 +320,6 @@
               c += 1;
             }
         }
-
-      $.getJSON("theses.json", function(json)
-        {
-          theses = json;
-        });
 
       function input_value(input_name)
         {
@@ -551,37 +562,123 @@
       function search_clicked()
         {
           var result = [];
+          var i = 0;
 
-          for (i in theses)
+          function iterate()
             {
-              try
-                {
-                  if (meets_criteria(theses[i]))
-                    result.push(theses[i]);
-                }
-              catch (err)
-                {
-                  console.log("search error: " + err.message);
-                }
+              console.log("it");
+              next_iteration_in = 1000;
+              
+              while (true)
+                { 
+                  try
+                    {
+                      if (meets_criteria(theses[i]))
+                        result.push(theses[i]);
+                    }
+                  catch (err)
+                    {
+                      console.log("search error: " + err.message);
+                    }
+
+                  i += 1;
+                  next_iteration_in -= 1;
+
+                  if (i >= theses.length)
+                    {
+                      // end 
+                      $("#info_text").html(result.length + " results found.");
+                      current_list = sort_theses(result).slice(0,parseInt(input_value("max_results")));
+                      display_thesis_list(current_list);
+                      break;
+                    }
+                  else if (next_iteration_in <= 0)
+                    {
+                      $("#info_text").html("searching, " + i + "/" + theses.length);
+                      setTimeout(iterate,1);
+                      break;
+                    }
+                } 
             }
 
-          current_list = sort_theses(result).slice(0,parseInt(input_value("max_results")));
-
-          display_thesis_list(current_list);
+          setTimeout(iterate,1);
         }
 
+      function db_loaded()
+        {
+          $("#info_text").html("Database loaded succesfully.");
+          $("#file_reader").css("display","none");
+        }
+
+      // try to load the json:
+
+      $.getJSON("theses.json", function(json)
+        {
+          theses = json;
+          db_loaded();
+        });
+      
+      function handle_file_select()
+        {               
+          input = document.getElementById('fileinput');
+
+          if (!input.files[0])
+            {
+              alert("No file selected.");               
+            }
+          else
+            {
+              file = input.files[0];
+              fr = new FileReader();
+              fr.onload = received_text;
+              $("#info_text").html("Loading file, please wait.");
+              fr.readAsText(file);
+            }
+        }
+
+      function received_text()
+        {
+          try
+            {
+              theses = JSON.parse(fr.result);
+              db_loaded();
+            }
+          catch (err)
+            {
+              $("#info_text").html("");
+              alert("Could not parse the json file.");
+            }
+        } 
+
+      function on_load()
+        {
+          if (theses === null || theses.length == 0)
+            $("#info_text").html("Could not load json file. Please use the form below to select the file.");
+        }
     </script>
 
   </head>
 
-  <body>
+  <body onload="on_load()">
     <div id="thesis_detail">
-      <span id="info_title_cs"></span>
-      <span id="info_title_en"></span>
-      <span id="info_info"></span>
-      <span id="info_keywords"></span>
-      <span id="info_abstract_cs"></span>
-      <span id="info_abstract_en"></span>
+      <span id="info_title_cs"> Test title in Czech language </span>
+      <span id="info_title_en"> Test title in English langauge </span>
+      <span id="info_info"> some info, year, author, FACULTY </span>
+      <span id="info_keywords"> keyword1, keyword2, keyword3 </span>
+      <span id="info_abstract_cs">
+        abstract in czech abstract in czech abstract in czech
+        abstract in czech abstract in czech abstract in czech
+        abstract in czech abstract in czech abstract in czech
+        abstract in czech abstract in czech abstract in czech
+        abstract in czech abstract in czech abstract in czech
+      </span>
+      <span id="info_abstract_en">
+        abstract in english abstract lorem ipsum in english abstract in english
+        abstract in english abstract in english in english
+        abstract in english abstract in english 123 abstract in english
+        abstract in english abstract in english abstract in english
+        abstract in english abstract in abstract in english
+      </span>
     </div>
 
     <h1> Czech Computer Science Theses </h1>
@@ -719,6 +816,13 @@
         </tr>
       </table>
     </form>
+
+    <span id="info_text"></span>
+
+    <div id="file_reader">
+      <input type="file" id="fileinput" />
+      <input type="button" onclick="handle_file_select()" value="load" />
+    </div>
 
     <table id="thesis_list">
     </table>
