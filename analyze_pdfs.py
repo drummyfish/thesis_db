@@ -5,12 +5,12 @@ from common import *
 
 INPUT_FILE = "theses_pdf_updated.json"
 OUTPUT_FILE = "theses_pdf_updated.json"
-END_AFTER = 100
+END_AFTER = 20
 
 theses = load_json(INPUT_FILE)
 
 def thesis_needs_pdf_analysis(thesis):
-  return thesis["pages"] == None or thesis["typesetting_system"] == None or thesis["size"] == None
+  return thesis["pages"] == None or thesis["typesetting_system"] == None or thesis["size"] == None or thesis["language"] == None
 
 for i in range(END_AFTER):
   print(i)
@@ -25,7 +25,7 @@ for i in range(END_AFTER):
 
       pdf_info = download_and_analyze_pdf(random_thesis["url_fulltext"])
 
-      print(pdf_info.pages,pdf_info.typesetting_system,pdf_info.size)
+      print(pdf_info.pages,pdf_info.typesetting_system,pdf_info.size,pdf_info.language)
 
       if random_thesis["pages"] == None:
         random_thesis["pages"] = pdf_info.pages
@@ -35,6 +35,10 @@ for i in range(END_AFTER):
 
       if random_thesis["size"] == None:
         random_thesis["size"] = pdf_info.size
+
+      if random_thesis["language"] == None:
+        if pdf_info.language in LANGUAGES:
+          random_thesis["language"] = pdf_info.language
   except Exception as e:
     print("ERROR: " + str(e))
 

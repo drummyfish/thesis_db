@@ -67,7 +67,7 @@ named `theses_compressed.json`.
 It is more convenient and sometimes (for the tools in this repo)
 required to uncompress the JSON (so that the object have all the
 attributes, set to `null` if unknown). This can be done with
-`postprocess.py` (you'll probably need to edit a line or two).
+`uncompress_json.py`.
 
 The database is a JSON list consisting of objects in format:
 
