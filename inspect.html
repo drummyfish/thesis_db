@@ -1,5 +1,4 @@
 <html>
-
   <!-- NOTE!!! Chromium has to be run with flags: --args --disable-web-security --allow-file-access-from-files  -->
 
   <head>
@@ -9,6 +8,11 @@
       body
         {
           font-family: Arial, Helvetica, sans-serif;
+        }
+
+      #file_reader
+        {
+          margin: 30px;
         }
 
       #thesis_list td
@@ -408,6 +412,11 @@
               if (!checkbox_checked("do_doc"))
                 return false;
             }
+          else if (thesis.kind == null)
+            {
+              if (!checkbox_checked("do_type_unknown"))
+                return false;
+            }
 
           if (!checkbox_checked("do_grade_unknown"))
             {
@@ -719,10 +728,10 @@
           <td> type </td>
           <td> <input type="checkbox" name="do_bachelor" checked="checked"> Bc. </td>
           <td> <input type="checkbox" name="do_master" checked="checked"> master </td>
-          <td> <input type="checkbox" name="do_dr" checked="checked"> dr. </td>
-          <td> <input type="checkbox" name="do_phd" checked="checked"> PhD. </td>
-          <td> <input type="checkbox" name="do_doc" checked="checked"> doc. </td>
-          <td></td>
+          <td> <input type="checkbox" name="do_dr" checked=" checked"> dr. </td>
+          <td> <input type="checkbox" name="do_phd" checked=" checked"> PhD. </td>
+          <td> <input type="checkbox" name="do_doc" checked=" checked"> doc. </td>
+          <td> <input type="checkbox" name="do_type_unknown" checked="checked"> N/A </td>
           <td></td>
           <td></td>
           <td></td>
