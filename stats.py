@@ -8,8 +8,7 @@ from common import *
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-db_text = get_file_text("theses_uncompressed.json")
-theses = json.loads(db_text,encoding="utf8")
+theses = load_json("theses.json")
 
 RECORDED_FACULTIES = [FACULTY_MFF_CUNI,
   FACULTY_FIT_BUT,
@@ -22,6 +21,7 @@ RECORDED_FACULTIES = [FACULTY_MFF_CUNI,
   FACULTY_UC]
 
 YEAR_RANGE = range(1990,2018)
+
 FACULTY_GRADE_AVERAGES = [
     FACULTY_FIT_BUT,
     FACULTY_FI_MUNI,
@@ -63,71 +63,6 @@ def table_row(cells,cell_width=20):
 
   return result
 
-def grade_to_number(grade):
-  if grade == GRADE_A:
-    return 1.0
-  elif grade == GRADE_B:
-    return 1.5
-  elif grade == GRADE_C:
-    return 2.0
-  elif grade == GRADE_D:
-    return 2.5
-  elif grade == GRADE_E:
-    return 3.0
-  else:
-    return 4.0
-
-def person_to_string(person):
-  if person == None:
-    return "none"
-
-  result = ""
-
-  degrees_after = []
-
-  for degree in person["degrees"]:
-    if degree in DEGREES_AFTER:
-      degrees_after.append(degree)
-    else:
-      result += degree + " "
-
-  result += str(person["name_first"]) + " " + str(person["name_last"])
-
-  for degree in degrees_after:
-    result += " " + degree
-
-  return result
-
-def thesis_to_string(thesis, lang="cs"):
-  if thesis == None:
-    return "none"
-
-  result = ""
-
-  if thesis["author"] != None:
-    result += person_to_string(thesis["author"]) + ": "
-
-  other_lang = "en" if lang == "cs" else "cs"
-
-  result += str(thesis["title_" + lang] if thesis["title_" + lang] != None else thesis["title_" + other_lang])
-
-  if thesis["year"] != None:
-    result += ", " + str(thesis["year"])
-
-  if thesis["faculty"] != None:
-    result += ", " + thesis["faculty"]
-
-  if thesis["kind"] != None:
-    result += ", " + thesis["kind"] + " thesis"
-
-  if thesis["pages"] != None:
-    result += ", " + str(thesis["pages"]) + " pages"
-
-  if thesis["size"] != None:
-    result += ", " + "{0:.2f}".format(thesis["size"] / 1000000.0) + " MB"
-
-  return result
-
 def degree_score(person):
   if person == None or not "degrees" in person:
     return 0.0
@@ -141,7 +76,6 @@ def degree_score(person):
       result += 0.1
 
   return result
-
 
 class Stats(object):
 

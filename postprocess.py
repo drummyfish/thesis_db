@@ -54,8 +54,6 @@ def uncompress():  # makes the json big and readable again
     if not "degrees" in person:
       person["degrees"] = []
 
-  f = open(OUTPUT_UNCOMPRESSED_FILE,"w")
-
   reference_thesis = Thesis()
 
   uncompressed = []
@@ -77,9 +75,7 @@ def uncompress():  # makes the json big and readable again
 
     uncompressed.append(new_thesis)
 
-  f.write(json.dumps(uncompressed,sort_keys=True,ensure_ascii=False,indent=1))
-
-  f.close()
+  save_json(uncompressed,OUTPUT_UNCOMPRESSED_FILE)
 
 compress()
 uncompress()

@@ -16,6 +16,8 @@ import traceback
 import requests
 import copy
 
+ANALYZE_PDFS = True
+
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...
 THESIS_PHD = "PhD"              # PhD.
@@ -539,6 +541,52 @@ NAMES_FEMALE = ["Marie", "Jana", "Eva", "Anna", "Hana",
   "Ingrid", "Ema", "Zlata", "Emílie", "Ivona",
   "Natália", "Viktória"]
 
+PROXIES = [
+    "109.169.6.152:8080",
+    "123.231.65.170:8080",
+    "79.137.24.195:3128",
+    "175.45.132.96:80",
+    "46.105.50.151:8080",
+    "119.226.14.46:80",
+    "149.255.154.4:8080",
+    "194.88.105.156:3128",
+    "51.255.48.61:8080",
+    "212.237.12.18:1189",
+    "89.36.212.129:1189",
+    "205.196.181.11:8080",
+    "45.32.139.160:3128",
+    "24.244.168.15:8080",
+    "190.90.162.98:53281",
+    "78.26.207.173:53281",
+    "36.37.221.184:53281",
+    "87.119.236.208:53281",
+    "62.122.65.60:53281",
+    "51.15.66.2:3128",
+    "203.130.2.66:53281",
+    "142.165.19.133:3128",
+    "186.42.191.166:53281",
+    "105.28.119.228:8080",
+    "78.156.49.241:53281",
+    "45.58.124.164:1080",
+    "111.68.115.22:53281",
+    "103.248.233.156:80",
+    "109.169.6.152:8080",
+    "24.244.168.13:8080",
+    "189.99.227.231:8080",
+    "52.144.46.176:8080",
+    "45.32.163.55:3128",
+    "45.58.124.166:1080",
+    "100.12.34.36:8080",
+    "45.58.124.164:1080",
+    "68.11.154.37:53281",
+    "45.58.124.166:1080",
+    "23.94.102.180:1080",
+    "23.94.102.178:1080",
+    "170.55.15.175:3128",
+    "23.94.102.179:1080",
+    None
+  ]
+
 def guess_field_from_keywords(keyword_list):
   if keyword_list == None:
     return None
@@ -673,7 +721,7 @@ class Thesis(object):
 
   def normalize(self):              # makes the object consistent
     def print_norm(print_what):
-      debug_print("NORMALIZATION: " + print_what)
+      print("NORMALIZATION: " + str(print_what))
 
     if self.opponents == None:
       print_norm("correcting oppoentnts (None to [])")
@@ -835,18 +883,20 @@ class PDFInfo(object):
         self.typesetting_system = SYSTEM_OTHER
 
     except Exception as e:
-      debug_print("could not analyze PDF: " + str(e))
+      print("could not analyze PDF: " + str(e))
 
 def beautify_list(keywords):  # removes duplicates, empties, strips etc.
   return [item.decode("utf-8") for item in
     map(lambda s: s.lstrip().rstrip(),
       filter(lambda item: item != None,list(set(keywords)))) if len(item) > 1]
 
-def download_webpage(url,encoding="utf-8"):
-  #random_proxy = random.choice(PROXIES)
-  random_proxy = None
-  progress_print("using proxy " + str(random_proxy))
-  wait_for = 10.0
+def download_webpage(url,encoding="utf-8",try_proxy=True):
+  if try_proxy:
+    random_proxy = random.choice(PROXIES)
+  else:
+    random_proxy = None
+
+  wait_for = 30.0
 
   if random_proxy != None:
     proxies = { "http": random_proxy, "https": random_proxy }
@@ -858,11 +908,10 @@ def download_webpage(url,encoding="utf-8"):
   return r.text
 
 def download_to_file(url, filename):
-  progress_print("downloading file: " + url)
   gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-  web_file = urllib2.urlopen(url,context=gcontext)
+  web_file = urllib2.urlopen(url,context=gcontext,timeout=120)
 
-  with open(filename, "wb") as local_file:
+  with open(filename,"wb") as local_file:
     local_file.write(web_file.read()) 
 
 def download_and_analyze_pdf(url):
@@ -878,3 +927,80 @@ def get_file_text(filename):
 
 def starts_with(what, prefix):
   return what[:len(prefix.decode("utf-8"))] == prefix
+
+def grade_to_number(grade):
+  if grade == GRADE_A:
+    return 1.0
+  elif grade == GRADE_B:
+    return 1.5
+  elif grade == GRADE_C:
+    return 2.0
+  elif grade == GRADE_D:
+    return 2.5
+  elif grade == GRADE_E:
+    return 3.0
+  else:
+    return 4.0
+
+def person_to_string(person):
+  if person == None:
+    return "none"
+
+  result = ""
+
+  degrees_after = []
+
+  for degree in person["degrees"]:
+    if degree in DEGREES_AFTER:
+      degrees_after.append(degree)
+    else:
+      result += degree + " "
+
+  result += str(person["name_first"]) + " " + str(person["name_last"])
+
+  for degree in degrees_after:
+    result += " " + degree
+
+  return result
+
+def thesis_to_string(thesis, lang="cs"):
+  if thesis == None:
+    return "none"
+
+  result = ""
+
+  if thesis["author"] != None:
+    result += person_to_string(thesis["author"]) + ": "
+
+  other_lang = "en" if lang == "cs" else "cs"
+
+  result += str(thesis["title_" + lang] if thesis["title_" + lang] != None else thesis["title_" + other_lang])
+
+  if thesis["year"] != None:
+    result += ", " + str(thesis["year"])
+
+  if thesis["faculty"] != None:
+    result += ", " + thesis["faculty"]
+
+  if thesis["kind"] != None:
+    result += ", " + thesis["kind"] + " thesis"
+
+  if thesis["pages"] != None:
+    result += ", " + str(thesis["pages"]) + " pages"
+
+  if thesis["size"] != None:
+    result += ", " + "{0:.2f}".format(thesis["size"] / 1000000.0) + " MB"
+
+  return result
+
+def load_json(filename):
+  text = get_file_text(filename)
+  return json.loads(text,encoding="utf8")
+
+def save_json(what, filename):
+  f = open(filename,"w")
+  f.write(json.dumps(what,sort_keys=True,ensure_ascii=False,indent=1))
+  f.close()
+
+reload(sys)
+sys.setdefaultencoding("utf8")
