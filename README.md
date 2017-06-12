@@ -32,7 +32,7 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 - **most common keywords**: PHP (1159), Java (1108), MySQL (878), informační systém (688), databáze (610)
 - **most common field (estimated)**: computer graphics
 - **oldest thesis**: year 1983, Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, PhD thesis of Ing. Tomáš Hruška
-- **most keywords**: 26
+- **most keywords**: 281, 2006 FIT BUT bachelor's thesis
 
 - **degrees**:
 

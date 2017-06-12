@@ -266,7 +266,7 @@ class Stats(object):
 
     print_record("most keywords", [
         thesis_to_string(self.records["most keywords thesis"]),
-        "keywords (" + str(len(self.records["most keywords thesis"])) + "): " + ", ".join(self.records["most keywords thesis"]["keywords"])
+        "keywords (" + str(len(self.records["most keywords thesis"]["keywords"])) + "): " + ", ".join(self.records["most keywords thesis"]["keywords"])
        ])
  
     if self.records["longest abstract thesis"] != None:
@@ -375,7 +375,7 @@ for thesis in theses:
       if stats.records["shortest abstract thesis"] == None or len(thesis["abstract_cs"]) < len(stats.records["shortest abstract thesis"]["abstract_cs"]):
         stats.records["shortest abstract thesis"] = thesis 
 
-    if stats.records["most keywords thesis"] == None or len(thesis["keywords"]) > len(stats.records["most keywords thesis"]):
+    if stats.records["most keywords thesis"] == None or len(thesis["keywords"]) > len(stats.records["most keywords thesis"]["keywords"]):
       stats.records["most keywords thesis"] = thesis
 
     if thesis["year"] != None:
