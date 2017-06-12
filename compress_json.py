@@ -37,11 +37,18 @@ def compress():    # make the json small, dropping empty characters and null pro
   f = open(OUTPUT_COMPRESSED_FILE,"w")
   f.write("[")
 
+  first = True
+
   for thesis in theses:   # keep one thesis per line for git friendliness
-    line = json.dumps(remove_empty_attributes(thesis),sort_keys=True,ensure_ascii=False,separators=(",",":")) + ",\n"
+    if first:
+      first = False
+    else:
+      f.write(",\n")
+
+    line = json.dumps(remove_empty_attributes(thesis),sort_keys=True,ensure_ascii=False,separators=(",",":"))
     f.write(line)
 
-  f.write("]")
+  f.write("\n]")
   f.close()
 
 compress()

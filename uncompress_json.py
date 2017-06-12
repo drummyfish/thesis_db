@@ -2,12 +2,13 @@ from common import save_json, Thesis, get_file_text
 import sys
 import json
 
-INPUT_FILE = "theses.json"
+INPUT_FILE = "theses_compressed.json"
 OUTPUT_UNCOMPRESSED_FILE = "theses.json"
 
 reload(sys)
 sys.setdefaultencoding("utf8")
 db_text = get_file_text(INPUT_FILE)
+
 theses = json.loads(db_text,encoding="utf8")
 
 def uncompress():  # makes the json big and readable again
