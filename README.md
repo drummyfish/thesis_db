@@ -16,8 +16,8 @@ topics have been covered in the huge area of computer science.
   - The DB is not and probably will never be completed.
 
   - The Python scripts, especially `make_db.py`, do not work out of the box
-    and shouldn't be just run. The code is here mostly for reference, so do
-    not run it.
+    and shouldn't be just run. Also the code is ugly as it's not meant to be reusable.
+    The code is here mostly for reference, so do not run it.
 
 # Info and Interesting Statistics
 
