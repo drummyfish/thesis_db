@@ -33,7 +33,7 @@
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25333     2350      3090      5354      
+  25369     2352      3105      5301      
 
 ~~~~~ other ~~~~~
 
@@ -56,11 +56,11 @@
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 483
-    Open/Libre Office: 61
-    LaTeX: 110
-    ghostscript: 2
-    unknown: 35402
+    MS Word: 523
+    Open/Libre Office: 79
+    LaTeX: 206
+    ghostscript: 3
+    unknown: 35185
 
  -- largest thesis: dagmar tkadlecová: Výuková aplikace pro předškolní děti, 2012, FELK CTU, master thesis, 97 pages, 19.62 MB
 

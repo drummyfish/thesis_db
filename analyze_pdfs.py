@@ -5,7 +5,7 @@ from common import *
 
 INPUT_FILE = "theses_pdf_updated.json"
 OUTPUT_FILE = "theses_pdf_updated.json"
-END_AFTER = 20
+END_AFTER = 200
 
 theses = load_json(INPUT_FILE)
 
