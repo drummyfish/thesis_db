@@ -3,37 +3,37 @@
 ~~~~~ faculties ~~~~~
 
   MFF CUNI         FIT BUT          FI MUNI          FIT CTU          FELK CTU         FEI VŠB         FAI UTB          PEF MENDELU      Unicorn College  other            total            
-  2727             7398             7776             888              3319             8794             4370             419              205              231              36127            
+  2727             7405             7776             888              3319             8794             4370             419              205              231              36134            
 
 ~~~~~ gender ~~~~~
 
   male            female          unknown         
-  31883           2657            1587            
+  31999           2664            1471            
 
 ~~~~~ degrees ~~~~~
 
   Bc.             Ing.            Mgr.            PhD.            doc.            RNDr.           
-  18638           7116            4617            956             58              334             
+  18698           7117            4617            959             66              334             
 
 ~~~~~ grades ~~~~~
 
   A                B                C                D                E                F                failed           
-  4371             2826             2183             828              525              309              315              
+  4382             2836             2194             828              525              309              315              
 
   average grade (1 = A, 4 = F) by group:
   FIT BUT          FI MUNI          FELK CTU         FAI UTB          MFF CUNI         Unicorn College  PEF MENDELU      male             female           
-  1.81             N/A              N/A              1.48             1.42             1.35             N/A              1.63             1.49             
+  1.81             N/A              N/A              1.48             1.42             1.42             N/A              1.63             1.49             
 
 ~~~~~ years ~~~~~
 
   year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
-  total:       0     1     4     71    59    103   152   125   252   209   362   434   495   590   641   919   2050  2324  2859  3032  2919  3085  3121  3164  2878  2259  2146  562   
+  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2059  2330  2869  3038  2929  3091  3128  3171  2886  2270  2151  562   
   female/male: 0.00  0.00  0.00  0.05  0.02  0.23  0.10  0.05  0.06  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.14  0.14  0.11  
 
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25369     2352      3105      5301      
+  25487     2354      3107      5186      
 
 ~~~~~ other ~~~~~
 
@@ -58,25 +58,29 @@
  -- typesetting systems: 
     MS Word: 523
     Open/Libre Office: 79
-    LaTeX: 206
+    LaTeX: 207
     ghostscript: 3
-    unknown: 35185
+    unknown: 35191
 
  -- largest thesis: dagmar tkadlecová: Výuková aplikace pro předškolní děti, 2012, FELK CTU, master thesis, 97 pages, 19.62 MB
 
  -- smallest thesis: Ondřej Svačina: Analýza RFID čipů prostřednictvím mikroskopické analýzy, 2012, FIT BUT, bachelor thesis, 15 pages, 0.17 MB
 
+ -- shortest PhD. thesis: Ing. Michal Košťál PhD.: Market-based Resource Allocation in Non-Dedicated Clusters, 2012, FIT CTU, PhD thesis, 62 pages, 0.60 MB
+
+ -- shortest habilitation thesis: Petr Hanáček: Kritéria hodnocení bezpečnosti informačních systémů, 2005, FIT BUT, habilitation thesis, 71 pages
+
  -- most common keywords: 
-    php (1159)
-    java (1108)
-    mysql (878)
-    informační systém (688)
-    databáze (610)
+    php (1162)
+    java (1110)
+    mysql (880)
+    informační systém (691)
+    databáze (611)
 
  -- most common fields (estimated): 
-    computer graphics (3233)
+    computer graphics (3236)
     hardware (3111)
-    information systems (2461)
+    information systems (2465)
     software engineering (839)
     theoretical computer science (638)
 

@@ -5,7 +5,7 @@ import theses_common
 import traceback
 import sys
 
-theses = theses_common.load_json("theses.json")
+theses = theses_common.load_json("../theses.json")
 
 RECORDED_FACULTIES = [theses_common.FACULTY_MFF_CUNI,
   theses_common.FACULTY_FIT_BUT,
@@ -119,6 +119,9 @@ class Stats(object):
         "grade average female": (0.0,0),
 
         "oldest thesis": None,
+
+        "shortest phd thesis": None,
+        "shortest habilitation thesis": None,
 
         theses_common.LANGUAGE_CS: 0,
         theses_common.LANGUAGE_EN: 0,
@@ -247,6 +250,9 @@ class Stats(object):
 
     print_record("largest thesis", [theses_common.thesis_to_string(self.records["largest thesis"])])
     print_record("smallest thesis", [theses_common.thesis_to_string(self.records["smallest thesis"])])
+
+    print_record("shortest PhD. thesis",[theses_common.thesis_to_string(self.records["shortest phd thesis"])])
+    print_record("shortest habilitation thesis",[theses_common.thesis_to_string(self.records["shortest habilitation thesis"])])
 
     keywords = [k for k in self.records if type(k) is unicode and theses_common.starts_with(k,"keyword ")]
     keyword_histogram = sorted([(k[8:],self.records[k]) for k in keywords],key = lambda item: -1 * item[1])
@@ -378,6 +384,14 @@ for thesis in theses:
     if thesis["year"] != None:
       if stats.records["oldest thesis"] == None or thesis["year"] < stats.records["oldest thesis"]["year"]:
         stats.records["oldest thesis"] = thesis
+
+    if thesis["kind"] == theses_common.THESIS_PHD and thesis["pages"] != None:
+      if stats.records["shortest phd thesis"] == None or thesis["pages"] < stats.records["shortest phd thesis"]["pages"]:
+        stats.records["shortest phd thesis"] = thesis
+
+    if thesis["kind"] == theses_common.THESIS_DOC and thesis["pages"] != None:
+      if stats.records["shortest habilitation thesis"] == None or thesis["pages"] < stats.records["shortest habilitation thesis"]["pages"]:
+        stats.records["shortest habilitation thesis"] = thesis
 
     people = []
 
