@@ -1,6 +1,6 @@
 # Czech Computer Science Thesis Database
 
-This is a (still work-in-progress) JSON DB of university theses written in the Czech Republic, made
+This is a (still work-in-progress) JSON DB of computer science university theses written in the Czech Republic, made
 with Python 2.7.
 
 These theses are usually freely available at university websites, but each of these websites has
@@ -62,13 +62,13 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 # Format
 
 In the repository here, the DB is stored in JSON that is compressed
-(no whitechars or empty attributes) to not waste space. The file is
-named `theses_compressed.json`.
+(no whitechars or empty attributes) to not waste space. It is still a
+valid JSON. The file is named `theses_compressed.json`.
 
 It is more convenient and sometimes (for the tools in this repo)
-required to uncompress the JSON (so that the object have all the
+required to decompress the JSON (so that the object have all the
 attributes, set to `null` if unknown). This can be done with
-`uncompress_json.py`.
+`decompress_json.py`.
 
 The database is a JSON list consisting of objects in format:
 
