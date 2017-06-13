@@ -1,6 +1,7 @@
 # Czech Computer Science Thesis Database
 
-This is a (still work-in-progress) JSON DB of university theses written in the Czech Republic.
+This is a (still work-in-progress) JSON DB of university theses written in the Czech Republic, made
+with Python 2.7.
 
 These theses are usually freely available at university websites, but each of these websites has
 a different interface, shows different info in different formats, allows limited searching etc.
@@ -15,7 +16,7 @@ topics have been covered in the huge area of computer science.
 
   - The DB is not and probably will never be completed.
 
-  - The Python scripts, especially `make_db.py`, do not work out of the box
+  - The Python scripts in `scripts_do_not_use` do not work out of the box
     and shouldn't be just run. Also the code is ugly as it's not meant to be reusable.
     The code is here mostly for reference, so do not run it.
 
@@ -122,7 +123,11 @@ where Person is another JSON object:
 ```
 # How to Work With the Database
 
-In any way you want. This repo, however, offers some tools you may find useful:
+In any way you want, it's JSON. Firstly run `run_me.py` though, as it uncompresses the JSON etc.
 
-- `inspect.html`: Simple HTML viewer that allows for advanced search, sorting etc. Tested only in Chrome.
+This repo offers some tools you may find useful, located in the `tools` folder
+(I'm still working on these so don't expect them to work perfectly):
+
+- `inspect.html`: Simple HTML viewer that allows for advanced search, sorting etc. Tested only in Chrome. This tool should be suitable to most people for quick searches and inspections.
 - `stats.py`: Computes the statistics of the database (see above).
+- `theses_common.py`: Common stuff you may find useful when working with the DB from within Python.

@@ -6,6 +6,8 @@
 
 from common import *
 
+ANALYZE_PDFS = True
+
 reload(sys)
 sys.setdefaultencoding("utf8")
 
@@ -1038,7 +1040,7 @@ class FeiVsbDownloader(FacultyDownloader):
     while True:    # for each page
       progress_print("downloading FEI VSB thesis list, offset " + str(offset))      
 
-      soup = BeautifulSoup(download_webpage(FeiVsbDownloader.BASE_URL + "handle/10084/2564/browse?order=ASC&rpp=" + str(records) + "&sort_by=2&etal=-1&offset=" + str(offset) + "&type=dateissued"),"lxml")
+      soup = BeautifulSoup(download_webpage(FeiVsbDownloader.BASE_URL + "handle/10084/2564/browse?order=ASC&rpp=" + str(records) + "&sort_by=2&etal=-1&offset=" + str(offset) + "&type=dateissued",try_proxy=False),"lxml")
       current = soup.find("h2")
 
       links = iterative_load(soup,
