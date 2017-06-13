@@ -1,15 +1,7 @@
-from common import save_json, Thesis, get_file_text
-import sys
-import json
+import theses_common
 
 INPUT_FILE = "theses_compressed.json"
 OUTPUT_UNCOMPRESSED_FILE = "theses.json"
-
-reload(sys)
-sys.setdefaultencoding("utf8")
-db_text = get_file_text(INPUT_FILE)
-
-theses = json.loads(db_text,encoding="utf8")
 
 def uncompress():  # makes the json big and readable again
   print("uncompressing")
@@ -25,7 +17,7 @@ def uncompress():  # makes the json big and readable again
     if not "degrees" in person:
       person["degrees"] = []
 
-  reference_thesis = Thesis()
+  reference_thesis = theses_common.Thesis()
 
   uncompressed = []
 
@@ -46,6 +38,7 @@ def uncompress():  # makes the json big and readable again
 
     uncompressed.append(new_thesis)
 
-  save_json(uncompressed,OUTPUT_UNCOMPRESSED_FILE)
+  theses_common.save_json(uncompressed,OUTPUT_UNCOMPRESSED_FILE)
 
+theses = theses_common.load_json(INPUT_FILE)
 uncompress()

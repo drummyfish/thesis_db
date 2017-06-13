@@ -1,14 +1,9 @@
-from common import get_file_text
+import theses_common
 import sys
 import json
 
 INPUT_FILE = "theses.json"
 OUTPUT_COMPRESSED_FILE = "theses_compressed.json"
-
-reload(sys)
-sys.setdefaultencoding("utf8")
-db_text = get_file_text(INPUT_FILE)
-theses = json.loads(db_text,encoding="utf8")
 
 def remove_empty_attributes(json_object):
   if not type(json_object) is dict:
@@ -51,4 +46,5 @@ def compress():    # make the json small, dropping empty characters and null pro
   f.write("\n]")
   f.close()
 
+theses = theses_common.load_json(INPUT_FILE) 
 compress()

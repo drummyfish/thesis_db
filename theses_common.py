@@ -1,22 +1,42 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# import standard libs:
 import urllib
 import urllib2
 import ssl
-import langdetect
 import json
-from PyPDF2 import PdfFileReader
-from bs4 import BeautifulSoup
-from bs4 import element
 import random
 import os
 import sys
 import traceback
-import requests
 import copy
 
-ANALYZE_PDFS = True
+# import non-standard libs:
+
+def import_warning_print(module_name):
+  print("Warning: could not load module " + module_name)
+
+try:
+  import langdetect
+except Exception:
+  import_warning_print("langdetect")
+
+try:
+  from PyPDF2 import PdfFileReader
+except Exception:
+  import_warning_print("PyPDF2")
+
+try:
+  from bs4 import BeautifulSoup
+  from bs4 import element
+except Exception:
+  import_warning_print("BeautifulSoup")
+
+try:
+  import requests
+except Exception:
+  import_warning_print("requests")
 
 THESIS_BACHELOR = "bachelor"    # Bc.
 THESIS_MASTER = "master"        # Ing., Mgr., ...

@@ -1,58 +1,55 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
-from pprint import pprint
-from common import *
+import theses_common
+import traceback
+import sys
 
-reload(sys)
-sys.setdefaultencoding("utf8")
+theses = theses_common.load_json("theses.json")
 
-theses = load_json("theses.json")
-
-RECORDED_FACULTIES = [FACULTY_MFF_CUNI,
-  FACULTY_FIT_BUT,
-  FACULTY_FI_MUNI,
-  FACULTY_FIT_CTU,
-  FACULTY_FELK_CTU,
-  unicode(FACULTY_FEI_VSB),
-  FACULTY_FAI_UTB,
-  FACULTY_PEF_MENDELU,
-  FACULTY_UC]
+RECORDED_FACULTIES = [theses_common.FACULTY_MFF_CUNI,
+  theses_common.FACULTY_FIT_BUT,
+  theses_common.FACULTY_FI_MUNI,
+  theses_common.FACULTY_FIT_CTU,
+  theses_common.FACULTY_FELK_CTU,
+  unicode(theses_common.FACULTY_FEI_VSB),
+  theses_common.FACULTY_FAI_UTB,
+  theses_common.FACULTY_PEF_MENDELU,
+  theses_common.FACULTY_UC]
 
 YEAR_RANGE = range(1990,2018)
 
 FACULTY_GRADE_AVERAGES = [
-    FACULTY_FIT_BUT,
-    FACULTY_FI_MUNI,
-    FACULTY_FELK_CTU,
-    FACULTY_FAI_UTB,
-    FACULTY_MFF_CUNI,
-    FACULTY_UC,
-    FACULTY_PEF_MENDELU
+    theses_common.FACULTY_FIT_BUT,
+    theses_common.FACULTY_FI_MUNI,
+    theses_common.FACULTY_FELK_CTU,
+    theses_common.FACULTY_FAI_UTB,
+    theses_common.FACULTY_MFF_CUNI,
+    theses_common.FACULTY_UC,
+    theses_common.FACULTY_PEF_MENDELU
   ]
 
 DEGREE_SCORES = {
-  DEGREE_DOC: 3.0,
-  DEGREE_PROF: 3.7,
-  DEGREE_CSC: 2.5,
-  DEGREE_THD: 2.1,
-  DEGREE_DIPLING: 1.6,
-  DEGREE_DIS: 0.5,
-  DEGREE_DR: 2.1,
-  DEGREE_MBA: 2.0
+  theses_common.DEGREE_DOC: 3.0,
+  theses_common.DEGREE_PROF: 3.7,
+  theses_common.DEGREE_CSC: 2.5,
+  theses_common.DEGREE_THD: 2.1,
+  theses_common.DEGREE_DIPLING: 1.6,
+  theses_common.DEGREE_DIS: 0.5,
+  theses_common.DEGREE_DR: 2.1,
+  theses_common.DEGREE_MBA: 2.0
   }
 
-for d in DEGREES_BC:
+for d in theses_common.DEGREES_BC:
   DEGREE_SCORES[d] = 1.0
 
-for d in DEGREES_MASTER:
+for d in theses_common.DEGREES_MASTER:
   DEGREE_SCORES[d] = 1.7
 
-for d in DEGREES_DR:
+for d in theses_common.DEGREES_DR:
   DEGREE_SCORES[d] = 2.1
 
-for d in DEGREES_PHD:
+for d in theses_common.DEGREES_PHD:
   DEGREE_SCORES[d] = 2.5
 
 def table_row(cells,cell_width=20):
@@ -84,18 +81,18 @@ class Stats(object):
 
     self.records = {
         "total": 0,
-        THESIS_BACHELOR: 0,
-        THESIS_MASTER: 0,
-        THESIS_PHD: 0,
-        THESIS_DR: 0,
-        THESIS_DOC: 0,
+        theses_common.THESIS_BACHELOR: 0,
+        theses_common.THESIS_MASTER: 0,
+        theses_common.THESIS_PHD: 0,
+        theses_common.THESIS_DR: 0,
+        theses_common.THESIS_DOC: 0,
   
-        GRADE_A: 0,
-        GRADE_B: 0,
-        GRADE_C: 0,
-        GRADE_D: 0,
-        GRADE_E: 0,
-        GRADE_F: 0,
+        theses_common.GRADE_A: 0,
+        theses_common.GRADE_B: 0,
+        theses_common.GRADE_C: 0,
+        theses_common.GRADE_D: 0,
+        theses_common.GRADE_E: 0,
+        theses_common.GRADE_F: 0,
 
         "not defended": 0,
 
@@ -123,15 +120,15 @@ class Stats(object):
 
         "oldest thesis": None,
 
-        LANGUAGE_CS: 0,
-        LANGUAGE_EN: 0,
-        LANGUAGE_SK: 0,
+        theses_common.LANGUAGE_CS: 0,
+        theses_common.LANGUAGE_EN: 0,
+        theses_common.LANGUAGE_SK: 0,
         "unknown language": 0,
 
-        SYSTEM_WORD: 0,
-        SYSTEM_OPEN_OFFICE: 0,
-        SYSTEM_LATEX: 0,
-        SYSTEM_GHOSTSCRIPT: 0,
+        theses_common.SYSTEM_WORD: 0,
+        theses_common.SYSTEM_OPEN_OFFICE: 0,
+        theses_common.SYSTEM_LATEX: 0,
+        theses_common.SYSTEM_GHOSTSCRIPT: 0,
         "system unknown": 0
       }
 
@@ -141,7 +138,7 @@ class Stats(object):
     for faculty in FACULTY_GRADE_AVERAGES:
       self.records["grade average " + faculty] = (0.0,0) 
 
-    for degree in DEGREES:
+    for degree in theses_common.DEGREES:
       self.records[degree] = 0
 
     for year in YEAR_RANGE:
@@ -149,7 +146,7 @@ class Stats(object):
       self.records[str(year) + " male"] = 0
       self.records[str(year) + " female"] = 0
 
-    for field in ALL_FIELDS:
+    for field in theses_common.ALL_FIELDS:
       self.records["field " + field] = 0
 
   def try_increment(self, key):
@@ -187,15 +184,15 @@ class Stats(object):
 
     print_heading("degrees")
     cell_width = 16
-    degrees = [DEGREE_BC, DEGREE_ING, DEGREE_MGR, DEGREE_PHD, DEGREE_DOC, DEGREE_RNDR]
+    degrees = [theses_common.DEGREE_BC, theses_common.DEGREE_ING, theses_common.DEGREE_MGR, theses_common.DEGREE_PHD, theses_common.DEGREE_DOC, theses_common.DEGREE_RNDR]
     degree_sums = [self.records[d] for d in degrees]
     print("  " + table_row( degrees,cell_width) )
     print("  " + table_row( degree_sums,cell_width) )
 
     print_heading("grades")
     cell_width = 17
-    print("  " + table_row(ALL_GRADES + ["failed"],cell_width))
-    print("  " + table_row([self.records[g] for g in ALL_GRADES] + [self.records["not defended"]],cell_width))
+    print("  " + table_row(theses_common.ALL_GRADES + ["failed"],cell_width))
+    print("  " + table_row([self.records[g] for g in theses_common.ALL_GRADES] + [self.records["not defended"]],cell_width))
 
     print("\n  average grade (1 = A, 4 = F) by group:")
     groups = FACULTY_GRADE_AVERAGES + ["male","female"]
@@ -218,7 +215,7 @@ class Stats(object):
 
     print_heading("languages")
     cell_width = 10
-    languages = [LANGUAGE_CS,LANGUAGE_SK,LANGUAGE_EN]
+    languages = [theses_common.LANGUAGE_CS,theses_common.LANGUAGE_SK,theses_common.LANGUAGE_EN]
     print("  " + table_row(languages + ["unknown"],cell_width))
     print("  " + table_row([self.records[l] for l in languages] + [self.records["unknown language"]],cell_width))
 
@@ -233,49 +230,49 @@ class Stats(object):
 
       print("")
 
-    print_record("longest title (cs)", ["",thesis_to_string(self.records["longest title cs thesis"])])
-    print_record("longest title (en)", ["",thesis_to_string(self.records["longest title en thesis"],lang="en")])
-    print_record("shortest title (cs)", ["",thesis_to_string(self.records["shortest title cs thesis"])])
-    print_record("shortest title (en)", ["",thesis_to_string(self.records["shortest title en thesis"],lang="en")])
-    print_record("most pages", [thesis_to_string(self.records["most pages thesis"])]) 
-    print_record("least pages", [thesis_to_string(self.records["least pages thesis"])])
-    print_record("oldest thesis",[thesis_to_string(self.records["oldest thesis"])])
+    print_record("longest title (cs)", ["",theses_common.thesis_to_string(self.records["longest title cs thesis"])])
+    print_record("longest title (en)", ["",theses_common.thesis_to_string(self.records["longest title en thesis"],lang="en")])
+    print_record("shortest title (cs)", ["",theses_common.thesis_to_string(self.records["shortest title cs thesis"])])
+    print_record("shortest title (en)", ["",theses_common.thesis_to_string(self.records["shortest title en thesis"],lang="en")])
+    print_record("most pages", [theses_common.thesis_to_string(self.records["most pages thesis"])]) 
+    print_record("least pages", [theses_common.thesis_to_string(self.records["least pages thesis"])])
+    print_record("oldest thesis",[theses_common.thesis_to_string(self.records["oldest thesis"])])
 
     print_record("typesetting systems",["",
-      "MS Word: " + str(self.records[SYSTEM_WORD]),
-      "Open/Libre Office: " + str(self.records[SYSTEM_OPEN_OFFICE]),
-      "LaTeX: " + str(self.records[SYSTEM_LATEX]),
-      "ghostscript: " + str(self.records[SYSTEM_GHOSTSCRIPT]),
+      "MS Word: " + str(self.records[theses_common.SYSTEM_WORD]),
+      "Open/Libre Office: " + str(self.records[theses_common.SYSTEM_OPEN_OFFICE]),
+      "LaTeX: " + str(self.records[theses_common.SYSTEM_LATEX]),
+      "ghostscript: " + str(self.records[theses_common.SYSTEM_GHOSTSCRIPT]),
       "unknown: " + str(self.records["system unknown"])])
 
-    print_record("largest thesis", [thesis_to_string(self.records["largest thesis"])])
-    print_record("smallest thesis", [thesis_to_string(self.records["smallest thesis"])])
+    print_record("largest thesis", [theses_common.thesis_to_string(self.records["largest thesis"])])
+    print_record("smallest thesis", [theses_common.thesis_to_string(self.records["smallest thesis"])])
 
-    keywords = [k for k in self.records if type(k) is unicode and starts_with(k,"keyword ")]
+    keywords = [k for k in self.records if type(k) is unicode and theses_common.starts_with(k,"keyword ")]
     keyword_histogram = sorted([(k[8:],self.records[k]) for k in keywords],key = lambda item: -1 * item[1])
 
     print_record("most common keywords",[""] + map(lambda item: item[0] + " (" + str(item[1]) + ")",keyword_histogram[:5]))
 
-    field_histogram = sorted([(f,self.records["field " + f]) for f in ALL_FIELDS],key = lambda item: -1 * item[1])
+    field_histogram = sorted([(f,self.records["field " + f]) for f in theses_common.ALL_FIELDS],key = lambda item: -1 * item[1])
 
     print_record("most common fields (estimated)",[""] + map(lambda item: item[0] + " (" + str(item[1]) + ")",field_histogram[:5]))
 
-    print_record("person with most degrees", [person_to_string(self.records["most degrees person"])])
+    print_record("person with most degrees", [theses_common.person_to_string(self.records["most degrees person"])])
     
-    print_record("person with greatest degree score", [person_to_string(self.records["greatest degree score person"])])
+    print_record("person with greatest degree score", [theses_common.person_to_string(self.records["greatest degree score person"])])
 
     print_record("most keywords", [
-        thesis_to_string(self.records["most keywords thesis"]),
+        theses_common.thesis_to_string(self.records["most keywords thesis"]),
         "keywords (" + str(len(self.records["most keywords thesis"]["keywords"])) + "): " + ", ".join(self.records["most keywords thesis"]["keywords"])
        ])
  
     if self.records["longest abstract thesis"] != None:
-      print_record("longest abstract",[thesis_to_string(self.records["longest abstract thesis"]),self.records["longest abstract thesis"]["abstract_cs"]])
+      print_record("longest abstract",[theses_common.thesis_to_string(self.records["longest abstract thesis"]),self.records["longest abstract thesis"]["abstract_cs"]])
     else:
       print_record("longest abstract",["unresolved"])    
 
     if self.records["longest abstract thesis"] != None:
-      print_record("shortest abstract",[thesis_to_string(self.records["shortest abstract thesis"]),self.records["shortest abstract thesis"]["abstract_cs"]])
+      print_record("shortest abstract",[theses_common.thesis_to_string(self.records["shortest abstract thesis"]),self.records["shortest abstract thesis"]["abstract_cs"]])
     else:
       print_record("shortest abstract",["unresolved"])    
 
@@ -323,12 +320,12 @@ for thesis in theses:
       if thesis["author"] != None and thesis["author"]["sex"] != None:
         key_string = "grade average " + thesis["author"]["sex"]
         current = stats.records[key_string]
-        stats.records[key_string] = (current[0] + grade_to_number(thesis["grade"]), current[1] + 1)
+        stats.records[key_string] = (current[0] + theses_common.grade_to_number(thesis["grade"]), current[1] + 1)
 
       if thesis["faculty"] in FACULTY_GRADE_AVERAGES:
         key_string = "grade average " + thesis["faculty"]
         current = stats.records[key_string]
-        stats.records[key_string] = (current[0] + grade_to_number(thesis["grade"]), current[1] + 1)
+        stats.records[key_string] = (current[0] + theses_common.grade_to_number(thesis["grade"]), current[1] + 1)
         
     if thesis["field"] != None: 
       stats.try_increment("field " + thesis["field"])
