@@ -8,7 +8,7 @@
 ~~~~~ gender ~~~~~
 
   male            female          unknown         
-  32000           2664            1471            
+  32001           2664            1470            
 
 ~~~~~ degrees ~~~~~
 
@@ -33,7 +33,7 @@
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25498     2355      3112      5170      
+  25514     2358      3117      5146      
 
 ~~~~~ other ~~~~~
 
@@ -56,11 +56,11 @@
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 542
-    Open/Libre Office: 84
-    LaTeX: 241
-    ghostscript: 4
-    unknown: 35103
+    MS Word: 556
+    Open/Libre Office: 93
+    LaTeX: 267
+    ghostscript: 5
+    unknown: 35023
 
  -- largest thesis: Pavel Celba: Dynamická úroveň detailu, 2007, MFF CUNI, master thesis, 174 pages, 29.04 MB
 

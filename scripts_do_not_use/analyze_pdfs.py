@@ -7,9 +7,9 @@ sys.path.insert(0,"../tools")
 
 from theses_common import *
 
-INPUT_FILE = "theses_pdf_updated.json"
+INPUT_FILE = "../theses.json"
 OUTPUT_FILE = "theses_pdf_updated.json"
-END_AFTER = 100
+END_AFTER = 200
 
 theses = load_json(INPUT_FILE)
 
