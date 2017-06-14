@@ -15,23 +15,39 @@
           margin: 30px;
         }
 
-      #thesis_list td
+      .row_even td
         {
-          border: 1px solid rgb(100,100,000);
-          padding: 5px;
+          background-color: rgb(255,255,255);
+        }
+
+      .row_odd td
+        {
+          background-color: rgb(215,210,220);
+        }
+
+      #thesis_list td, th
+        {
+          padding: 12px 10px;
         }
 
       #thesis_list
         {
           border-collapse: collapse;
           margin: 20px;
+          width: 95%;
+          font-size: 15px;
         }
 
       #thesis_list th
         {
           padding: 10px 0;
-          background-color: rgb(0,0,150);
+          background-color: rgb(100,100,100);
           color: white;
+        }
+
+      #thesis_list a
+        {
+          color: rgb(0,0,50);
         }
 
       #thesis_detail
@@ -107,9 +123,9 @@
       form
         {
           font-size: 10px;
-          background-color: rgb(0,0,0);
+          background-color: rgb(240,240,240);
           padding: 20px;
-          border-radius: 10px;
+          border-radius: 2px;
           margin: 30px;
         }
 
@@ -118,7 +134,7 @@
           border-collapse: collapse;
           table-layout: fixed;
           width: 100%;
-          color: white;
+          color: black;
         }
 
       form table td
@@ -140,6 +156,12 @@
           width: 100%;
           height: 30px;
           font-weight: bold;
+        }
+
+      h1
+        {
+          width: 100%;
+          text-align: center;
         }
 
     </style>
@@ -300,7 +322,9 @@
             {
               var t = thesis_list[i];
 
-              table_row = "<tr> " +
+              class_str = i % 2 == 0 ? "row_even" : "row_odd";
+
+              table_row = "<tr class=\"" + class_str + "\"> " +
                 "<td>" + to_str(t.degree) + "</td>" +
                 "<td>" + to_str(t.faculty) + "</td>" +
                 "<td>" + to_str(t.language) + "</td>" +
@@ -620,7 +644,7 @@
 
       // try to load the json:
 
-      $.getJSON("theses.json", function(json)
+      $.getJSON("../theses.json", function(json)
         {
           theses = json;
           db_loaded();
@@ -695,7 +719,7 @@
       <table>
         <tr>
           <td colspan="3"> search for: <input type="text" name="search_for"> </td>
-          <td colspan="3"> max results: <input type="number" name="max_results" value="50"> </td>
+          <td colspan="3"> max results: <input type="number" name="max_results" value="500"> </td>
           <td colspan="2">
             sort by
             <select name="sort_by">
@@ -809,7 +833,7 @@
 
         <tr>
           <td> year </td>
-          <td colspan="2"> year from: <input name="year_from" type="number" value="1990"> </td>
+          <td colspan="2"> year from: <input name="year_from" type="number" value="1950"> </td>
           <td colspan="2"> year to: <input name="year_to" type="number" value="2020"> </td>
           <td> <input type="checkbox" name="do_year_unknown" checked="checked"> unknown </td>
           <td></td>
