@@ -33,7 +33,7 @@
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25514     2358      3117      5146      
+  25551     2366      3189      5029      
 
 ~~~~~ other ~~~~~
 
@@ -49,24 +49,24 @@
  -- shortest title (en): 
     Jaroslav Burget: IS, 2005, FIT BUT, bachelor thesis
 
- -- most pages: Ing. Jaroslav Sýkora PhD.: Programmable and Customizable Hardware Accelerators for Self-adaptive Virtual Processors in FPGA, 2014, FIT CTU, PhD thesis, 239 pages, 4.22 MB
+ -- most pages: Libor Pekař: Řízení systémů se zpožděním - Algebraický přístup, 2007, FAI UTB, PhD thesis, 324 pages, 2.38 MB
 
- -- least pages: Bc. Martin Foltin: Automated Maze Generation and Human Interaction, 2011, FI MUNI, master thesis, 1 pages, 0.07 MB
+ -- least pages: Bc. Michal Hruška: Studie modernich features HW, 2015, FI MUNI, master thesis, 11 pages, 0.26 MB
 
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 556
-    Open/Libre Office: 93
-    LaTeX: 267
-    ghostscript: 5
-    unknown: 35023
+    MS Word: 591
+    Open/Libre Office: 106
+    LaTeX: 342
+    ghostscript: 7
+    unknown: 34808
 
- -- largest thesis: Pavel Celba: Dynamická úroveň detailu, 2007, MFF CUNI, master thesis, 174 pages, 29.04 MB
+ -- largest thesis: Ing. Michal Zachariáš: Návrh a Aplikace Dvourozměrných Vizuálních Markerů pro Speciální Účely, 2016, FIT BUT, PhD thesis, 162 pages, 32.90 MB
 
- -- smallest thesis: Bc. Martin Foltin: Automated Maze Generation and Human Interaction, 2011, FI MUNI, master thesis, 1 pages, 0.07 MB
+ -- smallest thesis: Ondřej Svačina: Analýza RFID čipů prostřednictvím mikroskopické analýzy, 2012, FIT BUT, bachelor thesis, 15 pages, 0.17 MB
 
- -- shortest PhD. thesis: Ing. Michal Košťál PhD.: Market-based Resource Allocation in Non-Dedicated Clusters, 2012, FIT CTU, PhD thesis, 62 pages, 0.60 MB
+ -- shortest PhD. thesis: Ing. Michal Seeman: Zpracování obrazu pro lepší vjem a interakci, 2012, FIT BUT, PhD thesis, 61 pages, 3.23 MB
 
  -- shortest habilitation thesis: Petr Hanáček: Kritéria hodnocení bezpečnosti informačních systémů, 2005, FIT BUT, habilitation thesis, 71 pages
 

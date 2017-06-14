@@ -26,7 +26,7 @@ for i in range(len(theses)):
 
     random_thesis = theses[random_index]
 
-    if random_thesis["kind"] == THESIS_PHD and random_thesis["faculty"] == FACULTY_FIT_BUT and random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
+    if random_thesis["kind"] == THESIS_PHD and random_thesis["faculty"] == FACULTY_FAI_UTB and random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
 
     #if random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
       print(i,"chosen: " + thesis_to_string(random_thesis))
