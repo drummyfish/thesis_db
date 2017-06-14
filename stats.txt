@@ -33,7 +33,7 @@
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25551     2366      3189      5029      
+  25551     2366      3198      5020      
 
 ~~~~~ other ~~~~~
 
@@ -56,17 +56,17 @@
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 591
-    Open/Libre Office: 106
-    LaTeX: 342
-    ghostscript: 7
-    unknown: 34808
+    MS Word: 593
+    Open/Libre Office: 111
+    LaTeX: 418
+    ghostscript: 13
+    unknown: 34663
 
- -- largest thesis: Ing. Michal Zachariáš: Návrh a Aplikace Dvourozměrných Vizuálních Markerů pro Speciální Účely, 2016, FIT BUT, PhD thesis, 162 pages, 32.90 MB
+ -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
 
  -- smallest thesis: Ondřej Svačina: Analýza RFID čipů prostřednictvím mikroskopické analýzy, 2012, FIT BUT, bachelor thesis, 15 pages, 0.17 MB
 
- -- shortest PhD. thesis: Ing. Michal Seeman: Zpracování obrazu pro lepší vjem a interakci, 2012, FIT BUT, PhD thesis, 61 pages, 3.23 MB
+ -- shortest PhD. thesis: Mgr. Václav Vlček PhD.: Třídy Booleovských formulí s efektivně řešitelným SATem, 2013, MFF CUNI, PhD thesis, 51 pages, 0.60 MB
 
  -- shortest habilitation thesis: Petr Hanáček: Kritéria hodnocení bezpečnosti informačních systémů, 2005, FIT BUT, habilitation thesis, 71 pages
 

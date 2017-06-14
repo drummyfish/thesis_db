@@ -7,7 +7,7 @@ sys.path.insert(0,"../tools")
 
 from theses_common import *
 
-INPUT_FILE = "theses_pdf_updated.json"
+INPUT_FILE = "../theses.json"
 OUTPUT_FILE = "theses_pdf_updated.json"
 END_AFTER = 200
 
@@ -26,10 +26,12 @@ for i in range(len(theses)):
 
     random_thesis = theses[random_index]
 
-    if random_thesis["kind"] == THESIS_PHD and random_thesis["faculty"] == FACULTY_FAI_UTB and random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
+    if random_thesis["kind"] == THESIS_PHD and random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
 
     #if random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
       print(i,"chosen: " + thesis_to_string(random_thesis))
+
+      
       print("needs PDF update")
 
       pdf_info = download_and_analyze_pdf(random_thesis["url_fulltext"])
@@ -48,6 +50,7 @@ for i in range(len(theses)):
       if random_thesis["language"] == None:
         if pdf_info.language in LANGUAGES:
           random_thesis["language"] = pdf_info.language
+      
   except Exception as e:
     print("ERROR: " + str(e))
 
