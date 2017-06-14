@@ -3,17 +3,17 @@
 ~~~~~ faculties ~~~~~
 
   MFF CUNI         FIT BUT          FI MUNI          FIT CTU          FELK CTU         FEI VŠB         FAI UTB          PEF MENDELU      Unicorn College  other            total            
-  2727             7405             7776             888              3319             8794             4370             419              205              231              36134            
+  2727             7406             7776             888              3319             8794             4370             419              205              231              36135            
 
 ~~~~~ gender ~~~~~
 
   male            female          unknown         
-  31999           2664            1471            
+  32000           2664            1471            
 
 ~~~~~ degrees ~~~~~
 
   Bc.             Ing.            Mgr.            PhD.            doc.            RNDr.           
-  18698           7117            4617            959             66              334             
+  18698           7118            4617            959             66              334             
 
 ~~~~~ grades ~~~~~
 
@@ -27,13 +27,13 @@
 ~~~~~ years ~~~~~
 
   year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
-  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2059  2330  2869  3038  2929  3091  3128  3171  2886  2270  2151  562   
+  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2059  2330  2869  3038  2929  3091  3128  3171  2886  2270  2151  563   
   female/male: 0.00  0.00  0.00  0.05  0.02  0.23  0.10  0.05  0.06  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.14  0.14  0.11  
 
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25487     2354      3107      5186      
+  25498     2355      3112      5170      
 
 ~~~~~ other ~~~~~
 
@@ -51,20 +51,20 @@
 
  -- most pages: Ing. Jaroslav Sýkora PhD.: Programmable and Customizable Hardware Accelerators for Self-adaptive Virtual Processors in FPGA, 2014, FIT CTU, PhD thesis, 239 pages, 4.22 MB
 
- -- least pages: Mgr. Jan Vykopal: Flow-based Intrusion Detection in Large and High-Speed Networks, 2010, FI MUNI, small doctorate thesis, 5 pages, 0.23 MB
+ -- least pages: Bc. Martin Foltin: Automated Maze Generation and Human Interaction, 2011, FI MUNI, master thesis, 1 pages, 0.07 MB
 
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 523
-    Open/Libre Office: 79
-    LaTeX: 207
-    ghostscript: 3
-    unknown: 35191
+    MS Word: 542
+    Open/Libre Office: 84
+    LaTeX: 241
+    ghostscript: 4
+    unknown: 35103
 
- -- largest thesis: dagmar tkadlecová: Výuková aplikace pro předškolní děti, 2012, FELK CTU, master thesis, 97 pages, 19.62 MB
+ -- largest thesis: Pavel Celba: Dynamická úroveň detailu, 2007, MFF CUNI, master thesis, 174 pages, 29.04 MB
 
- -- smallest thesis: Ondřej Svačina: Analýza RFID čipů prostřednictvím mikroskopické analýzy, 2012, FIT BUT, bachelor thesis, 15 pages, 0.17 MB
+ -- smallest thesis: Bc. Martin Foltin: Automated Maze Generation and Human Interaction, 2011, FI MUNI, master thesis, 1 pages, 0.07 MB
 
  -- shortest PhD. thesis: Ing. Michal Košťál PhD.: Market-based Resource Allocation in Non-Dedicated Clusters, 2012, FIT CTU, PhD thesis, 62 pages, 0.60 MB
 
@@ -78,7 +78,7 @@
     databáze (611)
 
  -- most common fields (estimated): 
-    computer graphics (3236)
+    computer graphics (3237)
     hardware (3111)
     information systems (2465)
     software engineering (839)

@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from common import *
+import sys
+
+sys.path.insert(0,"../tools")
+
+from theses_common import *
 
 INPUT_FILE = "theses_pdf_updated.json"
 OUTPUT_FILE = "theses_pdf_updated.json"
-END_AFTER = 200
+END_AFTER = 100
 
 theses = load_json(INPUT_FILE)
 

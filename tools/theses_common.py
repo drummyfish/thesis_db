@@ -14,6 +14,8 @@ import sys
 import traceback
 import copy
 
+ANALYZE_PDFS = True
+
 # import non-standard libs:
 
 def import_warning_print(module_name):
