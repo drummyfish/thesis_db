@@ -743,18 +743,73 @@ class Thesis(object):
     if self.language == None:
       self.language = pdf_info.language
 
-  def normalize(self):              # makes the object consistent
+  def from_json_object(self,json_object):
+    def try_get_attribute(what,attr_name):
+      try:
+        return what[attr_name]
+      except Exception as e:
+        print("error converting from json: " + str(e))
+        return None
+
+    def person_from_json_object(json_object):
+      if json_object == None:
+        return None
+
+      person = Person()
+      person.degrees = try_get_attribute(json_object,"degrees")
+      person.name_first = try_get_attribute(json_object,"name_first")
+      person.name_last = try_get_attribute(json_object,"name_last")
+      person.sex = try_get_attribute(json_object,"sex")
+      return person
+
+    self.title_en = try_get_attribute(json_object,"title_en")
+    self.title_cs = try_get_attribute(json_object,"title_cs")
+    self.language = try_get_attribute(json_object,"language")
+    self.keywords = try_get_attribute(json_object,"keywords")
+    self.year = try_get_attribute(json_object,"year")
+    self.city = try_get_attribute(json_object,"city")
+    self.kind = try_get_attribute(json_object,"kind")
+    self.degree = try_get_attribute(json_object,"degree")
+    self.faculty = try_get_attribute(json_object,"faculty")
+    self.department = try_get_attribute(json_object,"department")
+    self.url_page = try_get_attribute(json_object,"url_page")
+    self.url_fulltext = try_get_attribute(json_object,"url_fulltext")
+    self.author = person_from_json_object(try_get_attribute(json_object,"author"))
+    self.supervisor = person_from_json_object(try_get_attribute(json_object,"supervisor"))
+    self.grade = try_get_attribute(json_object,"grade")
+    self.defended = try_get_attribute(json_object,"defended")
+    self.pages = try_get_attribute(json_object,"pages")
+    self.typesetting_system = try_get_attribute(json_object,"typesetting_system",)
+
+    self.opponents = []
+
+    for opponent in json_object["opponents"]:
+      self.opponents.append(person_from_json_object(opponent)) 
+
+    self.field = try_get_attribute(json_object,"field")
+    self.abstract_en = try_get_attribute(json_object,"abstract_en")
+    self.abstract_cs = try_get_attribute(json_object,"abstract_cs")
+    self.size = try_get_attribute(json_object,"size")
+    self.public_university = try_get_attribute(json_object,"public_university")
+    self.branch = try_get_attribute(json_object,"branch")
+    self.note = try_get_attribute(json_object,"note")
+
+  def normalize(self):              # makes the object consistent, returns True if changes were made, else False
+    changes_made = False
+
     def print_norm(print_what):
       print("NORMALIZATION: " + str(print_what))
 
     if self.opponents == None:
       print_norm("correcting oppoentnts (None to [])")
+      changes_made = True
       self.opponents = []
 
     self.opponents = filter(lambda item: item != None and isinstance(item,Person),self.opponents)
 
     if self.keywords == None: 
       print_norm("correcting keywords (None to [])")
+      changes_made = True
       self.keywords = []
 
     try:
@@ -767,78 +822,102 @@ class Thesis(object):
 
     if self.author != None and self.author.name_first == None and self.author.name_first == None:
       print_norm("correcting author (set but empty)")
+      changes_made = True
       self.author = None
 
     if self.supervisor != None and self.supervisor.name_first == None and self.supervisor.name_first == None:
       print_norm("correcting supervisor (set but empty)")
+      changes_made = True
       self.supervisor = None
 
     if self.degree != None and not self.degree in DEGREES:
       print_norm("correcting degree (" + str(self.degree) + ")")
+      changes_made = True
       self.degree = None
 
     if self.language != None and not self.language in LANGUAGES:
       print_norm("correcting language (" + str(self.language) + ")")
+      changes_made = True
       self.language = None 
 
     if self.grade != None and not self.grade in ALL_GRADES:
       print_norm("correcting grade (" + str(self.grade) + ")")
+      changes_made = True
       self.grade = None
 
     if self.field != None and not self.field in ALL_FIELDS:
       print_norm("correcting field (" + str(self.field) + ")")
+      changes_made = True
       self.field = None
 
     if self.degree == DEGREE_PHD2: 
       print_norm("correcting degree: " + DEGREE_PHD2 + " -> " + DEGREE_PHD)
+      changes_made = True
       self.degree = DEGREE_PHD
 
     if self.grade == GRADE_F and self.defended != False:
       print_norm("F grade but wrong defended value - correcting")
+      changes_made = True
       self.defended = False
+
+    if self.grade != None and self.grade != GRADE_F and self.defended == None:
+      print_norm("non-F grade but defended not set - correcting")
+      changes_made = True
+      self.defended = True
 
     if self.defended == False and self.grade != None and self.grade != GRADE_F:
       print_norm("not defended but wrong grade - correcting")
+      changes_made = True
       self.defended = True
    
     if self.degree in DEGREES_BC and self.kind != THESIS_BACHELOR:
       print_norm("degree Bc. but kind != bachelor - correcting")
+      changes_made = True
       self.kind = THESIS_BACHELOR 
 
     if self.kind == THESIS_BACHELOR and self.degree != DEGREE_BC:
       print_norm("kind bachelor but degree != Bc. - correcting")
+      changes_made = True
       self.degree = DEGREE_BC
 
     if self.degree in DEGREES_MASTER and self.kind != THESIS_MASTER:
       print_norm("master degree but kind != master - correcting")
+      changes_made = True
       self.kind = THESIS_MASTER
  
     if self.degree == DEGREE_DOC and self.kind != THESIS_DOC:
       print_norm("doc. degree but kind != doc - correcting")
+      changes_made = True
       self.kind = THESIS_DOC
 
     if self.kind == THESIS_DOC and self.degree != DEGREE_DOC:
       print_norm("kind doc but degree != doc. - correcting")
+      changes_made = True
       self.degree = DEGREE_DOC
 
     if self.degree in DEGREES_PHD and self.kind != THESIS_PHD:
       print_norm("PhD degree but kind != phd - correcting")
+      changes_made = True
       self.kind = THESIS_PHD
 
     if self.kind == THESIS_PHD and self.degree != DEGREE_PHD:
       print_norm("kind phd but degree != PhD - correcting")
+      changes_made = True
       self.degree = DEGREE_PHD
 
     if self.degree in DEGREES_DR and self.kind != THESIS_DR:
       print_norm("degree dr but kind != dr - correcting")
+      changes_made = True
       self.kind = THESIS_DR
 
     if self.kind == THESIS_DOC and self.defended != True:
       print_norm("doc thesis and defended != True - correcting")
+      changes_made = True
       self.defended = True
 
     if self.pages != None and not type(self.pages) is int:
       print_norm("number of pages not int - correcting")
+      changes_made = True
 
       try:
         self.pages = int(self.pages)
@@ -847,21 +926,31 @@ class Thesis(object):
 
     if self.year != None and not type(self.year) is int:
       print_norm("year not int - correcting")
+      changes_made = True
       
       try:
         self.year = int(self.year)
 
         if self.year < 1000 or self.year > 3000:
           print_norm("wrong year value (" + str(self.year) + ") - clearing")
+          changes_made = True
           self.year = None
 
       except Exception:
         print_norm("could not convert year to int")
 
+    if self.defended != None and not (type(self.defended) is bool):
+      print_norm("wrong defended value: " + str(self.defended) + ", correcting")
+      self.defended = None
+      changes_made = True
+
     if self.faculty in (FACULTY_FIT_BUT,FACULTY_FIT_CTU,FACULTY_FELK_CTU,
       FACULTY_FAI_UTB,FACULTY_MFF_CUNI,FACULTY_FEI_VSB,FACULTY_FI_MUNI) and self.public_university != True:
       print_norm("public university but public_university != True - correcting")
+      changes_made = True
       self.public_university = True
+
+    return changes_made
 
 class PDFInfo(object):
   def __init__(self, filename):
@@ -1023,7 +1112,7 @@ def load_json(filename):
 
 def save_json(what, filename):
   f = open(filename,"w")
-  f.write(json.dumps(what,sort_keys=True,ensure_ascii=False,indent=1))
+  f.write(json.dumps(what, default=lambda o: o.__dict__, sort_keys=True,ensure_ascii=False,indent=1))
   f.close()
 
 reload(sys)
