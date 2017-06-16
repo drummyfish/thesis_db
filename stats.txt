@@ -3,17 +3,17 @@
 ~~~~~ faculties ~~~~~
 
   MFF CUNI         FIT BUT          FI MUNI          FIT CTU          FELK CTU         FEI VŠB         FAI UTB          PEF MENDELU      Unicorn College  other            total            
-  2727             7406             7776             888              3319             8794             4370             419              205              231              36135            
+  2727             7406             7776             888              3319             8794             4370             419              205              311              36215            
 
 ~~~~~ gender ~~~~~
 
   male            female          unknown         
-  32001           2664            1470            
+  32056           2688            1471            
 
 ~~~~~ degrees ~~~~~
 
   Bc.             Ing.            Mgr.            PhD.            doc.            RNDr.           
-  18698           7118            4617            959             66              334             
+  18778           7118            4617            959             65              334             
 
 ~~~~~ grades ~~~~~
 
@@ -27,13 +27,13 @@
 ~~~~~ years ~~~~~
 
   year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
-  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2059  2330  2869  3038  2929  3091  3128  3171  2886  2270  2151  563   
-  female/male: 0.00  0.00  0.00  0.05  0.02  0.23  0.10  0.05  0.06  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.14  0.14  0.11  
+  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2059  2330  2869  3047  2933  3097  3137  3178  2898  2284  2163  570   
+  female/male: 0.00  0.00  0.00  0.05  0.02  0.23  0.10  0.05  0.06  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.15  0.15  0.11  
 
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25573     2372      3218      4972      
+  25653     2372      3218      4972      
 
 ~~~~~ other ~~~~~
 
@@ -49,7 +49,7 @@
  -- shortest title (en): 
     Jaroslav Burget: IS, 2005, FIT BUT, bachelor thesis
 
- -- most pages: Libor Pekař: Řízení systémů se zpožděním - Algebraický přístup, 2007, FAI UTB, PhD thesis, 324 pages, 2.38 MB
+ -- most pages: Martina Ďásková: Analýza geoinformatického trhu, 2016, MVŠO, bachelor thesis, 63199 pages
 
  -- least pages: Radek Hýža: NoSQL databáze pro ukládání auditních záznamů, 2016, FI MUNI, bachelor thesis, 8 pages, 0.24 MB
 
@@ -60,7 +60,7 @@
     Open/Libre Office: 133
     LaTeX: 511
     ghostscript: 13
-    unknown: 34442
+    unknown: 34522
 
  -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
 
@@ -72,15 +72,15 @@
 
  -- most common keywords: 
     php (1162)
-    java (1110)
+    java (1112)
     mysql (880)
-    informační systém (691)
-    databáze (611)
+    informační systém (694)
+    databáze (612)
 
  -- most common fields (estimated): 
     computer graphics (3237)
     hardware (3111)
-    information systems (2465)
+    information systems (2466)
     software engineering (839)
     theoretical computer science (638)
 

@@ -4,7 +4,7 @@
 # BEWARE!!! This script doesn't work out of the box, so don't just run it.
 # It only provides tools for downloading theses.
 
-from common import *
+from theses_common import *
 
 ANALYZE_PDFS = True
 
@@ -1634,6 +1634,135 @@ class UcDownloader(FacultyDownloader):
 
       result += links
 
+    return result 
+
+#----------------------------------------
+
+class MvsoDownloader(FacultyDownloader):
+
+  def get_thesis_info(self, filename):    # pages have to be downloaded manually because of the shitty MVSO website
+    result = Thesis()
+
+    soup = BeautifulSoup(get_file_text(filename),"lxml")
+
+    result.faculty = FACULTY_MVSO
+    result.city = CITY_OLOMOUC
+    result.public_university = False
+
+    def text_in_table(text):
+      tag = soup.find(lambda t: t.name == "div" and t.get("class") != None and t.get("class")[0] == "prohlizeniEntitaSubdetailPanesCoat").find_next(lambda t: t.name == "th" and t.string.lstrip().rstrip() == text).find_next("td")
+
+      if tag.string != None:
+        tag_string = tag.string
+      else:
+        tag_string = tag.find_next(lambda t: t.name == "a" or t.name == "span").string
+
+      return tag_string.string.lstrip().rstrip()
+      
+    try:
+      result.author = Person(text_in_table("Jméno"),False)
+    except Exception as e:
+      print("could not resolve author: " + str(e))
+
+    try:
+      result.title_cs = text_in_table("Název dle studenta")
+      result.title_en = text_in_table("Název dle studenta v angličtině")
+
+      if result.title_cs == "-":
+        result.title_cs = None
+
+      if result.title_en == "-":
+        result.title_en = None
+    except Exception as e:
+      print("could not resolve title: " + str(e))
+
+    try:
+      result.year = int(text_in_table("Datum obhajoby").split(".")[-1])
+    except Exception as e:
+      print("could not resolve year: " + str(e))
+
+      try:
+        result.year = int(text_in_table("Akad. rok").split("/")[1])
+      except Exception as e:
+        pass 
+
+    try:
+      department_string = text_in_table("Zadávající pracoviště")
+  
+      if department_string == "UIF":
+        result.department = DEPARTMENT_MVSO_UIF
+      elif department_string == "UIM":
+        result.department = DEPARTMENT_MVSO_UIM
+    except Exception as e:
+      print("could not resolve department: " + str(e))
+        
+    try:
+      kind_string = text_in_table("Typ práce")
+
+      if kind_string == "bakalářská":
+        result.kind = THESIS_BACHELOR
+        result.degree = DEGREE_BC
+    except Exception as e:
+      print("could not resolve type: " + str(e))
+
+    try:
+      result.abstract_cs = text_in_table("Anotace")
+
+      if len(result.abstract_cs) < 3:
+        result.abstract_cs = None 
+
+      result.abstract_en = text_in_table("Anotace v angličtině")
+
+      if len(result.abstract_en) < 3:
+        result.abstract_en = None 
+    except Exception as e:
+      print("could not resolve abstract: " + str(e))
+
+    try:
+      result.supervisor = Person(text_in_table("Vedoucí"),False)
+      result.supervisor.name_last = result.supervisor.name_last[0] + result.supervisor.name_last[1:].lower()
+    except Exception as e:
+      print("could not resolve supervisor: " + str(e))
+
+    try:
+      result.pages = int(text_in_table("Rozsah průvodní práce").split()[0])
+    except Exception as e:
+      print("could not resolve pages: " + str(e))
+
+    try:
+      lang_string = text_in_table("Jazyk")
+
+      if lang_string == "CZ":
+        result.language = LANGUAGE_CS
+      elif lang_string == "SK":
+        result.language = LANGUAGE_SL
+      elif lang_string == "EN":
+        result.language = LANGUAGE_EN
+    except Exception as e:
+      print("could not resolve language: " + str(e))
+
+    try:
+      result.pages = int(text_in_table("Rozsah průvodní práce").split()[0])
+    except Exception as e:
+      print("could not resolve pages: " + str(e))
+
+    try:
+      result.keywords = beautify_list(text_in_table("Klíčová slova").split(",") + text_in_table("Klíčová slova v angličtině").split(","))
+    except Exception as e:
+      print("could not resolve language: " + str(e))
+
+    try:
+      state_text = text_in_table("Stav práce")
+
+      if state_text.find("s úspěšnou"):
+        result.defended = True
+
+    except Exception as e:
+      print("could not resolve defended: " + str(e))
+
+    result.field = guess_field_from_keywords(result.keywords)
+
+    result.normalize()
     return result 
 
 #----------------------------------------

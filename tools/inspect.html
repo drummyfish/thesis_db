@@ -525,7 +525,7 @@
               if (!checkbox_checked("do_felk_ctu"))
                 return false;
             }
-          else if (thesis.faculty.substring(0,4) == "FEI ")
+          else if (thesis.faculty && thesis.faculty.substring(0,4) == "FEI ")
             {
               if (!checkbox_checked("do_fei_vsb"))
                 return false;
@@ -563,7 +563,7 @@
               if (!checkbox_checked("do_ostrava"))
                 return false;
             }
-          else if (thesis.city.substring(0,2) == "Zl")
+          else if (thesis.city && thesis.city.substring(0,2) == "Zl")
             {
               if (!checkbox_checked("do_zlin"))
                 return false;

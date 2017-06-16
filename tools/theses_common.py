@@ -298,6 +298,9 @@ DEPARTMENT_FF_MUNI_UHV = "ÚHV FF MU"         # ustav hudebni vychovy
 DEPARTMENT_PDF_MUNI_KTECH = "KTechV PdF MU"  # katedra technicke a informacni vychovy
 DEPARTMENT_FF_MU_UCJ = "ÚČJ FF MU"           # ustav ceskeho jazyka
 
+DEPARTMENT_MVSO_UIM = "MVŠO UIM"             # ustav informatiky a matematiky
+DEPARTMENT_MVSO_UIF = "MVŠO UIF"             # ustav informatiky
+
 DEPARTMENTS_MUNI = [
   DEPARTMENT_FI_MUNI_KPSK,
   DEPARTMENT_FI_MUNI_CVT,
@@ -503,6 +506,7 @@ CITY_PRAHA = "Praha"
 CITY_BRNO = "Brno"
 CITY_OSTRAVA = "Ostrava"
 CITY_ZLIN = "Zlín"
+CITY_OLOMOUC = "Olomouc"
 
 SYSTEM_LATEX = "LaTeX"
 SYSTEM_WORD = "MS Word"
