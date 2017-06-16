@@ -8,6 +8,8 @@ a different interface, shows different info in different formats, allows limited
 This project aims to make a unified database for students and teachers to easily see which
 topics have been covered in the huge area of computer science.
 
+![screenshot](https://github.com/drummyfish/thesis_db/blob/master/screenshot.png?raw=true)
+
 # Important Notes
 
   - Sometimes some information is unavailable online, the crawler can make
