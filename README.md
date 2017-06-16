@@ -25,7 +25,7 @@ topics have been covered in the huge area of computer science.
 Some interesting statistics gathered so far (for more see `stats.txt`).
 
 - **total**: 36127 theses (31872 male, 2654 female, 1601 unknown)
-- **faculties analyzed**:  FIT BUT, FI MUNI, MFF CUNI, FAI UTB, FEI VŠB, FIT CTU, FELK CTU, PEF MENDELU, Unicorn College, FACULTY_FBMI_CTU, FACULTY_FD_CTU, FACULTY_FJFI_CTU, FACULTY_FSV_CTU, MVŠO
+- **faculties analyzed**:  FIT BUT, FI MUNI, MFF CUNI, FAI UTB, FEI VŠB, FIT CTU, FELK CTU, PEF MENDELU, Unicorn College, FBMI CTU, FD CTU, FJFI CTU, FSV CTU, MVŠO
 - **longest title (yes, it's a title)**: Navrhněte a ve VRML naplementujte systém pro 3-D internetovou galerii, která umožní tvorbu virtuálních výstav libovolných uměleckých děl. Následná internetová aplikace umožní do galerie vkládat libovolné 2-D i 3-D modely uměleckých děl a tím realizovat vlastní výstavy.
 - **shortest title**: Risk, 2013 MFF CUNI bachelor's thesis
 - **longest abstract**: 6813 characters (to read see `stats.txt`), 2005 master's thesis at FELK CTU
