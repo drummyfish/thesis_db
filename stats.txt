@@ -18,11 +18,11 @@
 ~~~~~ grades ~~~~~
 
   A                B                C                D                E                F                failed           
-  4382             2836             2194             828              525              309              315              
+  4397             2854             2204             828              525              309              315              
 
   average grade (1 = A, 4 = F) by group:
   FIT BUT          FI MUNI          FELK CTU         FAI UTB          MFF CUNI         Unicorn College  PEF MENDELU      male             female           
-  1.81             N/A              N/A              1.48             1.42             1.42             N/A              1.63             1.49             
+  1.81             N/A              N/A              1.48             1.42             1.43             N/A              1.63             1.49             
 
 ~~~~~ years ~~~~~
 
@@ -33,7 +33,7 @@
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25551     2366      3198      5020      
+  25573     2372      3218      4972      
 
 ~~~~~ other ~~~~~
 
@@ -51,16 +51,16 @@
 
  -- most pages: Libor Pekař: Řízení systémů se zpožděním - Algebraický přístup, 2007, FAI UTB, PhD thesis, 324 pages, 2.38 MB
 
- -- least pages: Bc. Michal Hruška: Studie modernich features HW, 2015, FI MUNI, master thesis, 11 pages, 0.26 MB
+ -- least pages: Radek Hýža: NoSQL databáze pro ukládání auditních záznamů, 2016, FI MUNI, bachelor thesis, 8 pages, 0.24 MB
 
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 593
-    Open/Libre Office: 111
-    LaTeX: 418
+    MS Word: 642
+    Open/Libre Office: 133
+    LaTeX: 511
     ghostscript: 13
-    unknown: 34663
+    unknown: 34442
 
  -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
 

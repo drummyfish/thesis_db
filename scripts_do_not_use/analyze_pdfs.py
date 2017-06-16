@@ -16,22 +16,20 @@ theses = load_json(INPUT_FILE)
 def thesis_needs_pdf_analysis(thesis):
   return thesis["pages"] == None or thesis["typesetting_system"] == None or thesis["size"] == None or thesis["language"] == None
 
-for i in range(len(theses)):
-#for i in range(END_AFTER):
-#  print(i)
+#for i in range(len(theses)):
+for i in range(END_AFTER):
+  print(i)
 
   try:
-    #random_index = random.randint(0,len(theses) - 1)
-    random_index = i
+    random_index = random.randint(0,len(theses) - 1)
+    #random_index = i
 
     random_thesis = theses[random_index]
 
-    if random_thesis["kind"] == THESIS_PHD and random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
-
-    #if random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
+    #if random_thesis["kind"] == THESIS_PHD and random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
+    if random_thesis["url_fulltext"] != None and thesis_needs_pdf_analysis(random_thesis):
       print(i,"chosen: " + thesis_to_string(random_thesis))
-
-      
+ 
       print("needs PDF update")
 
       pdf_info = download_and_analyze_pdf(random_thesis["url_fulltext"])
