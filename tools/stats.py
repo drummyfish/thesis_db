@@ -111,6 +111,7 @@ class Stats(object):
         "shortest title en theses": [None,None,None],
         "most pages thesis": None,
         "least pages thesis": None,
+        "least pages defended thesis": None,
         "most degrees person": None,
         "most master degrees person": None,
         "greatest degree score person": None,
@@ -247,6 +248,7 @@ class Stats(object):
 
     print_record("most pages", [theses_common.thesis_to_string(self.records["most pages thesis"])]) 
     print_record("least pages", [theses_common.thesis_to_string(self.records["least pages thesis"])])
+    print_record("least pages and defended", [theses_common.thesis_to_string(self.records["least pages defended thesis"])])
     print_record("oldest thesis",[theses_common.thesis_to_string(self.records["oldest thesis"])])
 
     print_record("typesetting systems",["",
@@ -317,6 +319,10 @@ for thesis in theses:
 
       if stats.records["least pages thesis"] == None or thesis["pages"] < stats.records["least pages thesis"]["pages"]:
         stats.records["least pages thesis"] = thesis
+
+      if thesis["defended"]:
+        if stats.records["least pages defended thesis"] == None or thesis["pages"] < stats.records["least pages defended thesis"]["pages"]:
+          stats.records["least pages defended thesis"] = thesis
 
     stats.try_increment(thesis["faculty"])
     stats.try_increment(thesis["degree"]) 

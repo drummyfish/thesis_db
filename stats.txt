@@ -18,7 +18,7 @@
 ~~~~~ grades ~~~~~
 
   A                B                C                D                E                F                failed           
-  4438             2893             2230             830              526              309              315              
+  4438             2893             2230             830              526              309              316              
 
   average grade (1 = A, 4 = F) by group:
   FIT BUT          FI MUNI          FELK CTU         FAI UTB          MFF CUNI         Unicorn College  PEF MENDELU      male             female           
@@ -57,9 +57,11 @@
     Jaroslav Košulič: UGE, 2006, FIT BUT, bachelor thesis
     Jakub Jirka: xxx, 2014, FEI VŠB, PhD thesis
 
- -- most pages: Martina Ďásková: Analýza geoinformatického trhu, 2016, MVŠO, bachelor thesis, 63199 pages
+ -- most pages: Libor Pekař: Řízení systémů se zpožděním - Algebraický přístup, 2007, FAI UTB, PhD thesis, 324 pages, 2.38 MB
 
  -- least pages: Radek Hýža: NoSQL databáze pro ukládání auditních záznamů, 2016, FI MUNI, bachelor thesis, 8 pages, 0.24 MB
+
+ -- least pages and defended: Jaroslav Kollár: Optimalizace v zadní části zpětného překladače, 2013, FIT BUT, bachelor thesis, 21 pages, 0.26 MB
 
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
