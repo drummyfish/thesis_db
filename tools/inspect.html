@@ -220,6 +220,14 @@
               return s1.localeCompare(s2);  
             };
 
+          sort_pages = function(a,b)
+            {
+              var p1 = a.pages === null ? -1 : a.pages;
+              var p2 = b.pages === null ? -1 : b.pages;
+
+              return p2 - p1;
+            }
+
           sort_author = function(a,b)
             {
               var s1 = ("" + a.author.name_last + a.author.name_first).toLowerCase();
@@ -235,8 +243,10 @@
             sort_func = sort_year;
           else if (sort_by == 1)
             sort_func = sort_title;
-          else
+          else if (sort_by == 2)
             sort_func = sort_author;
+          else
+            sort_func = sort_pages;
 
           thesis_list.sort(sort_func);
 
@@ -596,6 +606,12 @@
                 return false; 
             }
 
+          if (thesis.pages === null)
+            {
+              if (checkbox_checked("do_pages"))
+                return false; 
+            }
+
           if (thesis.year === null)
             {
               if (!checkbox_checked("do_year_unknown"))
@@ -747,6 +763,7 @@
               <option value="0"> year </option>
               <option value="1"> title </option>
               <option value="2"> author </option>
+              <option value="3"> pages </option>
             </select>
           </td>
           <td> <input type="checkbox" name="do_descending" checked="checked"> desc. </td>
@@ -855,7 +872,7 @@
         <tr>
           <td> other </td>
           <td> <input type="checkbox" name="do_fulltext"> fulltext </td>
-          <td></td>
+          <td> <input type="checkbox" name="do_pages"> pages </td>
           <td></td>
           <td></td>
           <td></td>
