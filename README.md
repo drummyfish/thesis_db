@@ -35,6 +35,7 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 - **most pages**: Řízení systémů se zpožděním - Algebraický přístup, 2007 FAI UTB PhD thesis, 324 pages
 - **longest abstract**: 6813 characters (to read see `stats.txt`), 2005 master's thesis at FELK CTU
 - **shortest abstract**: NIC, failed thesis at FIT BUT from 2012
+- **shortest abstract and defended**: Microsoft Azure výhody a nevýhody služby, 2014 FAI UTB bachelor thesis (the abstract is same as title)
 - **most common keywords**: PHP (1159), Java (1108), MySQL (878), informační systém (688), databáze (610)
 - **most common field (estimated)**: computer graphics
 - **oldest thesis**: year 1983, Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, PhD thesis of Ing. Tomáš Hruška
