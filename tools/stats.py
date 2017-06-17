@@ -52,6 +52,12 @@ for d in theses_common.DEGREES_DR:
 for d in theses_common.DEGREES_PHD:
   DEGREE_SCORES[d] = 2.5
 
+def number_of_master_degrees(person):
+  if person == None or person["degrees"] == None:
+    return 0
+
+  return len(filter(lambda d: d in theses_common.DEGREES_MASTER,person["degrees"]))
+
 def table_row(cells,cell_width=20):
   result = ""
 
@@ -99,13 +105,14 @@ class Stats(object):
         "male": 0,
         "female": 0,
 
-        "longest title cs thesis": None,
-        "longest title en thesis": None,
-        "shortest title cs thesis": None,
-        "shortest title en thesis": None,
+        "longest title cs theses": [None,None,None],
+        "longest title en theses": [None,None,None],
+        "shortest title cs theses": [None,None,None],
+        "shortest title en theses": [None,None,None],
         "most pages thesis": None,
         "least pages thesis": None,
         "most degrees person": None,
+        "most master degrees person": None,
         "greatest degree score person": None,
 
         "longest abstract thesis": None,
@@ -233,10 +240,11 @@ class Stats(object):
 
       print("")
 
-    print_record("longest title (cs)", ["",theses_common.thesis_to_string(self.records["longest title cs thesis"])])
-    print_record("longest title (en)", ["",theses_common.thesis_to_string(self.records["longest title en thesis"],lang="en")])
-    print_record("shortest title (cs)", ["",theses_common.thesis_to_string(self.records["shortest title cs thesis"])])
-    print_record("shortest title (en)", ["",theses_common.thesis_to_string(self.records["shortest title en thesis"],lang="en")])
+    print_record("longest titles (cs)", [""] + [theses_common.thesis_to_string(t) for t in self.records["longest title cs theses"]])
+    print_record("longest titles (en)", [""] + [theses_common.thesis_to_string(t,"en") for t in self.records["longest title en theses"]])
+    print_record("shortest titles (cs)", [""] + [theses_common.thesis_to_string(t) for t in self.records["shortest title cs theses"]])
+    print_record("shortest titles (en)", [""] + [theses_common.thesis_to_string(t,"en") for t in self.records["shortest title en theses"]])
+
     print_record("most pages", [theses_common.thesis_to_string(self.records["most pages thesis"])]) 
     print_record("least pages", [theses_common.thesis_to_string(self.records["least pages thesis"])])
     print_record("oldest thesis",[theses_common.thesis_to_string(self.records["oldest thesis"])])
@@ -264,7 +272,7 @@ class Stats(object):
     print_record("most common fields (estimated)",[""] + map(lambda item: item[0] + " (" + str(item[1]) + ")",field_histogram[:5]))
 
     print_record("person with most degrees", [theses_common.person_to_string(self.records["most degrees person"])])
-    
+    print_record("person with most master degrees", [theses_common.person_to_string(self.records["most master degrees person"])])
     print_record("person with greatest degree score", [theses_common.person_to_string(self.records["greatest degree score person"])])
 
     print_record("most keywords", [
@@ -343,17 +351,25 @@ for thesis in theses:
       helper_str = "longest" if longest else "shortest"
 
       if thesis["title_" + lang] != None:
-        if stats.records[helper_str + " title " + lang + " thesis"] == None:
-          stats.records[helper_str + " title " + lang + " thesis"] = thesis 
-        else:
-          comparison = len(thesis["title_" + lang]) > len(stats.records[helper_str + " title " + lang + " thesis"]["title_" + lang])
+        for i in (2,1,0):
+          if stats.records[helper_str + " title " + lang + " theses"][i] == None:
+            stats.records[helper_str + " title " + lang + " theses"][i] = thesis
+            break 
+          else:
+            comparison = len(thesis["title_" + lang]) > len(stats.records[helper_str + " title " + lang + " theses"][i]["title_" + lang])
           
-          if not longest:
-            comparison = not comparison
+            if not longest:
+              comparison = not comparison
 
-          if comparison:
-            stats.records[helper_str + " title " + lang + " thesis"] = thesis 
- 
+            if comparison:
+              stats.records[helper_str + " title " + lang + " theses"][i] = thesis
+              break
+      
+      if longest:
+        stats.records[helper_str + " title " + lang + " theses"].sort(key=lambda item: 1 if item == None else -1 * len(item["title_" + lang]))
+      else: 
+        stats.records[helper_str + " title " + lang + " theses"].sort(key=lambda item: -1 if item == None else len(item["title_" + lang]))
+
     title_length_helper("cs",thesis,True)
     title_length_helper("cs",thesis,False)
     title_length_helper("en",thesis,True)
@@ -412,6 +428,9 @@ for thesis in theses:
       if stats.records["greatest degree score person"] == None or score > degree_score(stats.records["greatest degree score person"]):
         stats.records["greatest degree score person"] = person
 
+      if stats.records["most master degrees person"] == None or number_of_master_degrees(person) > number_of_master_degrees( stats.records["most master degrees person"]):
+        stats.records["most master degrees person"] = person
+        
   except Exception as e:
     print("error analysing thesis no. " + str(thesis_no) + ": " + str(e))
     traceback.print_exc(file=sys.stdout)

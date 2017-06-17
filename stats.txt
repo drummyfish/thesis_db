@@ -18,36 +18,44 @@
 ~~~~~ grades ~~~~~
 
   A                B                C                D                E                F                failed           
-  4408             2861             2205             830              526              309              315              
+  4438             2893             2230             830              526              309              315              
 
   average grade (1 = A, 4 = F) by group:
   FIT BUT          FI MUNI          FELK CTU         FAI UTB          MFF CUNI         Unicorn College  PEF MENDELU      male             female           
-  1.81             N/A              N/A              1.48             1.42             1.42             N/A              1.63             1.49             
+  1.81             N/A              N/A              1.48             1.42             1.44             N/A              1.63             1.49             
 
 ~~~~~ years ~~~~~
 
   year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
-  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2062  2332  2870  3049  2934  3102  3143  3182  2901  2292  2167  570   
+  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2062  2332  2870  3049  2934  3102  3143  3182  2901  2293  2167  570   
   female/male: 0.00  0.00  0.00  0.05  0.02  0.23  0.10  0.05  0.06  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.15  0.15  0.11  
 
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25686     2380      3230      4919      
+  25706     2383      3233      4893      
 
 ~~~~~ other ~~~~~
 
- -- longest title (cs): 
+ -- longest titles (cs): 
     Pavel Heřman: Navrhněte a ve VRML naplementujte systém pro 3-D internetovou galerii, která umožní tvorbu virtuálních výstav libovolných uměleckých děl. Následná internetová aplikace umožní do galerie vkládat libovolné 2-D i 3-D modely uměleckých děl a tím realizovat vlastní výstavy., 2008, FELK CTU, bachelor thesis
+    Edita Troszoková: Vývoj a rozšíření nástrojů pro úpravu medicínských snímků v prostředí FOTOM-NG za účelem následného zhodnocení změny vzduchového sloupce u pacientů se spánkovým aparátkem při léčbě obstrukčního spánkového syndromu, 2015, FEI VŠB, master thesis
+    Lenka Bacíková: Procesní a datová analýza výrobní části krevního centra s využitím RFID technologie. Část sklad karanténní plazmy v návaznosti na sklad propuštěné karanténní plazmy na sklad expedice, sklad expedice, 2013, FEI VŠB, bachelor thesis
 
- -- longest title (en): 
+ -- longest titles (en): 
     Pavel Heřman: Create and implement 3-D internet gallery system in VRML language, which enable to create any virtual expositions of artwork. The next internet application enable to insert  any  2-D and 3-D artwork models to the gallery and create your own expositions. , 2008, FELK CTU, bachelor thesis
+    Lenka Bacíková: Logistic and Data Analysis of the Subsystem of Blood and Blood Components Taking in a Donor Part using RFID Technology: the Section Quarantine Storage of released Plasma in Response to Store Quarantine Pools for Warehouse Shipping, Warehouse Shipping, 2013, FEI VŠB, bachelor thesis
+    Edita Troszoková: The Development and Enlargement Editing Tools for Medical Images in an FOTOM-NG for Subsequent Evaluation of Cchanges of the Air Column in Patients with Sleep Apparatus for Treating Obstructive Sleep Syndrome, 2015, FEI VŠB, master thesis
 
- -- shortest title (cs): 
+ -- shortest titles (cs): 
     Bc. Miroslav Štola: Risk, 2013, MFF CUNI, bachelor thesis
+    Bc. Michal Čevora: KBang, 2009, MFF CUNI, bachelor thesis
+    Bc. Veronika Čadová: O DSA, 2012, MFF CUNI, bachelor thesis
 
- -- shortest title (en): 
+ -- shortest titles (en): 
     Jaroslav Burget: IS, 2005, FIT BUT, bachelor thesis
+    Jaroslav Košulič: UGE, 2006, FIT BUT, bachelor thesis
+    Jakub Jirka: xxx, 2014, FEI VŠB, PhD thesis
 
  -- most pages: Martina Ďásková: Analýza geoinformatického trhu, 2016, MVŠO, bachelor thesis, 63199 pages
 
@@ -56,11 +64,11 @@
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 670
-    Open/Libre Office: 146
-    LaTeX: 580
-    ghostscript: 15
-    unknown: 34365
+    MS Word: 686
+    Open/Libre Office: 153
+    LaTeX: 608
+    ghostscript: 16
+    unknown: 34285
 
  -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
 
@@ -85,6 +93,8 @@
     theoretical computer science (638)
 
  -- person with most degrees: Dr. RNDr. Mgr. Bc. Jan Křetínský PhD.
+
+ -- person with most master degrees: Ing. Mgr. Mgr. Zdeněk Říha PhD.
 
  -- person with greatest degree score: prof. RNDr. Ing. Ivana Kolingerová CSc.
 
