@@ -118,6 +118,7 @@ class Stats(object):
 
         "longest abstract thesis": None,
         "shortest abstract thesis": None,
+        "shortest abstract defended thesis": None,
         "most keywords thesis": None,
 
         "largest thesis": None,
@@ -287,10 +288,15 @@ class Stats(object):
     else:
       print_record("longest abstract",["unresolved"])    
 
-    if self.records["longest abstract thesis"] != None:
+    if self.records["shortest abstract thesis"] != None:
       print_record("shortest abstract",[theses_common.thesis_to_string(self.records["shortest abstract thesis"]),self.records["shortest abstract thesis"]["abstract_cs"]])
     else:
       print_record("shortest abstract",["unresolved"])    
+
+    if self.records["shortest abstract defended thesis"] != None:
+      print_record("shortest abstract and defended",[theses_common.thesis_to_string(self.records["shortest abstract defended thesis"]),self.records["shortest abstract defended thesis"]["abstract_cs"]])
+    else:
+      print_record("shortest abstract and defended",["unresolved"])    
 
 stats = Stats(theses)
 
@@ -399,6 +405,10 @@ for thesis in theses:
 
       if stats.records["shortest abstract thesis"] == None or len(thesis["abstract_cs"]) < len(stats.records["shortest abstract thesis"]["abstract_cs"]):
         stats.records["shortest abstract thesis"] = thesis 
+
+      if thesis["defended"]:  
+        if stats.records["shortest abstract defended thesis"] == None or len(thesis["abstract_cs"]) < len(stats.records["shortest abstract defended thesis"]["abstract_cs"]):
+          stats.records["shortest abstract defended thesis"] = thesis 
 
     if stats.records["most keywords thesis"] == None or len(thesis["keywords"]) > len(stats.records["most keywords thesis"]["keywords"]):
       stats.records["most keywords thesis"] = thesis

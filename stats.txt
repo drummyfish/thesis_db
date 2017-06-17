@@ -109,3 +109,6 @@
  -- shortest abstract: Ondřej Svačina: Analýza RFID čipů prostřednictvím mikroskopické analýzy, 2012, FIT BUT, bachelor thesis, 15 pages, 0.17 MB
     NIC
 
+ -- shortest abstract and defended: Roman Směták: Microsoft Azure výhody a nevýhody služby, 2014, FAI UTB, bachelor thesis
+    Microsoft Azure výhody a nevýhody služby
+
