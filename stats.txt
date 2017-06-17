@@ -8,32 +8,32 @@
 ~~~~~ gender ~~~~~
 
   male            female          unknown         
-  32056           2688            1471            
+  32563           2727            925             
 
 ~~~~~ degrees ~~~~~
 
   Bc.             Ing.            Mgr.            PhD.            doc.            RNDr.           
-  18778           7118            4617            959             65              334             
+  18780           7118            4617            959             65              334             
 
 ~~~~~ grades ~~~~~
 
   A                B                C                D                E                F                failed           
-  4397             2854             2204             828              525              309              315              
+  4408             2861             2205             830              526              309              315              
 
   average grade (1 = A, 4 = F) by group:
   FIT BUT          FI MUNI          FELK CTU         FAI UTB          MFF CUNI         Unicorn College  PEF MENDELU      male             female           
-  1.81             N/A              N/A              1.48             1.42             1.43             N/A              1.63             1.49             
+  1.81             N/A              N/A              1.48             1.42             1.42             N/A              1.63             1.49             
 
 ~~~~~ years ~~~~~
 
   year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
-  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2059  2330  2869  3047  2933  3097  3137  3178  2898  2284  2163  570   
+  total:       0     1     4     72    60    104   156   125   254   210   368   436   499   594   641   932   2062  2332  2870  3049  2934  3102  3143  3182  2901  2292  2167  570   
   female/male: 0.00  0.00  0.00  0.05  0.02  0.23  0.10  0.05  0.06  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.15  0.15  0.11  
 
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25653     2372      3218      4972      
+  25686     2380      3230      4919      
 
 ~~~~~ other ~~~~~
 
@@ -56,11 +56,11 @@
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 642
-    Open/Libre Office: 133
-    LaTeX: 511
-    ghostscript: 13
-    unknown: 34522
+    MS Word: 670
+    Open/Libre Office: 146
+    LaTeX: 580
+    ghostscript: 15
+    unknown: 34365
 
  -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
 

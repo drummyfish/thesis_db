@@ -325,7 +325,7 @@
               class_str = i % 2 == 0 ? "row_even" : "row_odd";
 
               table_row = "<tr class=\"" + class_str + "\"> " +
-                "<td>" + to_str(t.degree) + "</td>" +
+                "<td>" + (t.degree != null ? to_str(t.degree) : to_str(t.kind)) + "</td>" +
                 "<td>" + to_str(t.faculty) + "</td>" +
                 "<td>" + to_str(t.language) + "</td>" +
                 "<td>" + person_to_string(t.author) + "</td>" +
@@ -411,10 +411,31 @@
                 return false;
             }
 
+          if (thesis.author == null)
+            {
+              if (!checkbox_checked("do_sex_unknown"))
+                return false;
+            }
+          else if (thesis.author.sex == null)
+            {
+              if (!checkbox_checked("do_sex_unknown"))
+                return false;
+            }
+          else if (thesis.author.sex == "male")
+            {
+              if (!checkbox_checked("do_male"))
+                return false;
+            }
+          else if (thesis.author.sex == "female")
+            {
+              if (!checkbox_checked("do_female"))
+                return false;
+            }
+
           if (thesis.kind == "bachelor")     
             {
               if (!checkbox_checked("do_bachelor"))
-                  return false;
+                return false;
             }
           else if (thesis.kind == "master")            
             {
@@ -809,6 +830,20 @@
           <td> <input type="checkbox" name="do_brno" checked="checked"> Brno </td>
           <td> <input type="checkbox" name="do_ostrava" checked="checked"> Ostrava </td>
           <td> <input type="checkbox" name="do_zlin" checked="checked"> Zlin </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+
+        <tr>
+          <td> sex </td>
+          <td> <input type="checkbox" name="do_male" checked="checked"> male </td>
+          <td> <input type="checkbox" name="do_female" checked="checked"> female </td>
+          <td> <input type="checkbox" name="do_sex_unknown" checked="checked"> N/A </td>
+          <td></td>
           <td></td>
           <td></td>
           <td></td>
