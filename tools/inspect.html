@@ -341,7 +341,17 @@
                 "<td>" + person_to_string(t.author) + "</td>" +
                 "<td>" + person_to_string(t.supervisor) + "</td>" +
                 "<td>" + to_str(t.grade) + "</td>" +
-                "<td onmouseenter=\"display_info(" + c + ")\" onmouseleave=\"hide_info()\"> <a href=\"" + t.url_page + "\">" +  (t.title_cs ? t.title_cs : t.title_en) + "</a> </td>";
+                "<td onmouseenter=\"display_info(" + c + ")\" onmouseleave=\"hide_info()\">";
+
+              if (t.url_page)
+                table_row += "<a href=\"" + t.url_page + "\">"; 
+
+              table_row += (t.title_cs ? t.title_cs : t.title_en);
+
+              if (t.url_page)
+                table_row += "</a>";
+
+              table_row += "</td>";
 
               if (t.url_fulltext)
                 table_row += "<td> <a href=\"" + t.url_fulltext + "\"> full </a> </td>"
@@ -659,6 +669,7 @@
                       $("#info_text").html(result.length + " results found.");
                       current_list = sort_theses(result).slice(0,parseInt(input_value("max_results")));
                       display_thesis_list(current_list);
+                      $("#search_button").prop("disabled",false); 
                       break;
                     }
                   else if (next_iteration_in <= 0)
@@ -670,6 +681,7 @@
                 } 
             }
 
+          $("#search_button").prop("disabled",true); 
           setTimeout(iterate,1);
         }
 
@@ -896,7 +908,7 @@
         </tr>
 
         <tr>
-          <td colspan="11"> <input class="search" type="button" value="search" onclick="search_clicked()"> </td>
+          <td colspan="11"> <input class="search" id="search_button" type="button" value="search" onclick="search_clicked()"> </td>
         </tr>
       </table>
     </form>
