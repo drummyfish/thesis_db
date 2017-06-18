@@ -431,6 +431,38 @@
                 return false;
             }
 
+          if (thesis.typesetting_system == null)
+            {
+              if (!checkbox_checked("do_system_unknown"))
+                return false;
+            }
+          else if (thesis.typesetting_system == "other")
+            {
+              if (!checkbox_checked("do_system_other"))
+                return false;
+            }
+          else if (thesis.typesetting_system == "MS Word")
+            {
+              if (!checkbox_checked("do_word"))
+                return false;
+            }
+          else if (thesis.typesetting_system == "OpenOffice")
+            {
+              if (!checkbox_checked("do_open_office"))
+                return false;
+            }
+          else if (thesis.typesetting_system == "LaTeX")
+            {
+              if (!checkbox_checked("do_latex"))
+                return false;
+            }
+          else if (thesis.typesetting_system == "ghostscript")
+            {
+              if (!checkbox_checked("do_ghostscript"))
+                return false;
+            }
+
+
           if (thesis.author == null)
             {
               if (!checkbox_checked("do_sex_unknown"))
@@ -861,6 +893,20 @@
           <td> <input type="checkbox" name="do_zlin" checked="checked"> Zlin </td>
           <td></td>
           <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+
+        <tr>
+          <td> system </td>
+          <td> <input type="checkbox" name="do_word" checked="checked"> Word </td>
+          <td> <input type="checkbox" name="do_open_office" checked="checked"> OpenOffice </td>
+          <td> <input type="checkbox" name="do_latex" checked="checked"> LaTeX </td>
+          <td> <input type="checkbox" name="do_ghostscript" checked="checked"> ghostscript </td>
+          <td> <input type="checkbox" name="do_system_other" checked="checked"> other </td>
+          <td> <input type="checkbox" name="do_system_unknown" checked="checked"> N/A </td>
           <td></td>
           <td></td>
           <td></td>

@@ -33,7 +33,7 @@
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25706     2383      3233      4893      
+  25718     2384      3235      4878      
 
 ~~~~~ other ~~~~~
 
@@ -66,11 +66,11 @@
  -- oldest thesis: Ing. Tomáš Hruška: Modelování sémantiky programovacích jazyků a využití modelů při implementaci programovacích jazyků, 1983, FIT BUT, PhD thesis
 
  -- typesetting systems: 
-    MS Word: 686
-    Open/Libre Office: 153
-    LaTeX: 608
-    ghostscript: 16
-    unknown: 34285
+    MS Word: 701
+    Open/Libre Office: 164
+    LaTeX: 660
+    ghostscript: 17
+    unknown: 34167
 
  -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
 
