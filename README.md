@@ -38,7 +38,7 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 - **shortest abstract and defended**: Microsoft Azure výhody a nevýhody služby, 2014 FAI UTB bachelor thesis (the abstract is same as title)
 - **most common keywords**: PHP (1159), Java (1108), MySQL (878), informační systém (688), databáze (610)
 - **most common field (estimated)**: computer graphics
-- **oldest thesis**: Jiří Kunovský's 1967 master's thesis at FE VUT
+- **oldest thesis**: Jan Honzík's 1966 master thesis
 - **most keywords**: 281, 2006 FIT BUT bachelor's thesis
 
 - **degrees**:

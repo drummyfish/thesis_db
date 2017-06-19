@@ -3,17 +3,17 @@
 ~~~~~ faculties ~~~~~
 
   MFF CUNI         FIT BUT          FI MUNI          FIT CTU          FELK CTU         FEI VŠB         FAI UTB          PEF MENDELU      Unicorn College  other            total            
-  2727             7406             7776             888              3319             8794             4370             419              205              318              36222            
+  2727             7406             7776             888              3321             8794             4370             419              205              330              36236            
 
 ~~~~~ gender ~~~~~
 
   male            female          unknown         
-  32571           2727            924             
+  32585           2727            924             
 
 ~~~~~ degrees ~~~~~
 
   Bc.             Ing.            Mgr.            PhD.            doc.            RNDr.           
-  18780           7120            4617            962             67              334             
+  18780           7126            4617            964             68              335             
 
 ~~~~~ grades ~~~~~
 
@@ -27,13 +27,13 @@
 ~~~~~ years ~~~~~
 
   year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
-  total:       0     1     4     72    60    106   156   125   255   210   368   436   499   594   642   933   2067  2334  2873  3053  2937  3104  3147  3186  2902  2297  2171  570   
-  female/male: 0.00  0.00  0.00  0.05  0.02  0.22  0.10  0.05  0.05  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.15  0.15  0.11  
+  total:       0     1     4     73    60    106   157   126   256   210   368   436   500   594   642   933   2067  2334  2874  3053  2937  3104  3148  3186  2902  2297  2171  570   
+  female/male: 0.00  0.00  0.00  0.04  0.02  0.22  0.10  0.05  0.05  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.15  0.15  0.11  
 
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25738     2385      3245      4854      
+  25758     2389      3250      4839      
 
 ~~~~~ other ~~~~~
 
@@ -63,14 +63,16 @@
 
  -- least pages and defended: Jaroslav Kollár: Optimalizace v zadní části zpětného překladače, 2013, FIT BUT, bachelor thesis, 21 pages, 0.26 MB
 
- -- oldest thesis: Jiří Kunovský: None, 1967, FE VUT, master thesis
+ -- oldest thesis: Jan Honzík: None, 1966, FE BUT, master thesis
+
+ -- oldest fulltext: Ing. Jan Černocký: Speech Processing Using Automatically Derived Segmental Units: Applications to Very Low Rate Coding and Speaker Verification, 1998, FEI BUT, PhD thesis, 137 pages, 1.47 MB
 
  -- typesetting systems: 
-    MS Word: 717
-    Open/Libre Office: 176
-    LaTeX: 705
+    MS Word: 735
+    Open/Libre Office: 181
+    LaTeX: 742
     ghostscript: 18
-    unknown: 34064
+    unknown: 33985
 
  -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
 

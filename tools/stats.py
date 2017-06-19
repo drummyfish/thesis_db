@@ -129,6 +129,8 @@ class Stats(object):
 
         "oldest thesis": None,
 
+        "oldest fulltext": None,
+
         "shortest phd thesis": None,
         "shortest habilitation thesis": None,
 
@@ -251,6 +253,7 @@ class Stats(object):
     print_record("least pages", [theses_common.thesis_to_string(self.records["least pages thesis"])])
     print_record("least pages and defended", [theses_common.thesis_to_string(self.records["least pages defended thesis"])])
     print_record("oldest thesis",[theses_common.thesis_to_string(self.records["oldest thesis"])])
+    print_record("oldest fulltext",[theses_common.thesis_to_string(self.records["oldest fulltext"])])
 
     print_record("typesetting systems",["",
       "MS Word: " + str(self.records[theses_common.SYSTEM_WORD]),
@@ -416,6 +419,10 @@ for thesis in theses:
     if thesis["year"] != None:
       if stats.records["oldest thesis"] == None or thesis["year"] < stats.records["oldest thesis"]["year"]:
         stats.records["oldest thesis"] = thesis
+
+      if thesis["url_fulltext"] != None:
+        if stats.records["oldest fulltext"] == None or thesis["year"] < stats.records["oldest fulltext"]["year"]:
+          stats.records["oldest fulltext"] = thesis
 
     if thesis["kind"] == theses_common.THESIS_PHD and thesis["pages"] != None:
       if stats.records["shortest phd thesis"] == None or thesis["pages"] < stats.records["shortest phd thesis"]["pages"]:
