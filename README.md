@@ -140,6 +140,7 @@ In any way you want, it's JSON. Firstly run `run_me.py` though, as it uncompress
 This repo offers some tools you may find useful, located in the `tools` folder
 (I'm still working on these so don't expect them to work perfectly):
 
+- `run_me.py`: Decompresses the DB to `theses.json` file, makes a plain-text list of theses and CSV format database (delimited with `|`).
 - `inspect.html`: Simple HTML viewer that allows for advanced search, sorting etc. Tested only in Chrome. This tool should be suitable to most people for quick searches and inspections.
 - `stats.py`: Computes the statistics of the database (see above).
 - `theses_common.py`: Common stuff you may find useful when working with the DB from within Python.
