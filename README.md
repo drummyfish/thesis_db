@@ -26,8 +26,8 @@ topics have been covered in the huge area of computer science.
 
 Some interesting statistics gathered so far (for more see `stats.txt`).
 
-- **total**: 36215 theses (32563 male, 2727 female, 925 unknown)
-- **faculties analyzed**:  FIT BUT, FI MUNI, MFF CUNI, FAI UTB, FEI VŠB, FIT CTU, FELK CTU, PEF MENDELU, Unicorn College, FBMI CTU, FD CTU, FJFI CTU, FSV CTU, MVŠO
+- **total**: 39871 theses (35626 male, 3185 female, 1060 unknown)
+- **faculties analyzed**:  FIT BUT, FI MUNI, MFF CUNI, FAI UTB, FEI VŠB, FIT CTU, FELK CTU, PEF MENDELU, Unicorn College, FBMI CTU, FD CTU, FJFI CTU, FSV CTU, MVŠO, FEEC BUT, FME BUT
 - **longest title (yes, it's a title)**: Navrhněte a ve VRML naplementujte systém pro 3-D internetovou galerii, která umožní tvorbu virtuálních výstav libovolných uměleckých děl. Následná internetová aplikace umožní do galerie vkládat libovolné 2-D i 3-D modely uměleckých děl a tím realizovat vlastní výstavy.
 - **shortest title (cs)**: Risk, 2013 MFF CUNI bachelor's thesis
 - **shortest title (en)**: IS, 2005 FIT BUT bachelor's thesis
@@ -36,7 +36,7 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 - **longest abstract**: 6813 characters (to read see `stats.txt`), 2005 master's thesis at FELK CTU
 - **shortest abstract**: NIC, failed thesis at FIT BUT from 2012
 - **shortest abstract and defended**: Microsoft Azure výhody a nevýhody služby, 2014 FAI UTB bachelor thesis (the abstract is same as title)
-- **most common keywords**: PHP (1159), Java (1108), MySQL (878), informační systém (688), databáze (610)
+- **most common keywords**: PHP (1247), Java (1234), MySQL (944), informační systém (703), databáze (660)
 - **most common field (estimated)**: computer graphics
 - **oldest thesis**: Jan Honzík's 1966 master thesis
 - **most keywords**: 281, 2006 FIT BUT bachelor's thesis
@@ -45,13 +45,13 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 
   |Bc.  |Ing.|Mgr.|PhD.|doc.|RNDr|
   |-----|----|----|----|----|----|
-  |18780|7118|4617|959 |65  |334 |
+  |20658|8807|4617|964 |68  |335 |
 
 - **grades**:
 
   |A    |B   |C   |D   |E   |F   |FIT BUT avg.|MFF CUNI avg.|FAI UTB avg.|male avg.|female avg.|
   |-----|----|----|----|----|----|------------|-------------|------------|---------|-----------|
-  |4438 |2893|2230|830 |526 |309 |1.81        |1.42         |1.48        |1.63     |1.49       |
+  |4451 |2905|2236|832 |527 |309 |1.81        |1.42         |1.48        |1.63     |1.49       |
 
 - **female/male ratio by year**:
 
@@ -63,13 +63,13 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 
   |cs   |sk  |en  |unknown|
   |-----|----|----|-------|
-  |25706|2383|3233|4893   |
+  |29021|2676|3334|4840   |
 
 - **typesetting systems**:
 
   |Word|Open Office|LaTeX|ghostscript|unknown|
   |----|-----------|-----|-----------|-------|
-  |686 |153        |608  |16         |34285  |
+  |735 |181        |748  |18         |37611  |
 
 # Format
 
