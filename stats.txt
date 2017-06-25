@@ -3,22 +3,22 @@
 ~~~~~ faculties ~~~~~
 
   MFF CUNI         FIT BUT          FI MUNI          FIT CTU          FELK CTU         FEI VŠB         FAI UTB          PEF MENDELU      Unicorn College  other            total            
-  2727             7406             7776             888              3321             8794             4370             419              205              330              36236            
+  2727             7406             7776             888              3321             8794             4370             419              205              3965             39871            
 
 ~~~~~ gender ~~~~~
 
   male            female          unknown         
-  32585           2727            924             
+  35626           3185            1060            
 
 ~~~~~ degrees ~~~~~
 
   Bc.             Ing.            Mgr.            PhD.            doc.            RNDr.           
-  18780           7126            4617            964             68              335             
+  20658           8807            4617            964             68              335             
 
 ~~~~~ grades ~~~~~
 
   A                B                C                D                E                F                failed           
-  4448             2905             2236             832              527              309              316              
+  4451             2905             2236             832              527              309              316              
 
   average grade (1 = A, 4 = F) by group:
   FIT BUT          FI MUNI          FELK CTU         FAI UTB          MFF CUNI         Unicorn College  PEF MENDELU      male             female           
@@ -27,13 +27,13 @@
 ~~~~~ years ~~~~~
 
   year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
-  total:       0     1     4     73    60    106   157   126   256   210   368   436   500   594   642   933   2067  2334  2874  3053  2937  3104  3148  3186  2902  2297  2171  570   
-  female/male: 0.00  0.00  0.00  0.04  0.02  0.22  0.10  0.05  0.05  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.06  0.06  0.07  0.08  0.09  0.10  0.11  0.15  0.15  0.11  
+  total:       0     1     4     73    60    106   157   126   256   210   368   436   500   594   642   933   2067  2339  3244  3399  3316  3511  3510  3596  3287  2656  2477  876   
+  female/male: 0.00  0.00  0.00  0.04  0.02  0.22  0.10  0.05  0.05  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.05  0.06  0.07  0.08  0.10  0.11  0.13  0.15  0.16  0.17  
 
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  25758     2389      3250      4839      
+  29021     2676      3334      4840      
 
 ~~~~~ other ~~~~~
 
@@ -70,9 +70,9 @@
  -- typesetting systems: 
     MS Word: 735
     Open/Libre Office: 181
-    LaTeX: 742
+    LaTeX: 748
     ghostscript: 18
-    unknown: 33985
+    unknown: 37611
 
  -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
 
@@ -83,24 +83,24 @@
  -- shortest habilitation thesis: Petr Hanáček: Kritéria hodnocení bezpečnosti informačních systémů, 2005, FIT BUT, habilitation thesis, 71 pages
 
  -- most common keywords: 
-    php (1162)
-    java (1112)
-    mysql (880)
-    informační systém (694)
-    databáze (612)
+    php (1247)
+    java (1234)
+    mysql (944)
+    informační systém (703)
+    databáze (660)
 
  -- most common fields (estimated): 
-    computer graphics (3237)
-    hardware (3111)
-    information systems (2466)
-    software engineering (839)
-    theoretical computer science (638)
+    computer graphics (3385)
+    hardware (3134)
+    information systems (2620)
+    software engineering (840)
+    computer networks (812)
 
  -- person with most degrees: Dr. RNDr. Mgr. Bc. Jan Křetínský PhD.
 
  -- person with most master degrees: Ing. Mgr. Mgr. Zdeněk Říha PhD.
 
- -- person with greatest degree score: prof. RNDr. Ing. Ivana Kolingerová CSc.
+ -- person with greatest degree score: prof. Ing. Pavel Koktavý CSc. PhD.
 
  -- most keywords: Jiří Novák: Pokročilý prohlížeč polygonálních modelů, 2006, FIT BUT, bachelor thesis
     keywords (281): dítě objektu směr k potomku, kostka, difusní složka, OpenGL, hierarchy, graphics, ukončení, ending, near plate, přední plocha, shape, světlo, scéna, aspect, koneční automat, osa, flexibile, hierarchie, polygonal model, mlha, projection matrix, video, outer, vlastnost pohled, density, vyplnění, osvětlení, přechod, šířka, scalar value, line width, posunutí, factor, dědičnost, exponencial, Rapid Prototyping, konec, aspekt, paralelní projekce, file, cube, dot prot, testování hlobky, format, anti-aliasing, ASCII verze, material, GUI toolkit, line stipple, binární verze, main menu, venek, matice, background, shading, rotation, strana, grafika, normála, zavření, manager, double precision, transformace, rotace, button, goniometrical functions, systém RGBA, paralel projection, inverzní matice, vektorový součin, filling, vector, ASCII version, mode, implicitní, výška, světelné vlastnosti, movement, basic primitives, side, aproximace, body, pozadí, projekční matice, horizont�l angle, colored vertexes, creation, view angle, struktura, perspective projection, lineární, mnohoúhelník, dvojnásobná přesnost, MDI klient, trojúhelník, čáry, key word, animace, konstantní stínování, color buffer, gradient, clearing, normal, odlesková složka, omezení, imaging style, STL, implicit, fog, orientace, diagram tříd, size, geometrie, method, MDI client, single precision, okřídlená hrana, videosekvence, linear, positron, state, vymazání, control points, materiál, zásobník, velikost bodů, Stach, standardní vzor, vertikální úhel, střed, cross prot, poloha kliku, maskovací bity, Goraud shading, point size, vytvoření, druh přechodu, thread, geometry, depth buffer, facet, specular, gradient type, dialog, kořenový uzel, view, standart view, okolní složka, aktuální natočení, saving, far plate, to parent, popup menu, distance integrity, zrcadlení, scene, šířka čar, height, rendering, standardní pohled, lighting properties, UML, exponenciální, uložení, Phongův osvětlovací model, orientation, ukazatel, current rotation, masking bits, tlačítko, width, object child, inner, 3D, vzdálenost, válec, soubor, vektor, goniometrické funkce, horizontální úhel, class diagram, sofistikovaný způsob, stupně, perspektivní projekce, barva mlhy, modelview matrix, hlavní menu, potomek, angles, child, multitasking, vyhlazení, distance, vnitřek, kopírování, binary version, metoda, základní primitiva, tree, rozměry, transformation, zorný úhel, směr k rodiči, rozptylová složka, closing, property, matrix, cylinder, register, polygonální model, ambient value, standart stipple, registr, stínování, faktor, zadní plocha, řídící body, ambient, click positron, Goraudovo stínování, depth test, počátek, pointer, describtion, triangle, Phong lighting model, pohledová matice, end, polygon, pozice, inheritance, finite automaton, symetrie, vertical angle, animation, copying, difuse value, strom, flat shading, skalární hodnota, stav, klíčové slovo, begin, screenshot, formát, handicap, object, objekt, styl zobrazení, ArcBall, RGBA system, aproximation, lighting, hustota, vlákno, obarvené vrcholy, jednoduchá přesnost, přiblížení, popis, integrita vzdáleností, structure, sophisticated solution, inverse matrix, skalární součin, center, manažer, zooming, light, tvar, lines, Z-buffer, root node, points, fog color, flexibilní, 2D, to child, vzor čar, režim, specular value, flying edge
@@ -111,6 +111,6 @@
  -- shortest abstract: Ondřej Svačina: Analýza RFID čipů prostřednictvím mikroskopické analýzy, 2012, FIT BUT, bachelor thesis, 15 pages, 0.17 MB
     NIC
 
- -- shortest abstract and defended: Roman Směták: Microsoft Azure výhody a nevýhody služby, 2014, FAI UTB, bachelor thesis
-    Microsoft Azure výhody a nevýhody služby
+ -- shortest abstract and defended: Václav Všetička: Sítě FTTx, 2009, FEEC BUT, bachelor thesis
+    Optická komunikace
 

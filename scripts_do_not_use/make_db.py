@@ -4,6 +4,10 @@
 # BEWARE!!! This script doesn't work out of the box, so don't just run it.
 # It only provides tools for downloading theses.
 
+import sys
+import time
+sys.path.insert(0,"../tools")
+
 from theses_common import *
 
 ANALYZE_PDFS = True
@@ -1767,6 +1771,168 @@ class MvsoDownloader(FacultyDownloader):
 
 #----------------------------------------
 
+class ButDownloader(FacultyDownloader):
+
+  BASE_URL = "https://www.vutbr.cz/"
+
+  def get_thesis_list(self):
+    result = []
+
+    faculty_id = 4
+    page = 500
+
+    for faculty_id in (4,5):
+      page = 1
+
+      maximum = 10000
+
+      while True:
+        try:
+          print("downloading page " + str(page))
+          soup = BeautifulSoup(download_webpage("https://www.vutbr.cz/studium/zaverecne-prace?action=search&fid=" + str(faculty_id) + "&str=" + str(page),try_proxy=False),"lxml")
+          real_page = int(soup.select("div.strany span")[-1].string)
+
+          if page != real_page or maximum <= 0:
+            break
+
+          result += [ButDownloader.BASE_URL[:-1] + t.get("href") for t in soup.select("a[title^=\"Detail\"]")]
+        except Exception as e:
+          print("error: " + str(e))   
+
+        page += 1
+        maximum -= 1
+
+    return result
+
+  def get_thesis_info(self,url):
+    # test theses:
+    # https://www.vutbr.cz/studium/zaverecne-prace?zp_id=73799
+    # https://www.vutbr.cz/studium/zaverecne-prace?action=detail&zp_id=14120&hl_klic_slova=0&hl_abstrakt=0&hl_nazev=0&hl_autor=0&str=1094
+    # https://www.vutbr.cz/studium/zaverecne-prace?zp_id=85369
+    # https://www.vutbr.cz/studium/zaverecne-prace?zp_id=93485   
+    # https://www.vutbr.cz/studium/zaverecne-prace?zp_id=93037
+ 
+    result = Thesis()
+
+    soup = BeautifulSoup(download_webpage(url,try_proxy=False),"lxml")
+
+    def text_in_table(what_text,cs=True,normal_row=True):
+      s = soup if cs else soup_en
+      start = s.find("h1",string="Detail závěrečné práce") if cs else s.find("h1",string="Final thesis detail") 
+       
+      if normal_row: 
+        tag = start.find_next("th",string=what_text)
+        return tag.find_next("td").string
+      else:
+        tag = start.find_next("b",string=what_text)
+        return (" ".join(str(c) for c in tag.find_next("blockquote").contents)).replace("<br/>"," ").replace("\n"," ")
+
+    try:
+      branch_string = text_in_table("Obor studia:")
+
+      if branch_string.find("TLI") >= 0:
+        result.branch = BRANCH_FEEC_BUT_TLI
+        result.faculty = FACULTY_FEEC_BUT
+      elif branch_string.find("TIT") >= 0:
+        result.branch = BRANCH_FEEC_BUT_TIT
+        result.faculty = FACULTY_FEEC_BUT
+      elif branch_string.find("BTB") >= 0:
+        result.branch = BRANCH_FEEC_BUT_BTB
+        result.faculty = FACULTY_FEEC_BUT
+      elif branch_string.find("AIŘ") >= 0:
+        result.branch = BRANCH_FME_BUT_AIR
+        result.faculty = FACULTY_FME_BUT
+      else:
+        return None     # non-CS branch
+    except Exception as e:
+      print("error at branch, quitting: " + str(e))
+
+    soup_en = BeautifulSoup(download_webpage(url.replace(".cz/studium/zaverecne-prace",".cz/en/studies/final-thesis"),try_proxy=False),"lxml")
+
+    result.city = CITY_BRNO
+    result.url_page = url.replace("\n","")
+
+    try:
+      result.url_fulltext = ButDownloader.BASE_URL[:-1] + soup.find(lambda t: t.name == "a" and t.string != None and starts_with(t.string,"Hlavní dokument")).get("href")
+    except Exception as e:
+      print("error at fulltext: " + str(e))
+
+    try:
+      result.title_cs = text_in_table("Název:").lstrip().rstrip()
+      result.title_en = text_in_table("Title:",False).lstrip().rstrip()
+    except Exception as e:
+      print("error at title: " + str(e))
+
+    try:
+      result.abstract_cs = text_in_table("Abstrakt:",True,False)
+      result.abstract_en = text_in_table("Abstract:",False,False)
+    except Exception as e:
+      print("error at abstract: " + str(e))
+
+    try:
+      result.keywords = beautify_list(text_in_table("Klíčová slova:",True,False).split(",") + text_in_table("Keywords:",False,False).split(",")) 
+      result.field = guess_field_from_keywords(result.keywords)
+    except Exception as e:
+      print("error at keywords: " + str(e))
+
+    try:
+      result.author = Person(text_in_table("Student:"))
+    except Exception as e:
+      print("error at author: " + str(e))
+
+    try:
+      result.supervisor = Person(text_in_table("Vedoucí:"))
+    except Exception as e:
+      print("error at supervisor: " + str(e))
+
+    try:
+      result.opponents.append(Person(text_in_table("Oponent:")))
+    except Exception as e:
+      print("error at opponent: " + str(e))
+
+    try:
+      lang_str = text_in_table("Jazyk:")
+
+      if lang_str == "čeština":
+        result.language = LANGUAGE_CS
+      elif lang_str == "slovenština":
+        result.language = LANGUAGE_SK
+      elif lang_str == "angličtina":
+        result.language = LANGUAGE_EN
+    except Exception as e:
+      print("error at language: " + str(e))
+
+    try:
+      status_str = text_in_table("Stav:")
+
+      if status_str.find("byla úspěš") >= 0:
+        result.defended = True
+    except Exception as e:
+      print("error at status: " + str(e))
+
+    try:
+      result.year = int(text_in_table("Rok:").split("/")[1])
+    except Exception as e:
+      print("error at year: " + str(e))
+
+    try:
+      type_string = text_in_table("Typ:")
+
+      if starts_with(type_string,"baka"):
+        result.kind = THESIS_BACHELOR
+        result.degree = DEGREE_BC
+      elif starts_with(type_string,"dipl"):
+        result.kind = THESIS_MASTER
+        result.degree = DEGREE_ING
+    except Exception as e:
+      print("error at type: " + str(e))
+
+    result.normalize()
+
+    return result
+
+#----------------------------------------
+
 if __name__ == "__main__":
   fit_but = FitButDownloader()
   ctu = CtuDownloader()
@@ -1777,6 +1943,7 @@ if __name__ == "__main__":
   fi_muni = FiMuniDownloader()
   pef_mendelu = PefMendeluDownloader()
   uc = UcDownloader()
+  but = ButDownloader()
 
   LINK_FILE_NAME = "links.txt"
   LINK_FILE_SHUFFLED = "links_shuffled.txt"
@@ -1959,9 +2126,40 @@ if __name__ == "__main__":
 
   #======================
 
+  link_file = open("but_links.txt","r")
+  theses_file = open("but_theses.txt","w",0) 
+ 
+  count = 0
+
+  for link in link_file:
+    try:
+      print(count)
+    
+      t = but.get_thesis_info(link)
+
+      if t != None:
+        print(str(t))
+        theses_file.write(str(t) + ",\n")
+
+    except Exception as e:
+      print("MAIN LOOP ERROR: " + str(e))
+
+    count += 1
+    time.sleep(1)
+
+  theses_file.close()
+  link_file.close()
+
+  #new_f = open("but_links.txt","w")
+
+  #for p in but.get_thesis_list():
+  #  new_f.write(p + "\n")
+
+  #new_f.close()
+
   #make_thesis_list_file()
   #shuffle_list_file()
-  download_theses()
+  #download_theses()
   #print(PDFInfo("test_smrcka.pdf").typesetting_system)
   #download_theses()
 

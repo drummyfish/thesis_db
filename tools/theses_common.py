@@ -173,6 +173,14 @@ FACULTY_FD_CTU      = "FD CTU"     # fakulta dopravni
 FACULTY_FJFI_CTU    = "FJFI CTU"   # fakulta jaderna a fyzikalne inzenyrska
 FACULTY_FSV_CTU     = "FSV CTU"    # fakulta stavebni
 
+FACULTY_FEEC_BUT    = "FEEC BUT"   # fakulta elektrotechniky a komunikacnich technologii
+FACULTY_FME_BUT     = "FME BUT"    # fakulta strojniho inzenyrstvi
+
+# old:
+
+FACULTY_FIT_FE       = "FE BUT"
+FACULTY_FIT_FEI      = "FEI BUT"
+
 # branches:
 
 BRANCH_FIT_BUT_BIT   = "FIT BUT BIT"           # (bc) informacni technologie
@@ -253,6 +261,11 @@ BRANCH_FEI_VSB_MT     = "FEI VŠB MT"           # (bc/ing) mobilni technologie
 BRANCH_FEI_VSB_TT     = "FEI VŠB TT"           # (bc/ing) telekomunikacni technika
 BRANCH_FEI_VSB_VM     = "FEI VŠB VM"           # (bc/ing) vypocetni matematika
 BRANCH_FEI_VSB_IKB    = "FEI VŠB IKB"          # (ing) informacni a komunikacni bezpecnost
+
+BRANCH_FEEC_BUT_TLI   = "FEEC BUT TLI"         # (bc) teleinformatika
+BRANCH_FEEC_BUT_BTB   = "FEEC BUT BTB"         # (bc) biomedicinska informatika a bioinformatika
+BRANCH_FEEC_BUT_TIT   = "FEEC BUT TIT"         # (ing) telekomunikacni a informacni technika
+BRANCH_FME_BUT_AIR    = "FME BUT AIŘ"          # (ing) aplikovana informatika a rizeni
 
 # departments:
 
