@@ -40,7 +40,7 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 - **most common field (estimated)**: computer graphics
 - **oldest thesis**: Jan Honzík's 1966 master thesis
 - **most keywords**: 281, 2006 FIT BUT bachelor's thesis
-- **total PDF pages analyzed**: 2062
+- **total PDF pages analyzed**: 154237
 
 - **degrees**:
 

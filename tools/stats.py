@@ -134,6 +134,8 @@ class Stats(object):
         "shortest phd thesis": None,
         "shortest habilitation thesis": None,
 
+        "pages total": 0,
+
         theses_common.LANGUAGE_CS: 0,
         theses_common.LANGUAGE_EN: 0,
         theses_common.LANGUAGE_SK: 0,
@@ -280,6 +282,7 @@ class Stats(object):
     print_record("person with most degrees", [theses_common.person_to_string(self.records["most degrees person"])])
     print_record("person with most master degrees", [theses_common.person_to_string(self.records["most master degrees person"])])
     print_record("person with greatest degree score", [theses_common.person_to_string(self.records["greatest degree score person"])])
+    print_record("total fulltext pages analyzed", [str(self.records["pages total"])])
 
     print_record("most keywords", [
         theses_common.thesis_to_string(self.records["most keywords thesis"]),
@@ -355,7 +358,10 @@ for thesis in theses:
         key_string = "grade average " + thesis["faculty"]
         current = stats.records[key_string]
         stats.records[key_string] = (current[0] + theses_common.grade_to_number(thesis["grade"]), current[1] + 1)
-        
+    
+    if thesis["pages"] != None:
+      stats.records["pages total"] += thesis["pages"]
+    
     if thesis["field"] != None: 
       stats.try_increment("field " + thesis["field"])
 
