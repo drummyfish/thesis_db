@@ -326,6 +326,7 @@
             "<th> year </th>" +
             "<th> pages </th>" +
             "<th> field (est.) </th>" +
+            "<th> note </th>" +
             "</tr>");
 
           for (var i in thesis_list)
@@ -361,6 +362,7 @@
               table_row += "<td>" + to_str(t.year) + "</td>" +
                 "<td>" + to_str(t.pages) + "</td>" +
                 "<td>" + to_str(t.field) + "</td>" +
+                "<td>" + to_str(t.note) + "</td>" +
                 "</tr>";
 
               $("#thesis_list").append(table_row);
@@ -413,16 +415,22 @@
                   search_strings.push(thesis.abstract_en);
                 }
 
+              if (checkbox_checked("do_note"))
+                search_strings.push(thesis.note);
+                
+
               if (checkbox_checked("do_keywords"))
-                {
-                  search_strings = search_strings.concat(thesis.keywords);
-                }
+                search_strings = search_strings.concat(thesis.keywords);
+                
 
-              if (checkbox_checked("do_names"))
-                {
-                  search_strings.push(person_to_string(thesis.author));
-                  search_strings.push(person_to_string(thesis.supervisor));
+              if (checkbox_checked("do_author"))
+                search_strings.push(person_to_string(thesis.author));
+                
+              if (checkbox_checked("do_supervisor"))
+                search_strings.push(person_to_string(thesis.supervisor));
 
+              if (checkbox_checked("do_opponents"))
+                {
                   for (var k in thesis.opponents)
                     search_strings.push(person_to_string(thesis.opponents[k]));
                 }
@@ -818,12 +826,12 @@
         <tr>
           <td> search </td>
           <td> <input type="checkbox" name="do_title" checked="checked"> title </td>
-          <td> <input type="checkbox" name="do_names" checked="checked"> names </td>
+          <td> <input type="checkbox" name="do_author" checked="checked"> author </td>
+          <td> <input type="checkbox" name="do_supervisor" checked="checked"> superv. </td>
+          <td> <input type="checkbox" name="do_opponents" checked="checked"> oppon. </td>
           <td> <input type="checkbox" name="do_keywords" checked="checked"> keyw. </td>
           <td> <input type="checkbox" name="do_abstract" checked="checked"> abstr. </td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td> <input type="checkbox" name="do_note" checked="checked"> note </td>
           <td></td>
           <td></td>
           <td></td>
