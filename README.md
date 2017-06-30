@@ -26,7 +26,7 @@ topics have been covered in the huge area of computer science.
 
 Some interesting statistics gathered so far (for more see `stats.txt`).
 
-- **total**: 39871 theses (35626 male, 3185 female, 1060 unknown)
+- **total**: 40015 theses (35762 male, 3190 female, 1063 unknown)
 - **faculties analyzed**:  FIT BUT, FI MUNI, MFF CUNI, FAI UTB, FEI VŠB, FIT CTU, FELK CTU, PEF MENDELU, Unicorn College, FBMI CTU, FD CTU, FJFI CTU, FSV CTU, MVŠO, FEEC BUT, FME BUT
 - **longest title (yes, it's a title)**: Navrhněte a ve VRML naplementujte systém pro 3-D internetovou galerii, která umožní tvorbu virtuálních výstav libovolných uměleckých děl. Následná internetová aplikace umožní do galerie vkládat libovolné 2-D i 3-D modely uměleckých děl a tím realizovat vlastní výstavy.
 - **shortest title (cs)**: Risk, 2013 MFF CUNI bachelor's thesis
@@ -36,7 +36,7 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 - **longest abstract**: 6813 characters (to read see `stats.txt`), 2005 master's thesis at FELK CTU
 - **shortest abstract**: NIC, failed thesis at FIT BUT from 2012
 - **shortest abstract and defended**: Microsoft Azure výhody a nevýhody služby, 2014 FAI UTB bachelor thesis (the abstract is same as title)
-- **most common keywords**: PHP (1247), Java (1234), MySQL (944), informační systém (703), databáze (660)
+- **most common keywords**: PHP (1251), Java (1239), MySQL (946), informační systém (705), databáze (661)
 - **most common field (estimated)**: computer graphics
 - **oldest thesis**: Jan Honzík's 1966 master thesis
 - **most keywords**: 281, 2006 FIT BUT bachelor's thesis
@@ -46,13 +46,13 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 
   |Bc.  |Ing.|Mgr.|PhD.|doc.|RNDr|
   |-----|----|----|----|----|----|
-  |20658|8807|4617|964 |68  |335 |
+  |20671|8938|4617|964 |68  |335 |
 
 - **grades**:
 
   |A    |B   |C   |D   |E   |F   |FIT BUT avg.|MFF CUNI avg.|FAI UTB avg.|male avg.|female avg.|
   |-----|----|----|----|----|----|------------|-------------|------------|---------|-----------|
-  |4451 |2905|2236|832 |527 |309 |1.81        |1.42         |1.48        |1.63     |1.49       |
+  |4561 |3035|2349|893 |552 |326 |1.81        |1.42         |1.48        |1.63     |1.49       |
 
 - **female/male ratio by year**:
 
@@ -64,7 +64,7 @@ Some interesting statistics gathered so far (for more see `stats.txt`).
 
   |cs   |sk  |en  |unknown|
   |-----|----|----|-------|
-  |29021|2676|3334|4840   |
+  |29173|2680|3346|4816   |
 
 - **typesetting systems**:
 
