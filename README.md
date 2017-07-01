@@ -120,7 +120,7 @@ The database is a JSON list consisting of objects in format:
   size:               Number, null              size in bytes
   public_university:  Boolean, null             public/private uni
   branch:             String, null              branch of study
-  note:               String, null              possible note
+  note:               String, null              possible note (awards etc.)
 }
 ```
 
