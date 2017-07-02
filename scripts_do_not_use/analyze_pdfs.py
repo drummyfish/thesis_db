@@ -5,6 +5,9 @@ import sys
 sys.path.insert(0,"../tools")
 
 from theses_common import *
+from datetime import datetime
+
+random.seed(datetime.now())
 
 INPUT_FILE = "../theses.json"
 OUTPUT_FILE = "theses_pdf_updated.json"
@@ -15,14 +18,13 @@ theses = load_json(INPUT_FILE)
 def thesis_needs_pdf_analysis(thesis):
   return thesis["pages"] == None or thesis["typesetting_system"] == None or thesis["size"] == None or thesis["language"] == None
 
-
 #for i in range(len(theses)):
 for i in range(END_AFTER):
   print(i)
 
   try:
-    #random_index = random.randint(0,len(theses) - 1)
-    random_index = i
+    random_index = random.randint(0,len(theses) - 1)
+    #random_index = i
 
     random_thesis = theses[random_index]
 
