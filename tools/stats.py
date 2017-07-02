@@ -135,6 +135,7 @@ class Stats(object):
         "shortest habilitation thesis": None,
 
         "pages total": 0,
+        "fulltexts analyzed": 0,
 
         theses_common.LANGUAGE_CS: 0,
         theses_common.LANGUAGE_EN: 0,
@@ -283,6 +284,7 @@ class Stats(object):
     print_record("person with most master degrees", [theses_common.person_to_string(self.records["most master degrees person"])])
     print_record("person with greatest degree score", [theses_common.person_to_string(self.records["greatest degree score person"])])
     print_record("total fulltext pages analyzed", [str(self.records["pages total"])])
+    print_record("total fulltexts", [str(self.records["fulltexts analyzed"])])
 
     print_record("most keywords", [
         theses_common.thesis_to_string(self.records["most keywords thesis"]),
@@ -344,6 +346,9 @@ for thesis in theses:
       stats.try_increment(thesis["typesetting_system"])
     else:
       stats.try_increment("system unknown")
+
+    if thesis["typesetting_system"] != None or thesis["size"] != None:
+      stats.try_increment("fulltexts analyzed")
 
     for keyword in thesis["keywords"]:
       stats.do_increment("keyword " + keyword.lower())
