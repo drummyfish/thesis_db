@@ -3,22 +3,22 @@
 ~~~~~ faculties ~~~~~
 
   MFF CUNI         FIT BUT          FI MUNI          FIT CTU          FELK CTU         FEI VŠB         FAI UTB          PEF MENDELU      Unicorn College  other            total            
-  2727             7550             7776             888              3321             8796             4370             419              205              3966             40018            
+  2727             7551             7776             888              3321             8796             4370             419              205              3967             40020            
 
 ~~~~~ gender ~~~~~
 
   male            female          unknown         
-  35767           3190            1061            
+  35769           3190            1061            
 
 ~~~~~ degrees ~~~~~
 
   Bc.             Ing.            Mgr.            PhD.            doc.            RNDr.           
-  20671           8939            4617            966             68              335             
+  20671           8941            4617            966             68              335             
 
 ~~~~~ grades ~~~~~
 
   A                B                C                D                E                F                failed           
-  4561             3035             2349             893              552              326              333              
+  4564             3035             2349             893              552              326              333              
 
   average grade (1 = A, 4 = F) by group:
   FIT BUT          FI MUNI          FELK CTU         FAI UTB          MFF CUNI         Unicorn College  PEF MENDELU      male             female           
@@ -27,13 +27,13 @@
 ~~~~~ years ~~~~~
 
   year:        1990  1991  1992  1993  1994  1995  1996  1997  1998  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  
-  total:       0     1     4     73    60    106   157   126   256   210   368   436   500   594   642   933   2067  2339  3244  3399  3317  3511  3511  3596  3287  2656  2477  1022  
+  total:       0     1     4     73    60    106   157   126   256   210   368   436   500   594   642   934   2067  2339  3244  3399  3318  3511  3511  3596  3287  2657  2477  1022  
   female/male: 0.00  0.00  0.00  0.04  0.02  0.22  0.10  0.05  0.05  0.04  0.06  0.04  0.03  0.08  0.06  0.07  0.06  0.06  0.05  0.06  0.07  0.08  0.10  0.11  0.13  0.15  0.16  0.15  
 
 ~~~~~ languages ~~~~~
 
   cs        sk        en        unknown   
-  29193     2681      3352      4792      
+  29207     2682      3359      4772      
 
 ~~~~~ other ~~~~~
 
@@ -68,13 +68,13 @@
  -- oldest fulltext: Ing. Jan Černocký: Speech Processing Using Automatically Derived Segmental Units: Applications to Very Low Rate Coding and Speaker Verification, 1998, FEI BUT, PhD thesis, 137 pages, 1.47 MB
 
  -- typesetting systems: 
-    MS Word: 783
-    Open/Libre Office: 194
-    LaTeX: 845
-    ghostscript: 22
-    unknown: 37531
+    MS Word: 806
+    Open/Libre Office: 201
+    LaTeX: 894
+    ghostscript: 23
+    unknown: 37414
 
- -- largest thesis: RNDr. Stanislav Mikeš PhD.: Segmentace obrazových dat, 2010, MFF CUNI, PhD thesis, 220 pages, 76.48 MB
+ -- largest thesis: Bc. Jan Vyhnánek: Frekvenční analýza pomocí mobilního telefonu, 2016, FI MUNI, master thesis, 92 pages, 100.51 MB
 
  -- smallest thesis: Marián Miško: Firewall s reputačním systémem, 2005, FIT BUT, bachelor thesis, 30 pages, 0.15 MB
 
@@ -102,9 +102,9 @@
 
  -- person with greatest degree score: prof. Ing. Pavel Koktavý CSc. PhD.
 
- -- total fulltext pages analyzed: 162075
+ -- total fulltext pages analyzed: 170485
 
- -- total fulltexts: 2641
+ -- total fulltexts: 2771
 
  -- most keywords: Jiří Novák: Pokročilý prohlížeč polygonálních modelů, 2006, FIT BUT, bachelor thesis
     keywords (281): dítě objektu směr k potomku, kostka, difusní složka, OpenGL, hierarchy, graphics, ukončení, ending, near plate, přední plocha, shape, světlo, scéna, aspect, koneční automat, osa, flexibile, hierarchie, polygonal model, mlha, projection matrix, video, outer, vlastnost pohled, density, vyplnění, osvětlení, přechod, šířka, scalar value, line width, posunutí, factor, dědičnost, exponencial, Rapid Prototyping, konec, aspekt, paralelní projekce, file, cube, dot prot, testování hlobky, format, anti-aliasing, ASCII verze, material, GUI toolkit, line stipple, binární verze, main menu, venek, matice, background, shading, rotation, strana, grafika, normála, zavření, manager, double precision, transformace, rotace, button, goniometrical functions, systém RGBA, paralel projection, inverzní matice, vektorový součin, filling, vector, ASCII version, mode, implicitní, výška, světelné vlastnosti, movement, basic primitives, side, aproximace, body, pozadí, projekční matice, horizont�l angle, colored vertexes, creation, view angle, struktura, perspective projection, lineární, mnohoúhelník, dvojnásobná přesnost, MDI klient, trojúhelník, čáry, key word, animace, konstantní stínování, color buffer, gradient, clearing, normal, odlesková složka, omezení, imaging style, STL, implicit, fog, orientace, diagram tříd, size, geometrie, method, MDI client, single precision, okřídlená hrana, videosekvence, linear, positron, state, vymazání, control points, materiál, zásobník, velikost bodů, Stach, standardní vzor, vertikální úhel, střed, cross prot, poloha kliku, maskovací bity, Goraud shading, point size, vytvoření, druh přechodu, thread, geometry, depth buffer, facet, specular, gradient type, dialog, kořenový uzel, view, standart view, okolní složka, aktuální natočení, saving, far plate, to parent, popup menu, distance integrity, zrcadlení, scene, šířka čar, height, rendering, standardní pohled, lighting properties, UML, exponenciální, uložení, Phongův osvětlovací model, orientation, ukazatel, current rotation, masking bits, tlačítko, width, object child, inner, 3D, vzdálenost, válec, soubor, vektor, goniometrické funkce, horizontální úhel, class diagram, sofistikovaný způsob, stupně, perspektivní projekce, barva mlhy, modelview matrix, hlavní menu, potomek, angles, child, multitasking, vyhlazení, distance, vnitřek, kopírování, binary version, metoda, základní primitiva, tree, rozměry, transformation, zorný úhel, směr k rodiči, rozptylová složka, closing, property, matrix, cylinder, register, polygonální model, ambient value, standart stipple, registr, stínování, faktor, zadní plocha, řídící body, ambient, click positron, Goraudovo stínování, depth test, počátek, pointer, describtion, triangle, Phong lighting model, pohledová matice, end, polygon, pozice, inheritance, finite automaton, symetrie, vertical angle, animation, copying, difuse value, strom, flat shading, skalární hodnota, stav, klíčové slovo, begin, screenshot, formát, handicap, object, objekt, styl zobrazení, ArcBall, RGBA system, aproximation, lighting, hustota, vlákno, obarvené vrcholy, jednoduchá přesnost, přiblížení, popis, integrita vzdáleností, structure, sophisticated solution, inverse matrix, skalární součin, center, manažer, zooming, light, tvar, lines, Z-buffer, root node, points, fog color, flexibilní, 2D, to child, vzor čar, režim, specular value, flying edge
